@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Sign in | TrueCosmic Calendar{% endblock %}
+{% block content %}
+<section class="py-16">
+  <div class="mx-auto max-w-md px-4">
+    <h1 class="text-2xl font-bold text-slate-900">Sign in</h1>
+    <form method="post" class="mt-6 space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Email</label>
+        <input name="email" type="email" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Password</label>
+        <input name="password" type="password" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+      </div>
+      <button class="w-full rounded-md bg-slate-900 px-4 py-2 text-white font-semibold">Sign in</button>
+    </form>
+    <p class="mt-4 text-sm text-slate-600">Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-brand-700 hover:underline">Sign up free</a></p>
+  </div>
+  </section>
+{% endblock %}

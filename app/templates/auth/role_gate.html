@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} Area | TrueCosmic Calendar{% endblock %}
+{% block content %}
+<section class="py-16">
+  <div class="mx-auto max-w-2xl px-4">
+    <h1 class="text-3xl font-bold text-slate-900">{{ title }} area</h1>
+    <p class="mt-2 text-slate-600">Only users with the <span class="font-semibold">{{ role }}</span> role can access this page.</p>
+    <p class="mt-6 text-sm text-slate-500">Customize this page to suit your app. It demonstrates role‑based access control.</p>
+  </div>
+</section>
+{% endblock %}
+
