@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Owner Dashboard | TrueCosmic Calendar{% endblock %}
+{% block content %}
+<section class="py-12">
+  <div class="mx-auto max-w-7xl px-4">
+    <nav class="text-sm text-slate-500"><a href="{{ url_for('dashboard.owner') }}" class="hover:underline">Dashboard</a> <span class="mx-1">/</span> Owner</nav>
+    <h1 class="mt-1 text-3xl font-bold text-slate-900">Owner dashboard <span class="align-middle ml-2 inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-200">Owner</span></h1>
+    <p class="text-slate-600 mt-1">Overview for the last 30 days. Current time (UTC): {{ now.strftime('%Y-%m-%d %H:%M') }}</p>
+
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="rounded-lg border border-slate-200 bg-white p-4">
+        <div class="text-xs text-slate-500">Bookings (7d)</div>
+        <div class="text-2xl font-bold text-slate-900">{{ kpis.bookings_7 }}</div>
+      </div>
+      <div class="rounded-lg border border-slate-200 bg-white p-4">
+        <div class="text-xs text-slate-500">Bookings (30d)</div>
+        <div class="text-2xl font-bold text-slate-900">{{ kpis.bookings_30 }}</div>
+      </div>
+      <div class="rounded-lg border border-slate-200 bg-white p-4">
+        <div class="text-xs text-slate-500">Cancellations (30d)</div>
+        <div class="text-2xl font-bold text-slate-900">{{ kpis.cancellations_30 }}</div>
+      </div>
+      <div class="rounded-lg border border-slate-200 bg-white p-4">
+        <div class="text-xs text-slate-500">Active coaches</div>
+        <div class="text-2xl font-bold text-slate-900">{{ kpis.coaches }}</div>
+      </div>
+      <div class="rounded-lg border border-slate-200 bg-white p-4">
+        <div class="text-xs text-slate-500">Google connected</div>
+        <div class="text-2xl font-bold text-slate-900">{{ kpis.connected }}</div>
+      </div>
+    </div>
+
+    <div class="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 rounded-lg border border-slate-200 bg-white p-6">
+        <h2 class="text-lg font-semibold text-slate-900">Upcoming sessions (next 7 days)</h2>
+        <div class="mt-4 overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead class="text-left text-slate-600">
+              <tr><th class="py-2 pr-4">Start (UTC)</th><th class="py-2 pr-4">Coach</th><th class="py-2 pr-4">Visitor</th><th class="py-2 pr-4">Status</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+              {% for b in upcoming %}
+              <tr>
+                <td class="py-2 pr-4">{{ b.start_utc.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td class="py-2 pr-4">{{ b.coach.name }}</td>
+                <td class="py-2 pr-4">{{ b.visitor_name }} ({{ b.visitor_email }})</td>
+                <td class="py-2 pr-4">{{ b.status }}</td>
+              </tr>
+              {% else %}
+              <tr><td class="py-4 text-slate-500" colspan="4">No upcoming sessions.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="rounded-lg border border-slate-200 bg-white p-6">
+        <h2 class="text-lg font-semibold text-slate-900">Coaches</h2>
+        <ul class="mt-4 space-y-3 text-sm">
+          {% for u, p in coach_rows %}
+            <li class="flex items-center justify-between">
+              <div>
+                <div class="font-medium text-slate-900">{{ u.name }}</div>
+                <div class="text-slate-500">{{ u.email }}</div>
+              </div>
+              <div class="text-xs {{ 'text-emerald-600' if p and p.google_credentials else 'text-amber-600' }}">
+                {{ 'Connected' if p and p.google_credentials else 'Not connected' }}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+        <div class="mt-4 text-sm">
+          <a href="{{ url_for('admin.users_index') }}" class="text-brand-700 hover:underline">Manage users</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

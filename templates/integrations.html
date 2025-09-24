@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-xl space-y-6">
+  <h2 class="text-xl font-semibold">Integrations</h2>
+
+  <div class="p-4 bg-white border rounded-md">
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="font-medium">Google Calendar</div>
+        {% if google_connected %}
+          <div class="text-sm text-green-700">Connected</div>
+        {% else %}
+          <div class="text-sm text-gray-600">Not connected</div>
+        {% endif %}
+      </div>
+      {% if google_connected %}
+        <span class="inline-flex items-center px-3 py-1 rounded-md bg-green-100 text-green-700 text-sm">Active</span>
+      {% else %}
+        <a href="{{ url_for('auth_google') }}" class="inline-flex items-center px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 text-sm">Connect</a>
+      {% endif %}
+    </div>
+    <p class="text-xs text-gray-500 mt-3">Ensure your Google Cloud OAuth credentials are configured and the Calendar API is enabled.</p>
+  </div>
+
+  <div class="p-4 bg-white border rounded-md">
+    <div class="font-medium mb-2">Shareable booking link</div>
+    {% set booking_url = (env('BASE_URL') if env else '') %}
+    <div class="flex gap-2">
+      <input type="text" readonly value="{{ request.url_root.rstrip('/') }}/meet/30" class="flex-1 border rounded-md px-3 py-2" />
+      <button type="button" onclick="navigator.clipboard.writeText(document.querySelector('input[readonly]').value)" class="px-3 py-2 bg-blue-600 text-white rounded-md">Copy</button>
+    </div>
+    <p class="text-xs text-gray-500 mt-2">Share this link anywhere (emails, websites) to let others book with you.</p>
+  </div>
+</div>
+{% endblock %}
