@@ -102,3 +102,35 @@ def callback():
     flash("Google Calendar connected.", "success")
     return redirect(url_for("auth.me"))
 
+
+@google_bp.route("/disconnect", methods=["POST"])
+@login_required
+def disconnect():
+    if current_user.role not in ("host", "owner", "admin"):
+        flash("Only coaches can manage Google Calendar.", "error")
+        return redirect(url_for("auth.me"))
+
+    profile = CoachProfile.query.filter_by(user_id=current_user.id).first()
+    if not profile or not profile.google_credentials:
+        flash("Google Calendar is not connected.", "error")
+        return redirect(url_for("auth.me"))
+
+    # Attempt token revocation (best-effort)
+    try:
+        import json, requests
+        data = json.loads(profile.google_credentials)
+        token = data.get("token") or data.get("access_token") or data.get("refresh_token")
+        if token:
+            requests.post(
+                "https://oauth2.googleapis.com/revoke",
+                params={"token": token},
+                headers={"content-type": "application/x-www-form-urlencoded"},
+                timeout=5,
+            )
+    except Exception:
+        pass
+
+    profile.google_credentials = None
+    db.session.commit()
+    flash("Google Calendar disconnected.", "success")
+    return redirect(url_for("auth.me"))

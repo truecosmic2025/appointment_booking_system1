@@ -33,8 +33,14 @@
       </dl>
       <div class="mt-6">
         <a href="{{ url_for('auth.logout') }}" class="inline-flex rounded-md bg-slate-900 px-4 py-2 text-white text-sm font-semibold">Sign out</a>
-        {% if current_user.role in ['host','owner','admin'] and (not profile or not profile.google_credentials) %}
-          <a href="{{ url_for('google.connect') }}" class="ml-2 inline-flex rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Connect Google Calendar</a>
+        {% if current_user.role in ['host','owner','admin'] %}
+          {% if not profile or not profile.google_credentials %}
+            <a href="{{ url_for('google.connect') }}" class="ml-2 inline-flex rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Connect Google Calendar</a>
+          {% else %}
+            <form method="post" action="{{ url_for('google.disconnect') }}" class="ml-2 inline">
+              <button class="inline-flex rounded-md border border-red-300 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100" onclick="return confirm('Disconnect Google Calendar? Bookings will no longer sync.');">Disconnect Google Calendar</button>
+            </form>
+          {% endif %}
         {% endif %}
       </div>
     </div>
