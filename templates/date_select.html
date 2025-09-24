@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="space-y-6">
+  <div>
+    <h2 class="text-xl font-semibold">Select a Date</h2>
+    <p class="text-gray-600">Choose a date to see available times.</p>
+  </div>
+
+  <div class="max-w-md bg-white border rounded-md p-4">
+    <div class="flex items-center justify-between mb-2">
+      <button id="prevMonth" class="px-2 py-1 rounded hover:bg-gray-100">&larr;</button>
+      <div id="monthLabel" class="font-medium"></div>
+      <button id="nextMonth" class="px-2 py-1 rounded hover:bg-gray-100">&rarr;</button>
+    </div>
+    <div class="grid grid-cols-7 text-center text-xs text-gray-500 mb-1">
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    </div>
+    <div id="daysGrid" class="grid grid-cols-7 gap-1"></div>
+  </div>
+
+  <div class="max-w-md">
+    <label for="tz" class="block text-sm font-medium text-gray-700">Time zone</label>
+    <select id="tz" name="tz" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+      {% for t in timezones %}
+        <option value="{{ t }}" {% if t == tz %}selected{% endif %}>{{ t }}</option>
+      {% endfor %}
+    </select>
+    <p class="text-xs text-gray-500 mt-1">We recommend choosing your local time zone.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tzSel = document.getElementById('tz');
+  let current = new Date();
+  current.setDate(1);
+
+  const daysGrid = document.getElementById('daysGrid');
+  const monthLabel = document.getElementById('monthLabel');
+  const prevBtn = document.getElementById('prevMonth');
+  const nextBtn = document.getElementById('nextMonth');
+
+  function ymd(d) { return d.toISOString().slice(0,10); }
+
+  function renderMonth() {
+    monthLabel.textContent = current.toLocaleString(undefined, { month: 'long', year: 'numeric' });
+    daysGrid.innerHTML = '';
+
+    const firstDayWeek = new Date(current.getFullYear(), current.getMonth(), 1).getDay();
+    const lastDate = new Date(current.getFullYear(), current.getMonth()+1, 0).getDate();
+
+    // add leading blanks
+    for (let i=0;i<firstDayWeek;i++) {
+      const cell = document.createElement('div');
+      daysGrid.appendChild(cell);
+    }
+
+    fetch(`/api/availability?year=${current.getFullYear()}&month=${current.getMonth()+1}&tz=${encodeURIComponent(tzSel.value)}`)
+      .then(r => r.json())
+      .then(data => {
+        const map = {};
+        (data.days || []).forEach(d => { map[d.date] = d.has_slots; });
+        for (let day=1; day<=lastDate; day++) {
+          const d = new Date(current.getFullYear(), current.getMonth(), day);
+          const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+          const has = !!map[iso];
+          const todayIso = new Date().toISOString().slice(0,10);
+
+          const cell = document.createElement('button');
+          cell.textContent = String(day);
+          cell.className = `text-center px-2 py-2 rounded border ${has ? 'bg-blue-50 border-blue-300 hover:bg-blue-100' : 'bg-gray-50 text-gray-400 border-gray-200'} `;
+          cell.disabled = !has || iso < todayIso;
+          if (has && iso >= todayIso) {
+            cell.addEventListener('click', () => {
+              window.location.href = `/meet/30/times?date=${iso}&tz=${encodeURIComponent(tzSel.value)}`;
+            });
+          }
+          daysGrid.appendChild(cell);
+        }
+      });
+  }
+
+  prevBtn.addEventListener('click', () => { current.setMonth(current.getMonth()-1); renderMonth(); });
+  nextBtn.addEventListener('click', () => { current.setMonth(current.getMonth()+1); renderMonth(); });
+  tzSel.addEventListener('change', renderMonth);
+
+  renderMonth();
+})();
+</script>
+{% endblock %}

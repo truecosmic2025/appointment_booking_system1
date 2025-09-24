@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <div class="text-sm text-gray-500">Selected date</div>
+      <h2 class="text-xl font-semibold">{{ date_header }}</h2>
+    </div>
+    <a href="{{ url_for('event_30', tz=tz) }}" class="text-blue-600 hover:text-blue-700">Change date</a>
+  </div>
+
+  {% if slots %}
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+    {% for s in slots %}
+      <a href="{{ url_for('event_30_details') }}?date={{ date_str }}&time={{ s.value }}&tz={{ tz }}"
+         class="text-center px-3 py-2 border rounded-md hover:bg-blue-50 hover:border-blue-500">
+        {{ s.label }}
+      </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-gray-600">No available times on this date. Please pick another date.</div>
+  {% endif %}
+
+  <div>
+    <a href="{{ url_for('event_30', tz=tz) }}" class="inline-flex items-center px-4 py-2 border rounded-md">Back</a>
+  </div>
+</div>
+{% endblock %}

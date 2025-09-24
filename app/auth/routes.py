@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models.user import User
+from app.models.coach_profile import CoachProfile
 from functools import wraps
 from urllib.parse import urlparse
 
@@ -38,10 +39,14 @@ def login():
             flash("Invalid email or password", "error")
         else:
             login_user(user, remember=True)
-            next_page = request.args.get("next")
-            if not next_page or urlparse(next_page).netloc != "":
-                next_page = url_for("main.index")
-            return redirect(next_page)
+            # Always send user to their role dashboard (owner/admin -> owner dashboard, host -> host dashboard, others -> coaches)
+            if user.role in ("owner", "admin"):
+                dest = url_for("dashboard.owner")
+            elif user.role == "host":
+                dest = url_for("dashboard.host")
+            else:
+                dest = url_for("public.coaches_list")
+            return redirect(dest)
 
     return render_template("auth/login.html")
 
@@ -64,7 +69,9 @@ def register():
         elif User.query.filter_by(email=email).first():
             flash("Email is already registered", "error")
         else:
-            user = User(name=name, email=email, role="invitee")
+            # First registered user becomes owner; others are coaches (host)
+            first = User.query.count() == 0
+            user = User(name=name, email=email, role=("owner" if first else "host"))
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
@@ -98,4 +105,5 @@ def host_only():
 @auth_bp.route("/me")
 @login_required
 def me():
-    return render_template("auth/me.html")
+    profile = CoachProfile.query.filter_by(user_id=current_user.id).first()
+    return render_template("auth/me.html", profile=profile)

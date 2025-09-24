@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-2xl">
+  <h2 class="text-xl font-semibold mb-4">Availability</h2>
+  <p class="text-gray-600 mb-6">Set your weekly availability windows. Times use 24-hour HH:MM format.</p>
+
+  <form method="post" class="space-y-4">
+    {% if has_token %}
+    <input type="password" name="token" placeholder="Admin token" class="border rounded-md px-3 py-2 w-full" />
+    {% endif %}
+
+    <div class="grid grid-cols-1 gap-3">
+      {% for r in rows %}
+      <div class="grid grid-cols-12 gap-2 items-center">
+        <div class="col-span-4 font-medium">{{ r.weekday_name }}</div>
+        <div class="col-span-4">
+          <label class="block text-xs text-gray-500">Start</label>
+          <input type="time" step="900" name="start_{{ r.weekday_index }}" value="{{ r.start }}" class="border rounded-md px-3 py-2 w-full" />
+        </div>
+        <div class="col-span-4">
+          <label class="block text-xs text-gray-500">End</label>
+          <input type="time" step="900" name="end_{{ r.weekday_index }}" value="{{ r.end }}" class="border rounded-md px-3 py-2 w-full" />
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="pt-4">
+      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Save</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

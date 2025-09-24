@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-xl">
+  <a href="{{ url_for('event_30_times', date=date_str, tz=tz) }}" class="text-blue-600 hover:text-blue-700 inline-flex items-center mb-4">&larr; Back</a>
+
+  <h2 class="text-xl font-semibold mb-2">Enter Details</h2>
+
+  <div class="mb-6 p-4 bg-white border rounded-md">
+    <div class="text-sm text-gray-500">Time</div>
+    <div class="font-medium">{{ time_range }}, {{ date_header }}</div>
+    <div class="text-sm text-gray-500">Time zone: {{ tz }}</div>
+  </div>
+
+  <form action="{{ url_for('event_30_details', tz=tz) }}" method="post" class="space-y-4">
+    <input type="hidden" name="date" value="{{ date_str }}" />
+    <input type="hidden" name="time" value="{{ time_str }}" />
+
+    <div>
+      <label for="name" class="block text-sm font-medium text-gray-700">Name <span class="text-red-600">*</span></label>
+      <input required type="text" id="name" name="name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+    </div>
+
+    <div>
+      <label for="email" class="block text-sm font-medium text-gray-700">Email <span class="text-red-600">*</span></label>
+      <input required type="email" id="email" name="email" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+    </div>
+
+    <div>
+      <label for="guests" class="block text-sm font-medium text-gray-700">Add Guests</label>
+      <input type="text" id="guests" name="guests" placeholder="guest1@example.com, guest2@example.com" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+    </div>
+
+    <div>
+      <label for="notes" class="block text-sm font-medium text-gray-700">Please share anything that will help prepare for our meeting</label>
+      <textarea id="notes" name="notes" rows="4" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+    </div>
+
+    <div class="text-sm text-gray-500">
+      By scheduling, you agree to our <a href="#" class="text-blue-600">Terms of Use</a> and <a href="#" class="text-blue-600">Privacy Notice</a>.
+    </div>
+
+    <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Schedule Event</button>
+  </form>
+</div>
+{% endblock %}

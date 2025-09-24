@@ -18,12 +18,26 @@
           <dt class="text-slate-500">Role</dt>
           <dd class="font-medium text-slate-900">{{ current_user.role }}</dd>
         </div>
+        {% if current_user.role in ['host','owner','admin'] %}
+        <div>
+          <dt class="text-slate-500">Google Calendar</dt>
+          <dd class="font-medium">
+            {% if profile and profile.google_credentials %}
+              <span class="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-emerald-700 ring-1 ring-inset ring-emerald-200 text-xs">Connected</span>
+            {% else %}
+              <span class="inline-flex items-center rounded-md bg-amber-50 px-2 py-0.5 text-amber-700 ring-1 ring-inset ring-amber-200 text-xs">Not connected</span>
+            {% endif %}
+          </dd>
+        </div>
+        {% endif %}
       </dl>
       <div class="mt-6">
         <a href="{{ url_for('auth.logout') }}" class="inline-flex rounded-md bg-slate-900 px-4 py-2 text-white text-sm font-semibold">Sign out</a>
+        {% if current_user.role in ['host','owner','admin'] and (not profile or not profile.google_credentials) %}
+          <a href="{{ url_for('google.connect') }}" class="ml-2 inline-flex rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Connect Google Calendar</a>
+        {% endif %}
       </div>
     </div>
   </div>
 </section>
 {% endblock %}
-
