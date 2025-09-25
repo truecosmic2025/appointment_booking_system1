@@ -18,9 +18,7 @@ def settings():
     settings = CoachSettings.query.filter_by(user_id=current_user.id).first()
     if request.method == 'POST':
         tz = request.form.get('timezone', 'UTC').strip() or 'UTC'
-        days = request.form.getlist('day')  # e.g., ['mon','tue']
-        start = request.form.get('start', '09:00')
-        end = request.form.get('end', '17:00')
+        days = request.form.getlist('day')  # enabled days like ['mon','tue']
         buffer_min = int(request.form.get('buffer_min', '0') or 0)
         min_notice_min = int(request.form.get('min_notice_min', '120') or 120)
         max_days_ahead = int(request.form.get('max_days_ahead', '30') or 30)
@@ -32,11 +30,68 @@ def settings():
             db.session.add(profile)
         profile.timezone = tz
 
-        # Build working hours JSON with one range per selected day
+        # Build working hours JSON with any number of ranges per selected day.
+        # Each range is captured by repeated input names: start_<day> and end_<day>
         hours = {}
         for d in ['mon','tue','wed','thu','fri','sat','sun']:
             if d in days:
-                hours[d] = [[start, end]]
+                starts = request.form.getlist(f'start_{d}')
+                ends = request.form.getlist(f'end_{d}')
+                d_ranges = []
+                for s, e in zip(starts, ends):
+                    s = (s or '').strip()
+                    e = (e or '').strip()
+                    if s and e and ':' in s and ':' in e:
+                        d_ranges.append([s, e])
+                if d_ranges:
+                    hours[d] = d_ranges
+        # Validate timezone
+        try:
+            import pytz
+            pytz.timezone(tz)
+        except Exception:
+            flash('Invalid time zone. Please choose a valid IANA time zone (e.g., America/New_York).', 'error')
+            return render_template(
+                'coach/settings.html', tz=tz, hours=hours, selected_days=set(hours.keys()),
+                buffer_min=buffer_min, min_notice_min=min_notice_min, max_days_ahead=max_days_ahead,
+            )
+
+        # Validate ranges: start < end and no overlaps within a day
+        def to_minutes(hhmm: str) -> int:
+            h, m = hhmm.split(':')
+            return int(h) * 60 + int(m)
+
+        for d, d_ranges in hours.items():
+            # Clean and sort
+            cleaned = []
+            for s, e in d_ranges:
+                try:
+                    sm = to_minutes(s)
+                    em = to_minutes(e)
+                except Exception:
+                    flash(f'Invalid time in {d.upper()} ranges.', 'error')
+                    return render_template(
+                        'coach/settings.html', tz=tz, hours=hours, selected_days=set(hours.keys()),
+                        buffer_min=buffer_min, min_notice_min=min_notice_min, max_days_ahead=max_days_ahead,
+                    )
+                if em <= sm:
+                    flash(f'End time must be after start time for {d.upper()} ranges.', 'error')
+                    return render_template(
+                        'coach/settings.html', tz=tz, hours=hours, selected_days=set(hours.keys()),
+                        buffer_min=buffer_min, min_notice_min=min_notice_min, max_days_ahead=max_days_ahead,
+                    )
+                cleaned.append((sm, em))
+            cleaned.sort()
+            for i in range(1, len(cleaned)):
+                prev_end = cleaned[i-1][1]
+                cur_start = cleaned[i][0]
+                if cur_start < prev_end:
+                    flash(f'Overlapping ranges on {d.upper()}. Please adjust times.', 'error')
+                    return render_template(
+                        'coach/settings.html', tz=tz, hours=hours, selected_days=set(hours.keys()),
+                        buffer_min=buffer_min, min_notice_min=min_notice_min, max_days_ahead=max_days_ahead,
+                    )
+
         wh_json = json.dumps(hours)
 
         if not settings:
@@ -67,22 +122,13 @@ def settings():
         except Exception:
             hours = {}
     selected_days = set(hours.keys()) if hours else set(['mon','tue','wed','thu','fri'])
-    start = '09:00'
-    end = '17:00'
-    if hours:
-        # take first available range from any day
-        sample = next(iter(hours.values()))
-        if sample and len(sample[0]) == 2:
-            start, end = sample[0]
 
     return render_template(
         'coach/settings.html',
         tz=tz,
+        hours=hours,
         selected_days=selected_days,
-        start=start,
-        end=end,
         buffer_min=settings.buffer_min if settings else 0,
         min_notice_min=settings.min_notice_min if settings else 120,
         max_days_ahead=settings.max_days_ahead if settings else 30,
     )
-
