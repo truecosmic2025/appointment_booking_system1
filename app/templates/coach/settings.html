@@ -75,7 +75,21 @@
       // Fallback small set
       ['UTC','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','Europe/London','Europe/Berlin','Asia/Kolkata','Asia/Tokyo','Australia/Sydney'].forEach(z=>{const o=document.createElement('option');o.value=z;dl.appendChild(o);});
     }
+    // Ensure detected zone appears as a choice
+    if (dl && tz) {
+      const exists = Array.from(dl.options).some(o => o.value === tz);
+      if (!exists) { const o = document.createElement('option'); o.value = tz; dl.appendChild(o); }
+    }
   } catch (e) {}
+
+  // Auto-fill timezone input with detected zone if it looks unset
+  const tzInput = document.getElementById('timezone');
+  if (tzInput && tz) {
+    const current = (tzInput.value || '').trim();
+    if (!current || current.toUpperCase() === 'UTC') {
+      tzInput.value = tz;
+    }
+  }
 
   function addRange(day){
     const wrap = document.getElementById('ranges_'+day);
