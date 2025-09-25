@@ -1,6 +1,6 @@
 import os
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, time
 import secrets
 
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
@@ -10,6 +10,7 @@ from app import db
 from app.models.user import User
 from app.models.coach_profile import CoachProfile
 from app.models.booking import Booking
+from app.models.coach_settings import CoachSettings
 from app.integrations.google_service import list_freebusy, create_event_with_meet, cancel_event, reschedule_event
 
 
@@ -35,6 +36,23 @@ def coach_page(slug):
     return render_template("coaches/booking.html", coach=coach, profile=profile)
 
 
+def _parse_iso(s: str) -> datetime:
+    if s.endswith('Z'):
+        s = s[:-1] + '+00:00'
+    return datetime.fromisoformat(s)
+
+
+def _default_hours():
+    # Mon-Fri 09:00-17:00
+    return {
+        'mon': [["09:00","17:00"]],
+        'tue': [["09:00","17:00"]],
+        'wed': [["09:00","17:00"]],
+        'thu': [["09:00","17:00"]],
+        'fri': [["09:00","17:00"]],
+    }
+
+
 @public_bp.route("/api/availability/<slug>")
 def api_availability(slug):
     profile = CoachProfile.query.filter_by(slug=slug).first_or_404()
@@ -46,28 +64,89 @@ def api_availability(slug):
         day = datetime.strptime(day_str, "%Y-%m-%d").date() if day_str else datetime.utcnow().date()
     except ValueError:
         day = datetime.utcnow().date()
+    # Load settings
+    settings = CoachSettings.query.filter_by(user_id=profile.user_id).first()
+    try:
+        import pytz
+        tzname = profile.timezone or 'UTC'
+        tz = pytz.timezone(tzname)
+    except Exception:
+        tz = timezone.utc
+        tzname = 'UTC'
 
-    # Working hours 09:00-17:00 local assumed as UTC for MVP; adjust with timezone later
-    start = datetime.combine(day, datetime.min.time()).replace(hour=9, tzinfo=timezone.utc)
-    end = start + timedelta(hours=8)
+    hours = _default_hours()
+    if settings and settings.working_hours:
+        try:
+            import json
+            parsed = json.loads(settings.working_hours)
+            if isinstance(parsed, dict):
+                hours = parsed
+        except Exception:
+            pass
 
-    busy = list_freebusy(profile.google_credentials, start, end)
-    # Build 30-minute slots
-    slot = start
+    min_notice = timedelta(minutes=(settings.min_notice_min if settings else 120))
+    buffer = timedelta(minutes=(settings.buffer_min if settings else 0))
+    max_days = settings.max_days_ahead if settings else 30
+
+    now_utc = datetime.utcnow().replace(tzinfo=timezone.utc)
+    if (day - now_utc.date()).days > max_days:
+        return jsonify({"slots": []})
+
+    # Determine weekday key
+    weekday_keys = ['mon','tue','wed','thu','fri','sat','sun']
+    wk = weekday_keys[day.weekday()]
+    ranges = hours.get(wk, [])
+    if not ranges:
+        return jsonify({"slots": []})
+
+    # Build start/end window to query freebusy (in UTC)
+    def _local_dt(d, hhmm):
+        h, m = map(int, hhmm.split(':'))
+        return datetime(d.year, d.month, d.day, h, m)
+
+    try:
+        import pytz
+        local_slots = []
+        for start_hhmm, end_hhmm in ranges:
+            local_start = pytz.timezone(tzname).localize(_local_dt(day, start_hhmm))
+            local_end = pytz.timezone(tzname).localize(_local_dt(day, end_hhmm))
+            local_slots.append((local_start, local_end))
+        window_start_utc = min(ls[0] for ls in local_slots).astimezone(timezone.utc)
+        window_end_utc = max(ls[1] for ls in local_slots).astimezone(timezone.utc)
+    except Exception:
+        # Fallback to full day UTC
+        window_start_utc = datetime.combine(day, time(0,0)).replace(tzinfo=timezone.utc)
+        window_end_utc = datetime.combine(day, time(23,59)).replace(tzinfo=timezone.utc)
+
+    busy = list_freebusy(profile.google_credentials, window_start_utc, window_end_utc)
+    busy_intervals = []
+    for b in busy:
+        b_start = _parse_iso(b['start'])
+        b_end = _parse_iso(b['end'])
+        busy_intervals.append((b_start - buffer, b_end + buffer))
+
+    # Generate 30-min slots across all working ranges
     slots = []
-    while slot < end:
-        slot_end = slot + timedelta(minutes=30)
-        overlap = False
-        for b in busy:
-            b_start = datetime.fromisoformat(b['start'])
-            b_end = datetime.fromisoformat(b['end'])
-            if not (slot_end <= b_start or slot >= b_end):
-                overlap = True
-                break
-        if not overlap:
-            slots.append(slot.isoformat())
-        slot = slot_end
-    return jsonify({"slots": slots})
+    for local_start, local_end in local_slots:
+        slot = local_start
+        while slot + timedelta(minutes=30) <= local_end:
+            slot_utc = slot.astimezone(timezone.utc)
+            # Apply min notice
+            if slot_utc < now_utc + min_notice:
+                slot += timedelta(minutes=30)
+                continue
+            end_utc = slot_utc + timedelta(minutes=30)
+            # check overlap
+            overlap = False
+            for b_start, b_end in busy_intervals:
+                if not (end_utc <= b_start or slot_utc >= b_end):
+                    overlap = True
+                    break
+            if not overlap:
+                slots.append(slot_utc.isoformat())
+            slot += timedelta(minutes=30)
+
+    return jsonify({"slots": slots, "timezone": tzname})
 
 
 @public_bp.route("/api/book/<slug>", methods=["POST"])
