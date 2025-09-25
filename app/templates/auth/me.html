@@ -40,6 +40,7 @@
             <form method="post" action="{{ url_for('google.disconnect') }}" class="ml-2 inline">
               <button class="inline-flex rounded-md border border-red-300 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100" onclick="return confirm('Disconnect Google Calendar? Bookings will no longer sync.');">Disconnect Google Calendar</button>
             </form>
+            <a href="{{ url_for('coach.settings') }}" class="ml-2 inline-flex rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Edit availability</a>
           {% endif %}
         {% endif %}
       </div>
