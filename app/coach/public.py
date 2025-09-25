@@ -31,9 +31,17 @@ def coaches_list():
 
 @public_bp.route("/c/<slug>")
 def coach_page(slug):
+    import json
     profile = CoachProfile.query.filter_by(slug=slug).first_or_404()
     coach = profile.user
-    return render_template("coaches/booking.html", coach=coach, profile=profile)
+    settings = CoachSettings.query.filter_by(user_id=coach.id).first()
+    hours = {}
+    if settings and settings.working_hours:
+        try:
+            hours = json.loads(settings.working_hours)
+        except Exception:
+            hours = {}
+    return render_template("coaches/booking.html", coach=coach, profile=profile, hours=hours)
 
 
 def _parse_iso(s: str) -> datetime:
@@ -114,9 +122,12 @@ def api_availability(slug):
         window_start_utc = min(ls[0] for ls in local_slots).astimezone(timezone.utc)
         window_end_utc = max(ls[1] for ls in local_slots).astimezone(timezone.utc)
     except Exception:
-        # Fallback to full day UTC
-        window_start_utc = datetime.combine(day, time(0,0)).replace(tzinfo=timezone.utc)
-        window_end_utc = datetime.combine(day, time(23,59)).replace(tzinfo=timezone.utc)
+        # Fallback to full day UTC and a single local slot in UTC
+        start_utc = datetime.combine(day, time(9,0)).replace(tzinfo=timezone.utc)
+        end_utc = datetime.combine(day, time(17,0)).replace(tzinfo=timezone.utc)
+        window_start_utc = start_utc
+        window_end_utc = end_utc
+        local_slots = [(start_utc, end_utc)]
 
     busy = list_freebusy(profile.google_credentials, window_start_utc, window_end_utc)
     busy_intervals = []
