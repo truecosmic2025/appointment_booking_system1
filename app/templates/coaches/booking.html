@@ -117,7 +117,7 @@ bookForm.addEventListener('submit', async (e)=>{
   e.preventDefault();
   if(!selectedStart){ alert('Select a time'); return; }
   const form = new FormData(bookForm);
-  const payload = { name: form.get('name'), email: form.get('email'), start: selectedStart };
+  const payload = { name: form.get('name'), email: form.get('email'), start: selectedStart, timezone: (tzInput.value || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC') };
   const res = await fetch(`/api/book/${slug}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
   const data = await res.json();
   if(data.ok){
