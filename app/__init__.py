@@ -4,6 +4,7 @@ from flask_login import LoginManager
 import os
 import click
 from dotenv import load_dotenv
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -21,6 +22,9 @@ def create_app():
         "DATABASE_URL", f"sqlite:///{os.path.join(app.root_path, 'app.db')}"
     )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    # Trust reverse proxy headers (Railway/Heroku-style) for scheme/host
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
     # Init extensions
     db.init_app(app)
