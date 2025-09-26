@@ -41,7 +41,9 @@ def connect():
         flash("Google OAuth is not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.", "error")
         return redirect(url_for("auth.me"))
 
-    redirect_uri = url_for("google.callback", _external=True)
+    # Build an external redirect URI; force https in production if requested
+    scheme = "https" if os.getenv("FORCE_HTTPS_URLS", "0") == "1" else None
+    redirect_uri = url_for("google.callback", _external=True, _scheme=scheme) if scheme else url_for("google.callback", _external=True)
     flow = Flow.from_client_config(
         {
             "web": {
