@@ -168,6 +168,7 @@ def api_book(slug):
     name = data.get("name", "").strip()
     email = data.get("email", "").strip().lower()
     start_iso = data.get("start")
+    tzname = (data.get("timezone") or "UTC").strip() or "UTC"
     if not (name and email and start_iso):
         return jsonify({"error": "Missing fields"}), 400
 
@@ -200,7 +201,7 @@ def api_book(slug):
         visitor_email=email,
         start_utc=start,
         end_utc=end,
-        timezone="UTC",
+        timezone=tzname,
         status="booked",
         google_event_id=event_id,
         meet_link=meet_link,
@@ -211,6 +212,19 @@ def api_book(slug):
 
     # Send emails (coach, visitor, owner)
     send_booking_email(coach.email, owner.email if owner else None, email, coach.name, name, start, meet_link, booking)
+
+    # Best-effort BotPenguin sync
+    try:
+        import pytz
+        from app.integrations.botpenguin_service import sync_booking_to_botpenguin
+        try:
+            tz = pytz.timezone(tzname)
+            start_local = start.astimezone(tz)
+        except Exception:
+            start_local = start
+        sync_booking_to_botpenguin(visitor_email=email, booking_time_local_iso=start_local.isoformat(), coach_name=coach.name)
+    except Exception:
+        pass
 
     return jsonify({"ok": True, "meet_link": meet_link, "manage_url": url_for('public.manage_booking', booking_id=booking.id, token=token, _external=True)})
 
