@@ -39,12 +39,12 @@
             <input id="date" type="date" class="rounded-md border border-slate-300 px-2 py-1 text-sm" />
           </div>
         </div>
-        <div id="slots" class="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"></div>
-        <form id="bookForm" class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 hidden">
-          <input type="text" name="name" placeholder="Your name" class="rounded-md border border-slate-300 px-3 py-2" required>
-          <input type="email" name="email" placeholder="Your email" class="rounded-md border border-slate-300 px-3 py-2" required>
-          <button class="rounded-md bg-slate-900 px-4 py-2 text-white">Book 30 min</button>
+        <form id="bookForm" class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <input type="text" name="name" placeholder="Your name" class="rounded-md border border-slate-300 px-3 py-2" value="{{ prefill_name }}" required>
+          <input type="email" name="email" placeholder="Your email" class="rounded-md border border-slate-300 px-3 py-2" value="{{ prefill_email }}" required>
+          <button class="rounded-md bg-slate-900 px-4 py-2 text-white" disabled id="bookBtn">Book 30 min</button>
         </form>
+        <div id="slots" class="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"></div>
         <div id="result" class="mt-4 text-sm"></div>
       </div>
     </div>
@@ -55,6 +55,7 @@ const slug = {{ profile.slug|tojson }}
 const dateInput = document.getElementById('date');
 const slotsEl = document.getElementById('slots');
 const bookForm = document.getElementById('bookForm');
+const bookBtn = document.getElementById('bookBtn');
 const resultEl = document.getElementById('result');
 let selectedStart = null;
 const tzInput = document.getElementById('tzInput');
@@ -87,7 +88,7 @@ async function loadSlots(){
   const slots = data.slots || [];
   if(!slots.length){
     slotsEl.innerHTML = '<div class="text-slate-500">No available slots for this day.</div>';
-    bookForm.classList.add('hidden');
+    bookBtn.disabled = true;
     return;
   }
   slotsEl.innerHTML = '';
@@ -104,7 +105,12 @@ async function loadSlots(){
       label = dt.toUTCString().slice(17,22) + ' UTC';
     }
     btn.textContent = label;
-    btn.onclick = () => { selectedStart = s; bookForm.classList.remove('hidden'); [...slotsEl.children].forEach(c=>c.classList.remove('ring-2','ring-brand-500')); btn.classList.add('ring-2','ring-brand-500'); }
+    btn.onclick = () => {
+      selectedStart = s;
+      bookBtn.disabled = false;
+      [...slotsEl.children].forEach(c=>c.classList.remove('ring-2','ring-brand-500'));
+      btn.classList.add('ring-2','ring-brand-500');
+    }
     slotsEl.appendChild(btn);
   });
 }

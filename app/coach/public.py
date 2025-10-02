@@ -41,7 +41,13 @@ def coach_page(slug):
             hours = json.loads(settings.working_hours)
         except Exception:
             hours = {}
-    return render_template("coaches/booking.html", coach=coach, profile=profile, hours=hours)
+    
+    # Get query parameters for pre-filling the form
+    prefill_name = request.args.get('name', '').strip()
+    prefill_email = request.args.get('email', '').strip()
+    
+    return render_template("coaches/booking.html", coach=coach, profile=profile, hours=hours,
+                         prefill_name=prefill_name, prefill_email=prefill_email)
 
 
 def _parse_iso(s: str) -> datetime:
