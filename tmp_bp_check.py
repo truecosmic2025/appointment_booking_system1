@@ -1,0 +1,1 @@
+import sys, json; from dotenv import load_dotenv; load_dotenv(); from app.integrations.botpenguin_service import BotPenguinClient; c=BotPenguinClient(); email='gglvoice12@gmail.com'; res=c.find_contact_by_email(email); print('Found:', bool(res)); print('ID:', (res.get('_id') or res.get('id') or res.get('uuid') or '')); print(json.dumps(res, indent=2, ensure_ascii=False)[:1000])

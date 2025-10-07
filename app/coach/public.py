@@ -12,10 +12,27 @@ from app.models.coach_profile import CoachProfile
 from app.models.booking import Booking
 from app.models.coach_settings import CoachSettings
 from app.integrations.google_service import list_freebusy, create_event_with_meet, cancel_event, reschedule_event
+import logging
+import requests
 
 
 public_bp = Blueprint("public", __name__, url_prefix="")
 
+
+def send_make_booking_event(webhook_url: str, coach_name: str, booking_time_iso: str, user_timezone: str, email: str) -> None:
+    """Post booking info to Make.com webhook. Best-effort, non-blocking."""
+    logger = logging.getLogger(__name__)
+    try:
+        payload = {
+            "demo_session_coach": coach_name,
+            "booking_time": booking_time_iso,
+            "timezone": user_timezone,
+            "email": email,
+        }
+        requests.post(webhook_url, json=payload, timeout=10)
+        logger.info("Make.com webhook posted successfully")
+    except Exception as e:
+        logger.error(f"Make.com webhook failed: {type(e).__name__}: {e}")
 
 @public_bp.route("/coaches")
 def coaches_list():
@@ -229,6 +246,10 @@ def api_book(slug):
         except Exception:
             start_local = start
         sync_booking_to_botpenguin(visitor_email=email, booking_time_local_iso=start_local.isoformat(), coach_name=coach.name)
+        # Send Make.com webhook if configured
+        webhook_url = os.getenv("MAKE_WEBHOOK_URL", "").strip()
+        if webhook_url:
+            send_make_booking_event(webhook_url, coach.name, start_local.isoformat(), tzname, email)
     except Exception:
         pass
 

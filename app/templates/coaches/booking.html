@@ -40,9 +40,9 @@
           </div>
         </div>
         <form id="bookForm" class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <input type="text" name="name" placeholder="Your name" class="rounded-md border border-slate-300 px-3 py-2" value="{{ prefill_name }}" required>
-          <input type="email" name="email" placeholder="Your email" class="rounded-md border border-slate-300 px-3 py-2" value="{{ prefill_email }}" required>
-          <button class="rounded-md bg-slate-900 px-4 py-2 text-white" disabled id="bookBtn">Book 30 min</button>
+          <input type="text" name="name" placeholder="Your name" class="rounded-md border border-slate-300 px-3 py-2" value="{{ prefill_name }}" {% if prefill_name %}readonly{% endif %} required>
+          <input type="email" name="email" placeholder="Your email" class="rounded-md border border-slate-300 px-3 py-2" value="{{ prefill_email }}" {% if prefill_email %}readonly{% endif %} required>
+          <button type="submit" class="rounded-md bg-slate-900 px-4 py-2 text-white" disabled id="bookBtn">Book 30 min</button>
         </form>
         <div id="slots" class="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"></div>
         <div id="result" class="mt-4 text-sm"></div>
@@ -124,13 +124,27 @@ bookForm.addEventListener('submit', async (e)=>{
   if(!selectedStart){ alert('Select a time'); return; }
   const form = new FormData(bookForm);
   const payload = { name: form.get('name'), email: form.get('email'), start: selectedStart, timezone: (tzInput.value || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC') };
-  const res = await fetch(`/api/book/${slug}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
-  const data = await res.json();
-  if(data.ok){
-    resultEl.innerHTML = `Booked! Meet link: <a class="text-brand-700 underline" href="${data.meet_link}" target="_blank">Join</a>. Manage: <a class="text-brand-700 underline" href="${data.manage_url}">Reschedule/Cancel</a>`;
-    bookForm.reset();
-  }else{
-    resultEl.textContent = data.error || 'Booking failed';
+  bookBtn.disabled = true;
+  bookBtn.textContent = 'Booking...';
+  try {
+    const res = await fetch(`/api/book/${slug}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+    let data = {};
+    try { data = await res.json(); } catch(_) {}
+    if(res.ok && data.ok){
+      resultEl.innerHTML = `Booked! Meet link: <a class="text-brand-700 underline" href="${data.meet_link}" target="_blank">Join</a>. Manage: <a class="text-brand-700 underline" href="${data.manage_url}">Reschedule/Cancel</a>`;
+      bookForm.reset();
+      selectedStart = null;
+      bookBtn.disabled = true;
+    } else {
+      resultEl.textContent = (data && (data.error || data.message)) || `Booking failed (${res.status})`;
+      bookBtn.disabled = false;
+    }
+  } catch (err) {
+    console.error(err);
+    resultEl.textContent = 'Network error while booking. Please try again.';
+    bookBtn.disabled = false;
+  } finally {
+    bookBtn.textContent = 'Book 30 min';
   }
 });
 </script>
