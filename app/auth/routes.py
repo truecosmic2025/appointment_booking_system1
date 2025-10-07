@@ -3,6 +3,9 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models.user import User
 from app.models.coach_profile import CoachProfile
+from app.models.coach_settings import CoachSettings
+from app.models.booking import Booking
+from app.integrations.google_service import cancel_event
 from functools import wraps
 from urllib.parse import urlparse
 
@@ -107,3 +110,45 @@ def host_only():
 def me():
     profile = CoachProfile.query.filter_by(user_id=current_user.id).first()
     return render_template("auth/me.html", profile=profile)
+
+
+@auth_bp.route("/delete-account", methods=["POST"])
+@login_required
+def delete_account():
+    # Allow any authenticated user (including owners) to delete their own account
+    user_id = current_user.id
+
+    # Best-effort: cancel upcoming Google Calendar events for this coach
+    profile = CoachProfile.query.filter_by(user_id=user_id).first()
+    if profile:
+        try:
+            creds_json = profile.google_credentials
+            if creds_json:
+                for b in Booking.query.filter_by(coach_id=user_id, status="booked").all():
+                    if b.google_event_id:
+                        try:
+                            cancel_event(creds_json, b.google_event_id)
+                        except Exception:
+                            pass
+        except Exception:
+            pass
+
+    # Delete related data: bookings, settings, profile, then the user
+    try:
+        db.session.query(Booking).filter(Booking.coach_id == user_id).delete(synchronize_session=False)
+        db.session.query(CoachSettings).filter(CoachSettings.user_id == user_id).delete(synchronize_session=False)
+        db.session.query(CoachProfile).filter(CoachProfile.user_id == user_id).delete(synchronize_session=False)
+        # Finally, delete the user
+        u = db.session.get(User, user_id)
+        if u:
+            db.session.delete(u)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        flash("Could not delete your account. Please try again.", "error")
+        return redirect(url_for("auth.me"))
+
+    # Log out and redirect home
+    logout_user()
+    flash("Your account has been deleted.", "success")
+    return redirect(url_for("main.index"))
