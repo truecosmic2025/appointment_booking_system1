@@ -5,7 +5,7 @@
   <div class="mx-auto max-w-7xl px-4">
     <nav class="text-sm text-slate-500"><a href="{{ url_for('dashboard.owner') }}" class="hover:underline">Dashboard</a> <span class="mx-1">/</span> Owner</nav>
     <h1 class="mt-1 text-3xl font-bold text-slate-900">Owner dashboard <span class="align-middle ml-2 inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-200">Owner</span></h1>
-    <p class="text-slate-600 mt-1">Overview for the last 30 days. Current time (UTC): {{ now.strftime('%Y-%m-%d %H:%M') }}</p>
+    <p class="text-slate-600 mt-1">Overview for the last 30 days. Current time (UTC): <span id="utc-now">{{ now.strftime('%Y-%m-%d %H:%M') }}</span></p>
 
     <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
       <div class="rounded-lg border border-slate-200 bg-white p-4">
@@ -75,4 +75,21 @@
     </div>
   </div>
 </section>
+<script>
+  (function(){
+    function pad(n){return n.toString().padStart(2,'0');}
+    function fmtUTC(d){
+      return d.getUTCFullYear() + '-' + pad(d.getUTCMonth()+1) + '-' + pad(d.getUTCDate()) + ' ' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes());
+    }
+    function tick(){
+      var el = document.getElementById('utc-now');
+      if (!el) return;
+      el.textContent = fmtUTC(new Date());
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      tick();
+      setInterval(tick, 1000);
+    });
+  })();
+</script>
 {% endblock %}
