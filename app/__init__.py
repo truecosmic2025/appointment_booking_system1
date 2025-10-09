@@ -90,9 +90,41 @@ def create_app():
             'current_tz_name': _current_tz_name(),
         }
 
-    # Create tables if not exist
+    # Create tables if not exist and run migrations
     with app.app_context():
         db.create_all()
+        
+        # Auto-migrate: Add timezone column to user table if it doesn't exist
+        try:
+            from sqlalchemy import text, inspect
+            inspector = inspect(db.engine)
+            columns = [col['name'] for col in inspector.get_columns('user')]
+            
+            if 'timezone' not in columns:
+                print("Running timezone migration: Adding timezone column to user table...")
+                db.session.execute(text("ALTER TABLE user ADD COLUMN timezone VARCHAR(64) DEFAULT 'UTC' NOT NULL"))
+                db.session.commit()
+                print("✓ Timezone column added successfully")
+                
+                # Sync timezones from CoachProfile to User
+                from .models.user import User
+                from .models.coach_profile import CoachProfile
+                
+                users = User.query.all()
+                updated_count = 0
+                
+                for user in users:
+                    profile = CoachProfile.query.filter_by(user_id=user.id).first()
+                    if profile and profile.timezone and (not user.timezone or user.timezone == 'UTC'):
+                        user.timezone = profile.timezone
+                        updated_count += 1
+                
+                if updated_count > 0:
+                    db.session.commit()
+                    print(f"✓ Synced {updated_count} user timezones from CoachProfile")
+        except Exception as e:
+            # Migration already done or error - continue silently
+            pass
 
     # CLI helpers
     @app.cli.command("create-user")

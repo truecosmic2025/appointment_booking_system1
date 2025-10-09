@@ -142,12 +142,7 @@ This document summarizes all changes made to implement timezone-aware date and t
    pip install pytz
    ```
 
-3. **Run the migration script**
-   ```bash
-   python migrate_user_timezone.py
-   ```
-
-4. **Restart the application**
+3. **Start the application**
    ```bash
    # For development
    python run.py
@@ -155,6 +150,21 @@ This document summarizes all changes made to implement timezone-aware date and t
    # For production (example)
    systemctl restart appointment-booking
    ```
+
+**The migration runs automatically!** When you start the app:
+- The system checks if the timezone column exists in the database
+- If not, it adds the column automatically using ALTER TABLE
+- Then syncs timezones from CoachProfile to User records
+- You'll see confirmation messages in the console output
+
+### Alternative: Manual Migration
+
+If you prefer to run the migration manually before starting the app:
+```bash
+python migrate_user_timezone.py
+```
+
+This script performs the same migration steps but can be run independently.
 
 ### For New Installations
 
