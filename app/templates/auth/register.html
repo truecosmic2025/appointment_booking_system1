@@ -4,10 +4,10 @@
 <section class="py-16">
   <div class="mx-auto max-w-md px-4">
     <h1 class="text-2xl font-bold text-slate-900">Create your account</h1>
-    <form method="post" class="mt-6 space-y-4">
+    <form method="post" autocomplete="off" class="mt-6 space-y-4">
       <div>
         <label class="block text-sm font-medium text-slate-700">Name</label>
-        <input name="name" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+        <input name="name" autocomplete="off" spellcheck="false" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
       </div>
       <div>
         <label class="block text-sm font-medium text-slate-700">Email</label>
@@ -21,9 +21,44 @@
         <label class="block text-sm font-medium text-slate-700">Confirm password</label>
         <input name="password2" type="password" minlength="8" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
       </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Time zone</label>
+        <input name="timezone" id="timezone" value="UTC" list="tzlist" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+        <datalist id="tzlist"></datalist>
+        <p class="text-xs text-slate-500 mt-1">Detected from your browser: <span id="detectedTz">...</span></p>
+      </div>
       <button class="w-full rounded-md bg-slate-900 px-4 py-2 text-white font-semibold">Create account</button>
     </form>
     <p class="mt-4 text-sm text-slate-600">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-brand-700 hover:underline">Sign in</a></p>
   </div>
   </section>
+<script>
+  // Detect browser timezone and prefill
+  (function(){
+    const tz = (Intl.DateTimeFormat && Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
+    const tzInput = document.getElementById('timezone');
+    const tzSpan = document.getElementById('detectedTz');
+    if (tzSpan) tzSpan.textContent = tz || 'Unavailable';
+    if (tzInput && (!tzInput.value || tzInput.value.toUpperCase() === 'UTC')) {
+      tzInput.value = tz;
+    }
+    // Populate datalist with supported IANA zones if available
+    try {
+      const zones = (Intl.supportedValuesOf && Intl.supportedValuesOf('timeZone')) || [];
+      const dl = document.getElementById('tzlist');
+      if (dl) {
+        if (zones.length) {
+          zones.forEach(z => { const o = document.createElement('option'); o.value = z; dl.appendChild(o); });
+        } else {
+          ['UTC','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','Europe/London','Europe/Berlin','Asia/Kolkata','Asia/Tokyo','Australia/Sydney'].forEach(z=>{const o=document.createElement('option');o.value=z;dl.appendChild(o);});
+        }
+        // Ensure detected tz is included
+        if (tz) {
+          const exists = Array.from(dl.options).some(o => o.value === tz);
+          if (!exists) { const o = document.createElement('option'); o.value = tz; dl.appendChild(o); }
+        }
+      }
+    } catch(e) { /* no-op */ }
+  })();
+</script>
 {% endblock %}

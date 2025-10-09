@@ -64,6 +64,7 @@ def register():
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
         password2 = request.form.get("password2", "")
+        tz = (request.form.get("timezone", "UTC") or "UTC").strip() or "UTC"
 
         if not name or not email or not password:
             flash("Please fill in all fields", "error")
@@ -74,7 +75,14 @@ def register():
         else:
             # First registered user becomes owner; others are coaches (host)
             first = User.query.count() == 0
-            user = User(name=name, email=email, role=("owner" if first else "host"))
+            # Validate timezone (fallback to UTC if invalid)
+            try:
+                import pytz
+                pytz.timezone(tz)
+            except Exception:
+                tz = "UTC"
+
+            user = User(name=name, email=email, role=("owner" if first else "host"), timezone=tz)
             user.set_password(password)
             db.session.add(user)
             db.session.commit()

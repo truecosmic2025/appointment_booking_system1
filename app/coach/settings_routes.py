@@ -23,7 +23,7 @@ def settings():
         min_notice_min = int(request.form.get('min_notice_min', '120') or 120)
         max_days_ahead = int(request.form.get('max_days_ahead', '30') or 30)
 
-        # Persist timezone on profile
+        # Persist timezone on profile and user record
         if not profile:
             # create a minimal profile if missing
             profile = CoachProfile(user_id=current_user.id, slug=CoachProfile.generate_slug(current_user.name))
@@ -55,6 +55,8 @@ def settings():
                 'coach/settings.html', tz=tz, hours=hours, selected_days=set(hours.keys()),
                 buffer_min=buffer_min, min_notice_min=min_notice_min, max_days_ahead=max_days_ahead,
             )
+        # If valid, also store on User for global usage
+        current_user.timezone = tz
 
         # Validate ranges: start < end and no overlaps within a day
         def to_minutes(hhmm: str) -> int:
@@ -114,7 +116,7 @@ def settings():
         return redirect(url_for('coach.settings'))
 
     # Defaults for form
-    tz = profile.timezone if profile and profile.timezone else 'UTC'
+    tz = (getattr(current_user, 'timezone', None) or (profile.timezone if profile and profile.timezone else 'UTC'))
     hours = {}
     if settings and settings.working_hours:
         try:
