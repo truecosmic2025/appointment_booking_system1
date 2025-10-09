@@ -5,7 +5,7 @@
   <div class="mx-auto max-w-7xl px-4">
     <nav class="text-sm text-slate-500"><a href="{{ url_for('dashboard.host') }}" class="hover:underline">Dashboard</a> <span class="mx-1">/</span> Coach</nav>
     <h1 class="mt-1 text-3xl font-bold text-slate-900">Coach dashboard <span class="align-middle ml-2 inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-200">Coach</span></h1>
-    <p class="text-slate-600 mt-1">Welcome, {{ current_user.name }}. Current time ({{ tz_name }}): <span id="local-now">{{ now_local_str }}</span></p>
+    <p class="text-slate-600 mt-1">Welcome, {{ current_user.name }}. Current time (<span id="tz-name">{{ tz_name }}</span>): <span id="local-now">{{ now_local_str }}</span></p>
 
     <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
       <div class="rounded-lg border border-slate-200 bg-white p-4">
@@ -48,7 +48,7 @@
             <tbody class="divide-y divide-slate-200">
               {% for r in upcoming_local %}
               <tr>
-                <td class="py-2 pr-4">{{ r.start_local_str }}</td>
+                <td class="py-2 pr-4"><span class="js-local-dt" data-utc="{{ upcoming[loop.index0].start_utc.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ r.start_local_str }}</span></td>
                 <td class="py-2 pr-4">{{ r.visitor_name }} ({{ r.visitor_email }})</td>
                 <td class="py-2 pr-4">{{ r.status }}</td>
                 <td class="py-2 pr-4">{% if r.meet_link %}<a class="text-brand-700 hover:underline" href="{{ r.meet_link }}" target="_blank">Join</a>{% else %}-{% endif %}</td>
@@ -65,7 +65,26 @@
 </section>
 <script>
   (function(){
-    var tz = {{ tz_name|tojson }};
+    var serverTz = {{ tz_name|tojson }};
+    var tz = (function(){
+      try { return Intl.DateTimeFormat().resolvedOptions().timeZone || serverTz; } catch(e) { return serverTz; }
+    })();
+    var tzEl = document.getElementById('tz-name');
+    if (tzEl && tz) { tzEl.textContent = tz; }
+    function fmt(dt){
+      try{
+        var parts = new Intl.DateTimeFormat('en-CA', {
+          timeZone: tz,
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', hour12: false
+        }).formatToParts(dt);
+        var m = {}; parts.forEach(function(p){ m[p.type] = p.value; });
+        return m.year + '-' + m.month + '-' + m.day + ' ' + m.hour + ':' + m.minute;
+      }catch(e){
+        var d = dt; var pad=function(n){return String(n).padStart(2,'0');};
+        return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+" "+pad(d.getHours())+":"+pad(d.getMinutes());
+      }
+    }
     function fmtNow(){
       try{
         var parts = new Intl.DateTimeFormat('en-CA', {
@@ -90,6 +109,21 @@
     document.addEventListener('DOMContentLoaded', function(){
       tick();
       setInterval(tick, 1000);
+      // Convert all UTC timestamps in the table to local
+      var nodes = document.querySelectorAll('.js-local-dt[data-utc]');
+      nodes.forEach(function(node){
+        var iso = node.getAttribute('data-utc');
+        if(!iso) return;
+        if(iso.charAt(iso.length-1) !== 'Z'){
+          var plus = iso.indexOf('+', 19);
+          var minus = iso.indexOf('-', 19);
+          if(plus === -1 && minus === -1){ iso += 'Z'; }
+        }
+        var dt = new Date(iso);
+        if(!isNaN(dt.getTime())){
+          node.textContent = fmt(dt);
+        }
+      });
     });
   })();
   </script>
