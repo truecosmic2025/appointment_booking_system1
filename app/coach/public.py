@@ -299,21 +299,55 @@ def send_email(subject: str, body: str, to_emails: list[str]):
 def send_booking_email(coach_email, owner_email, visitor_email, coach_name, visitor_name, start, meet_link, booking):
     subject = f"Booking confirmed: {visitor_name} with {coach_name}"
     manage = url_for('public.manage_booking', booking_id=booking.id, token=booking.token, _external=True)
-    body = (
-        f"Your 30-minute session is booked.\n\n"
-        f"Coach: {coach_name}\nVisitor: {visitor_name}\n"
-        f"Start (UTC): {start.isoformat()}\nMeet: {meet_link}\n\n"
+
+    # Common details section
+    details = (
+        f"Coach: {coach_name}\n"
+        f"Visitor: {visitor_name}\n"
+        f"Start (UTC): {start.isoformat()}\n"
+        f"Meet: {meet_link}\n\n"
         f"Manage: {manage} (reschedule or cancel)\n"
     )
-    # Build recipients: coach + visitor + owner (if any) + ADMIN_EMAILS
+
+    # Attendee/coach-facing body
+    attendee_body = f"Your 30-minute session is booked.\n\n" + details
+
+    # Admin-facing body with required phrasing
+    admin_body = f"A demo session has been booked.\n\n" + details
+
+    # Build recipients
     raw_admins = os.getenv('ADMIN_EMAILS', '')
     admin_emails = [e.strip() for e in raw_admins.split(',') if e.strip()]
-    order = [coach_email, visitor_email] + ([owner_email] if owner_email else []) + admin_emails
-    recipients: list[str] = []
-    for e in order:
-        if e and e not in recipients:
-            recipients.append(e)
-    send_email(subject, body, recipients)
+
+    # Participants: coach, visitor, owner
+    participant_order = [coach_email, visitor_email] + ([owner_email] if owner_email else [])
+    # Dedupe and exclude any admins from participant list to avoid double-send
+    admin_set = {e.lower() for e in admin_emails}
+    participant_recipients: list[str] = []
+    seen = set()
+    for e in participant_order:
+        if not e:
+            continue
+        el = e.lower()
+        if el in seen or el in admin_set:
+            continue
+        participant_recipients.append(e)
+        seen.add(el)
+
+    # Admin recipients (dedup)
+    admin_recipients: list[str] = []
+    seen_admin = set()
+    for e in admin_emails:
+        el = e.lower()
+        if el and el not in seen_admin:
+            admin_recipients.append(e)
+            seen_admin.add(el)
+
+    # Send distinct emails
+    if participant_recipients:
+        send_email(subject, attendee_body, participant_recipients)
+    if admin_recipients:
+        send_email(subject, admin_body, admin_recipients)
 
 
 @public_bp.route("/booking/<int:booking_id>/<token>")
