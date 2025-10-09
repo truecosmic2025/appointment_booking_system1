@@ -57,3 +57,27 @@ def users_set_role(user_id: int):
     flash(f"Updated role for {target.email} to {role}.", "success")
     return redirect(url_for("admin.users_index"))
 
+
+@admin_bp.route("/users/<int:user_id>/active", methods=["POST"])
+@roles_required("owner")
+def users_set_active(user_id: int):
+    target = db.session.get(User, user_id)
+    if not target:
+        return abort(404)
+
+    # Only hosts can be deactivated via this control
+    if target.role != "host":
+        flash("Only host accounts can be activated/deactivated here.", "error")
+        return redirect(url_for("admin.users_index"))
+
+    desired = request.form.get("active", "").strip()
+    if desired not in {"0", "1"}:
+        flash("Invalid active value.", "error")
+        return redirect(url_for("admin.users_index"))
+
+    target.is_active = True if desired == "1" else False
+    db.session.commit()
+    state = "activated" if target.is_active else "deactivated"
+    flash(f"{target.email} has been {state}.", "success")
+    return redirect(url_for("admin.users_index"))
+

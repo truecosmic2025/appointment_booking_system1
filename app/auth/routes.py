@@ -41,6 +41,10 @@ def login():
         if not user or not user.check_password(password):
             flash("Invalid email or password", "error")
         else:
+            # Block login for deactivated accounts
+            if hasattr(user, 'is_active') and not user.is_active:
+                flash("Your account has been deactivated. Please contact the owner.", "error")
+                return render_template("auth/login.html")
             login_user(user, remember=True)
             # Always send user to their role dashboard (owner/admin -> owner dashboard, host -> host dashboard, others -> coaches)
             if user.role in ("owner", "admin"):

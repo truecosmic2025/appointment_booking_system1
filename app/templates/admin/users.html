@@ -18,6 +18,7 @@
             <th class="px-4 py-3 text-left font-semibold text-slate-600">Name</th>
             <th class="px-4 py-3 text-left font-semibold text-slate-600">Email</th>
             <th class="px-4 py-3 text-left font-semibold text-slate-600">Role</th>
+            <th class="px-4 py-3 text-left font-semibold text-slate-600">Status</th>
             <th class="px-4 py-3 text-left font-semibold text-slate-600">Created</th>
             <th class="px-4 py-3"></th>
           </tr>
@@ -40,11 +41,33 @@
                         {% if u.id == current_user.id and u.role == 'owner' %}disabled{% endif %}>Update</button>
               </form>
             </td>
+            <td class="px-4 py-3">
+              {% if u.role == 'host' %}
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium {{ 'bg-green-100 text-green-800' if u.is_active else 'bg-red-100 text-red-800' }}">
+                    {{ 'Active' if u.is_active else 'Inactive' }}
+                  </span>
+                  {% if current_user.role == 'owner' %}
+                  <form method="post" action="{{ url_for('admin.users_set_active', user_id=u.id) }}">
+                    {% if u.is_active %}
+                      <input type="hidden" name="active" value="0" />
+                      <button class="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50">Deactivate</button>
+                    {% else %}
+                      <input type="hidden" name="active" value="1" />
+                      <button class="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50">Activate</button>
+                    {% endif %}
+                  </form>
+                  {% endif %}
+                </div>
+              {% else %}
+                <span class="text-slate-400 text-xs">—</span>
+              {% endif %}
+            </td>
             <td class="px-4 py-3 text-slate-500">{{ u.created_at.strftime('%Y-%m-%d') }}</td>
             <td class="px-4 py-3 text-right"></td>
           </tr>
           {% else %}
-          <tr><td class="px-4 py-4 text-slate-500" colspan="5">No users found.</td></tr>
+          <tr><td class="px-4 py-4 text-slate-500" colspan="6">No users found.</td></tr>
           {% endfor %}
         </tbody>
       </table>

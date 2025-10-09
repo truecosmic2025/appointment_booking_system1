@@ -36,7 +36,7 @@
         <div class="mt-4 overflow-x-auto">
           <table class="min-w-full text-sm">
             <thead class="text-left text-slate-600">
-              <tr><th class="py-2 pr-4">Start ({{ current_tz_name }})</th><th class="py-2 pr-4">Coach</th><th class="py-2 pr-4">Visitor</th><th class="py-2 pr-4">Status</th></tr>
+              <tr><th class="py-2 pr-4">Start (<span class="tz-name">{{ current_tz_name }}</span>)</th><th class="py-2 pr-4">Coach</th><th class="py-2 pr-4">Visitor</th><th class="py-2 pr-4">Status</th></tr>
             </thead>
             <tbody class="divide-y divide-slate-200">
               {% for b in upcoming %}
@@ -83,6 +83,8 @@
     })();
     var tzEl = document.getElementById('tz-name');
     if (tzEl && tz) { tzEl.textContent = tz; }
+    var tzEls = document.querySelectorAll('.tz-name');
+    if (tzEls && tz) { tzEls.forEach(function(el){ el.textContent = tz; }); }
     function fmt(dt){
       try{
         var parts = new Intl.DateTimeFormat('en-CA', {

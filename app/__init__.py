@@ -122,6 +122,21 @@ def create_app():
                 if updated_count > 0:
                     db.session.commit()
                     print(f"✓ Synced {updated_count} user timezones from CoachProfile")
+            
+            # Auto-migrate: Add is_active column to user table if it doesn't exist
+            inspector = inspect(db.engine)
+            columns = [col['name'] for col in inspector.get_columns('user')]
+            if 'is_active' not in columns:
+                try:
+                    print("Running migration: Adding is_active column to user table...")
+                    # SQLite uses INTEGER for booleans; default to 1 (true)
+                    db.session.execute(text("ALTER TABLE user ADD COLUMN is_active BOOLEAN DEFAULT 1 NOT NULL"))
+                    db.session.commit()
+                    print("✓ is_active column added successfully")
+                except Exception as _e:
+                    # If migration fails (e.g., other DB), ignore silently to avoid crash
+                    db.session.rollback()
+                    pass
         except Exception as e:
             # Migration already done or error - continue silently
             pass
