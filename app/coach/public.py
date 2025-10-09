@@ -261,11 +261,17 @@ def send_email(subject: str, body: str, to_emails: list[str]):
     from email.mime.text import MIMEText
     from email.mime.multipart import MIMEMultipart
 
+    # Respect standard env names with fallbacks for older keys
+    email_enabled = (os.getenv('EMAIL_ENABLED', 'false').lower() == 'true')
+    if not email_enabled:
+        return
+
     host = os.getenv('SMTP_HOST')
     port = int(os.getenv('SMTP_PORT', '587'))
-    user = os.getenv('SMTP_USER')
-    pwd = os.getenv('SMTP_PASS')
-    sender = os.getenv('MAIL_FROM', user)
+    user = os.getenv('SMTP_USERNAME') or os.getenv('SMTP_USER')
+    pwd = os.getenv('SMTP_PASSWORD') or os.getenv('SMTP_PASS')
+    sender = os.getenv('EMAIL_FROM') or os.getenv('MAIL_FROM') or user
+    use_tls = (os.getenv('SMTP_USE_TLS', 'true').lower() == 'true')
 
     if not (host and user and pwd and sender):
         # Skip actual sending in dev if not configured
@@ -277,10 +283,17 @@ def send_email(subject: str, body: str, to_emails: list[str]):
     msg['Subject'] = subject
     msg.attach(MIMEText(body, 'plain'))
 
-    with smtplib.SMTP(host, port) as server:
-        server.starttls()
-        server.login(user, pwd)
-        server.sendmail(sender, to_emails, msg.as_string())
+    # Use SMTP_SSL for port 465, SMTP with starttls for other ports
+    if port == 465:
+        with smtplib.SMTP_SSL(host, port) as server:
+            server.login(user, pwd)
+            server.sendmail(sender, to_emails, msg.as_string())
+    else:
+        with smtplib.SMTP(host, port) as server:
+            if use_tls:
+                server.starttls()
+            server.login(user, pwd)
+            server.sendmail(sender, to_emails, msg.as_string())
 
 
 def send_booking_email(coach_email, owner_email, visitor_email, coach_name, visitor_name, start, meet_link, booking):
@@ -292,9 +305,14 @@ def send_booking_email(coach_email, owner_email, visitor_email, coach_name, visi
         f"Start (UTC): {start.isoformat()}\nMeet: {meet_link}\n\n"
         f"Manage: {manage} (reschedule or cancel)\n"
     )
-    recipients = [coach_email, visitor_email]
-    if owner_email:
-        recipients.append(owner_email)
+    # Build recipients: coach + visitor + owner (if any) + ADMIN_EMAILS
+    raw_admins = os.getenv('ADMIN_EMAILS', '')
+    admin_emails = [e.strip() for e in raw_admins.split(',') if e.strip()]
+    order = [coach_email, visitor_email] + ([owner_email] if owner_email else []) + admin_emails
+    recipients: list[str] = []
+    for e in order:
+        if e and e not in recipients:
+            recipients.append(e)
     send_email(subject, body, recipients)
 
 
@@ -324,7 +342,14 @@ def cancel_booking(booking_id: int, token: str):
     owner = User.query.filter_by(role="owner").first() or User.query.filter_by(role="admin").first()
     subject = f"Booking cancelled: {b.visitor_name} x {b.coach.name}"
     body = f"The session scheduled at {b.start_utc.isoformat()} (UTC) has been cancelled."
-    send_email(subject, body, [b.coach.email, b.visitor_email] + ([owner.email] if owner else []))
+    raw_admins = os.getenv('ADMIN_EMAILS', '')
+    admin_emails = [e.strip() for e in raw_admins.split(',') if e.strip()]
+    order = [b.coach.email, b.visitor_email] + ([owner.email] if owner else []) + admin_emails
+    recipients: list[str] = []
+    for e in order:
+        if e and e not in recipients:
+            recipients.append(e)
+    send_email(subject, body, recipients)
     return jsonify({"ok": True})
 
 
@@ -348,5 +373,12 @@ def reschedule_booking(booking_id: int, token: str):
     owner = User.query.filter_by(role="owner").first() or User.query.filter_by(role="admin").first()
     subject = f"Booking rescheduled: {b.visitor_name} x {b.coach.name}"
     body = f"The session has been moved to {b.start_utc.isoformat()} (UTC)."
-    send_email(subject, body, [b.coach.email, b.visitor_email] + ([owner.email] if owner else []))
+    raw_admins = os.getenv('ADMIN_EMAILS', '')
+    admin_emails = [e.strip() for e in raw_admins.split(',') if e.strip()]
+    order = [b.coach.email, b.visitor_email] + ([owner.email] if owner else []) + admin_emails
+    recipients: list[str] = []
+    for e in order:
+        if e and e not in recipients:
+            recipients.append(e)
+    send_email(subject, body, recipients)
     return jsonify({'ok': True})

@@ -2,6 +2,7 @@ import os
 from datetime import datetime, date, time as dtime, timedelta
 import pytz
 from flask import Flask, render_template, request, redirect, url_for, session
+import logging
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 
@@ -15,6 +16,8 @@ from google.auth.transport.requests import Request
 # Email
 import smtplib
 from email.message import EmailMessage
+import hmac
+import hashlib
 
 # Load environment variables from .env if present
 load_dotenv()
@@ -24,6 +27,13 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-change-me')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Logging
+LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
+try:
+    app.logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
+except Exception:
+    app.logger.setLevel(logging.INFO)
+
 # Email configuration (optional)
 EMAIL_ENABLED = os.getenv('EMAIL_ENABLED', 'false').lower() == 'true'
 SMTP_HOST = os.getenv('SMTP_HOST')
@@ -32,6 +42,7 @@ SMTP_USERNAME = os.getenv('SMTP_USERNAME')
 SMTP_PASSWORD = os.getenv('SMTP_PASSWORD')
 SMTP_USE_TLS = os.getenv('SMTP_USE_TLS', 'true').lower() == 'true'
 EMAIL_FROM = os.getenv('EMAIL_FROM', SMTP_USERNAME or 'no-reply@example.com')
+ADMIN_EMAILS = os.getenv('ADMIN_EMAILS', '')  # comma-separated list of owner/admin emails
 
 # Fixed event configuration (30 minutes)
 EVENT_NAME = os.getenv('EVENT_NAME', 'Intro Meeting')
@@ -58,6 +69,21 @@ class Booking(db.Model):
     start_utc = db.Column(db.DateTime, nullable=False)
     end_utc = db.Column(db.DateTime, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='active')  # active|cancelled
+
+class BookingIntegration(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    provider = db.Column(db.String(50), nullable=False)  # e.g., 'google'
+    booking_id = db.Column(db.Integer, nullable=False)
+    external_id = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+class CalendarSyncState(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    provider = db.Column(db.String(50), nullable=False)  # e.g., 'google'
+    calendar_id = db.Column(db.String(255), nullable=False, default='primary')
+    sync_token = db.Column(db.Text, nullable=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
 class AvailabilityWindow(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -89,8 +115,38 @@ def start_scheduler_once():
         scheduler.start()
 
 
+from sqlalchemy import inspect, text
+
+HAS_BOOKING_STATUS = False
+
+def _has_column(table: str, column: str) -> bool:
+    try:
+        insp = inspect(db.engine)
+        cols = [c['name'] for c in insp.get_columns(table)]
+        return column in cols
+    except Exception:
+        return False
+
 def init_db():
     db.create_all()
+    # Attempt to add missing status column (sqlite only) for soft-cancel support
+    global HAS_BOOKING_STATUS
+    try:
+        HAS_BOOKING_STATUS = _has_column('booking', 'status')
+        if not HAS_BOOKING_STATUS:
+            if db.engine.url.drivername.startswith('sqlite'):
+                app.logger.info('Adding missing column booking.status for soft delete support')
+                try:
+                    db.session.execute(text("ALTER TABLE booking ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'active'"))
+                    db.session.commit()
+                    HAS_BOOKING_STATUS = True
+                except Exception as e:
+                    app.logger.error('Failed to add booking.status column: %s', e)
+                    db.session.rollback()
+            else:
+                app.logger.warning('booking.status column missing; please run a migration in your DB')
+    except Exception as e:
+        app.logger.error('Error checking/adding booking.status column: %s', e)
     AvailabilityWindow.seed_defaults()
     # Start scheduler when app first handles a request
     start_scheduler_once()
@@ -125,7 +181,14 @@ def generate_slots_for_date(the_date: date, tz_name: str):
     day_start_utc = day_start_local.astimezone(pytz.UTC)
     day_end_utc = day_end_local.astimezone(pytz.UTC)
 
-    bookings = Booking.query.filter(Booking.start_utc < day_end_utc, Booking.end_utc > day_start_utc).all()
+    q = Booking.query.filter(Booking.start_utc < day_end_utc, Booking.end_utc > day_start_utc)
+    # Filter out cancelled bookings if the column exists
+    try:
+        if HAS_BOOKING_STATUS:
+            q = q.filter(Booking.status != 'cancelled')
+    except Exception:
+        pass
+    bookings = q.all()
 
     # Build a set of blocked UTC intervals
     blocked = [(b.start_utc, b.end_utc) for b in bookings]
@@ -245,6 +308,12 @@ def event_30_details():
             # Ignore integration failures for now
             pass
 
+        # Notify admins/owners about the new booking (non-blocking)
+        try:
+            send_admin_notification(booking, 'booked')
+        except Exception:
+            pass
+
         # Send confirmation email (optional)
         try:
             send_confirmation_email(booking)
@@ -321,11 +390,17 @@ def send_email(to_email: str, subject: str, body: str):
     msg['Subject'] = subject
     msg.set_content(body)
 
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-        if SMTP_USE_TLS:
-            server.starttls()
-        server.login(SMTP_USERNAME, SMTP_PASSWORD)
-        server.send_message(msg)
+    # Use SMTP_SSL for port 465, SMTP with starttls for other ports
+    if SMTP_PORT == 465:
+        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT) as server:
+            server.login(SMTP_USERNAME, SMTP_PASSWORD)
+            server.send_message(msg)
+    else:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            if SMTP_USE_TLS:
+                server.starttls()
+            server.login(SMTP_USERNAME, SMTP_PASSWORD)
+            server.send_message(msg)
 
 
 def send_confirmation_email(booking: Booking):
@@ -341,6 +416,72 @@ def send_confirmation_email(booking: Booking):
         f"Notes: {booking.notes or 'N/A'}\n\n"
         f"If you need to reschedule, please reply to this email.\n"
     )
+
+# --- Admin email notifications ---
+
+def _admin_recipients() -> list[str]:
+    raw = ADMIN_EMAILS or ''
+    return [e.strip() for e in raw.split(',') if e.strip()]
+
+def _format_booking_window(booking: Booking) -> str:
+    tz_obj = pytz.timezone(booking.timezone)
+    start_local = booking.start_utc.astimezone(tz_obj)
+    end_local = booking.end_utc.astimezone(tz_obj)
+    start_str = start_local.strftime('%A, %B %d, %Y %I:%M %p')
+    end_str = end_local.strftime('%I:%M %p')
+    if os.name == 'nt':
+        # Strip leading zero quirks on Windows
+        if start_str.startswith('0'):
+            start_str = start_str[1:]
+        if end_str.startswith('0'):
+            end_str = end_str[1:]
+    return f"{start_str} — {end_str} ({booking.timezone})"
+
+def send_admin_notification(booking: Booking, action: str, previous: str | None = None):
+    if not EMAIL_ENABLED:
+        return
+    recipients = _admin_recipients()
+    if not recipients:
+        return
+
+    window = _format_booking_window(booking)
+    subject = f"[{BRAND_COMPANY}] {EVENT_NAME} {action.capitalize()}"
+
+    lines = [
+        f"Event: {EVENT_NAME}",
+        f"Action: {action}",
+        f"When: {window}",
+        f"Booker: {booking.name} <{booking.email}>",
+    ]
+    if booking.guests:
+        lines.append(f"Guests: {booking.guests}")
+    if booking.notes:
+        lines.append(f"Notes: {booking.notes}")
+    if previous:
+        lines.append(f"Previous time: {previous}")
+
+    body = "\n".join(lines)
+
+    for r in recipients:
+        try:
+            send_email(r, subject, body)
+        except Exception:
+            # Non-blocking; consider logging
+            pass
+
+# --- Attendee self-service security helpers ---
+
+def _booking_token(booking: Booking) -> str:
+    secret = (app.config.get('SECRET_KEY') or 'dev-secret-change-me').encode('utf-8')
+    payload = f"b:{booking.id}:{int(booking.created_at.timestamp())}".encode('utf-8')
+    return hmac.new(secret, payload, hashlib.sha256).hexdigest()
+
+def _verify_booking_token(booking: Booking, token: str) -> bool:
+    try:
+        expected = _booking_token(booking)
+        return hmac.compare_digest(expected, token or '')
+    except Exception:
+        return False
     send_email(booking.email, subject, body)
 
 
@@ -439,7 +580,248 @@ def create_google_calendar_event(booking: Booking):
         conferenceDataVersion=1,
         sendUpdates='all'
     ).execute()
+    try:
+        event_id = event.get('id')
+        if event_id:
+            # Upsert mapping
+            rec = BookingIntegration.query.filter_by(provider='google', booking_id=booking.id).first()
+            if rec:
+                rec.external_id = event_id
+            else:
+                db.session.add(BookingIntegration(provider='google', booking_id=booking.id, external_id=event_id))
+            db.session.commit()
+    except Exception:
+        pass
     return event
+
+def update_google_calendar_event(booking: Booking):
+    creds = get_google_credentials()
+    if not creds:
+        return
+    rec = BookingIntegration.query.filter_by(provider='google', booking_id=booking.id).first()
+    if not rec:
+        # If no mapping exists, create a fresh event and map it
+        try:
+            create_google_calendar_event(booking)
+        except Exception:
+            pass
+        return
+
+    tz_name = booking.timezone
+    tz_obj = pytz.timezone(tz_name)
+    start_local = booking.start_utc.astimezone(tz_obj)
+    end_local = booking.end_utc.astimezone(tz_obj)
+
+    body = {
+        'summary': EVENT_NAME,
+        'description': (EVENT_DESCRIPTION + '\n\n' + (booking.notes or '')).strip(),
+        'start': {'dateTime': start_local.isoformat(), 'timeZone': tz_name},
+        'end': {'dateTime': end_local.isoformat(), 'timeZone': tz_name},
+    }
+
+    service = build('calendar', 'v3', credentials=creds)
+    try:
+        service.events().patch(
+            calendarId='primary',
+            eventId=rec.external_id,
+            body=body,
+            sendUpdates='all'
+        ).execute()
+    except Exception:
+        # If patch fails (e.g., deleted externally), try to recreate and update mapping
+        try:
+            ev = create_google_calendar_event(booking)
+            if ev and ev.get('id'):
+                rec.external_id = ev['id']
+                db.session.commit()
+        except Exception:
+            pass
+
+def delete_google_calendar_event(booking: Booking):
+    creds = get_google_credentials()
+    if not creds:
+        return
+    rec = BookingIntegration.query.filter_by(provider='google', booking_id=booking.id).first()
+    if not rec:
+        return
+    service = build('calendar', 'v3', credentials=creds)
+    try:
+        service.events().delete(
+            calendarId='primary',
+            eventId=rec.external_id,
+            sendUpdates='all'
+        ).execute()
+    except Exception:
+        pass
+    # Remove mapping regardless
+    try:
+        db.session.delete(rec)
+        db.session.commit()
+    except Exception:
+        pass
+
+# --- Google Calendar polling sync (delta with syncToken) ---
+
+def _get_or_create_sync_state() -> CalendarSyncState:
+    rec = CalendarSyncState.query.filter_by(provider='google', calendar_id='primary').first()
+    if not rec:
+        rec = CalendarSyncState(provider='google', calendar_id='primary')
+        db.session.add(rec)
+        db.session.commit()
+    return rec
+
+def _parse_event_dt(part: dict) -> tuple[datetime, str] | None:
+    # Returns (aware_dt, tz_name)
+    if not part:
+        return None
+    dt_str = part.get('dateTime')
+    tz_name = part.get('timeZone') or 'UTC'
+    if not dt_str:
+        # All-day events (date) are not expected for app-created events; skip
+        return None
+    # Normalize 'Z' to '+00:00'
+    try:
+        s = dt_str.replace('Z', '+00:00')
+        aware = datetime.fromisoformat(s)
+        if aware.tzinfo is None:
+            aware = pytz.timezone(tz_name).localize(aware)
+        return aware, tz_name
+    except Exception:
+        return None
+
+def _process_google_event_change(event: dict):
+    ev_id = event.get('id')
+    status = event.get('status')
+    if not ev_id:
+        return
+    link = BookingIntegration.query.filter_by(provider='google', external_id=ev_id).first()
+    if not link:
+        return
+    booking = Booking.query.get(link.booking_id)
+    if not booking:
+        return
+
+    if status == 'cancelled':
+        try:
+            send_admin_notification(booking, 'cancelled')
+        except Exception:
+            app.logger.exception('Error sending admin notification for external cancel booking %s', booking.id)
+        try:
+            # Remove integration mapping then soft-cancel booking
+            db.session.delete(link)
+            if HAS_BOOKING_STATUS:
+                booking.status = 'cancelled'
+            else:
+                db.session.delete(booking)
+            db.session.commit()
+            app.logger.info('Processed Google cancellation for booking %s', booking.id)
+        except Exception:
+            app.logger.exception('Error processing Google cancellation for booking %s', booking.id)
+        return
+
+    start = _parse_event_dt(event.get('start'))
+    end = _parse_event_dt(event.get('end'))
+    if not (start and end):
+        return
+    start_dt, tz_name = start
+    end_dt, _ = end
+
+    prev_window = _format_booking_window(booking)
+    try:
+        booking.timezone = tz_name or booking.timezone
+        booking.start_utc = start_dt.astimezone(pytz.UTC)
+        booking.end_utc = end_dt.astimezone(pytz.UTC)
+        if HAS_BOOKING_STATUS and booking.status == 'cancelled':
+            booking.status = 'active'
+        db.session.commit()
+        app.logger.info('Processed Google reschedule for booking %s', booking.id)
+    except Exception:
+        app.logger.exception('Error updating booking from Google change %s', booking.id)
+        return
+
+    try:
+        send_admin_notification(booking, 'rescheduled', previous=prev_window)
+    except Exception:
+        app.logger.exception('Error sending admin reschedule notification for booking %s', booking.id)
+
+def sync_google_calendar_changes():
+    with app.app_context():
+        creds = get_google_credentials()
+        if not creds:
+            app.logger.debug('Google sync: no credentials; skipping')
+            return
+        service = build('calendar', 'v3', credentials=creds)
+        state = _get_or_create_sync_state()
+        page_token = None
+        next_sync_token = None
+        processed = 0
+        try:
+            while True:
+                if state.sync_token:
+                    req = service.events().list(
+                        calendarId='primary',
+                        syncToken=state.sync_token,
+                        showDeleted=True,
+                        singleEvents=True,
+                        pageToken=page_token
+                    )
+                else:
+                    time_min = (datetime.utcnow() - timedelta(days=90)).isoformat() + 'Z'
+                    req = service.events().list(
+                        calendarId='primary',
+                        timeMin=time_min,
+                        singleEvents=True,
+                        showDeleted=True,
+                        pageToken=page_token,
+                        maxResults=2500
+                    )
+                resp = req.execute()
+                for ev in resp.get('items', []):
+                    _process_google_event_change(ev)
+                    processed += 1
+                page_token = resp.get('nextPageToken')
+                if not page_token:
+                    next_sync_token = resp.get('nextSyncToken')
+                    break
+        except HttpError as e:
+            # 410 Gone indicates sync token is invalid; reset and try fresh next run
+            try:
+                if getattr(e, 'resp', None) and getattr(e.resp, 'status', None) == 410:
+                    state.sync_token = None
+                    state.updated_at = datetime.utcnow()
+                    db.session.commit()
+                    app.logger.warning('Google sync: sync token invalidated (410). Will reseed next run')
+                    return
+            except Exception:
+                pass
+            app.logger.exception('Google sync: HttpError during sync')
+            return
+        except Exception:
+            app.logger.exception('Google sync: unexpected error during sync')
+            return
+
+        if next_sync_token:
+            try:
+                state.sync_token = next_sync_token
+                state.updated_at = datetime.utcnow()
+                db.session.commit()
+                app.logger.info('Google sync: processed %s changes; token advanced', processed)
+            except Exception:
+                app.logger.exception('Google sync: failed to persist next sync token')
+
+def start_google_sync_poll():
+    try:
+        minutes = int(os.getenv('GOOGLE_SYNC_INTERVAL_MINUTES', '2'))
+        scheduler.add_job(
+            sync_google_calendar_changes,
+            'interval',
+            minutes=minutes,
+            id='google_sync_poll',
+            replace_existing=True,
+            misfire_grace_time=60,
+        )
+    except Exception:
+        pass
 
 @app.route('/integrations')
 def integrations_home():
@@ -556,6 +938,133 @@ def admin_availability():
 
     return render_template('admin_availability.html', rows=rows, has_token=bool(admin_token))
 
+# --- Admin: Booking Management (reschedule/cancel) ---
+
+@app.route('/admin/bookings/<int:booking_id>/reschedule', methods=['POST'])
+def admin_reschedule_booking(booking_id: int):
+    admin_token = os.getenv('ADMIN_TOKEN')
+    token = request.args.get('token') or request.form.get('token')
+    if admin_token and token != admin_token:
+        return "Unauthorized", 401
+
+    booking = Booking.query.get_or_404(booking_id)
+
+    prev_window = _format_booking_window(booking)
+
+    tz = request.form.get('tz') or booking.timezone
+    date_str = request.form.get('date')
+    time_str = request.form.get('time')
+    if not (date_str and time_str):
+        return {"error": "Missing date/time"}, 400
+
+    the_date = parse_date(date_str)
+    the_time = parse_time(time_str)
+    tz_obj = pytz.timezone(tz)
+    start_local = tz_obj.localize(datetime.combine(the_date, the_time))
+    end_local = start_local + timedelta(minutes=EVENT_DURATION_MINUTES)
+
+    booking.timezone = tz
+    booking.start_utc = start_local.astimezone(pytz.UTC)
+    booking.end_utc = end_local.astimezone(pytz.UTC)
+    if HAS_BOOKING_STATUS and booking.status == 'cancelled':
+        booking.status = 'active'
+    db.session.commit()
+
+    # Try to update Google Calendar event if integration available
+    try:
+        update_google_calendar_event(booking)
+    except Exception:
+        app.logger.exception('Error updating Google event for admin reschedule booking %s', booking_id)
+
+    try:
+        send_admin_notification(booking, 'rescheduled', previous=prev_window)
+    except Exception:
+        app.logger.exception('Error sending admin notification for admin reschedule booking %s', booking_id)
+
+    return {"ok": True}
+
+@app.route('/admin/bookings/<int:booking_id>/cancel', methods=['POST'])
+def admin_cancel_booking(booking_id: int):
+    admin_token = os.getenv('ADMIN_TOKEN')
+    token = request.args.get('token') or request.form.get('token')
+    if admin_token and token != admin_token:
+        return "Unauthorized", 401
+
+    booking = Booking.query.get_or_404(booking_id)
+
+    # Try to delete Google Calendar event first so we still have details
+    try:
+        delete_google_calendar_event(booking)
+    except Exception:
+        app.logger.exception('Error deleting Google Calendar event for booking %s', booking_id)
+
+    try:
+        send_admin_notification(booking, 'cancelled')
+    except Exception:
+        app.logger.exception('Error sending admin notification for cancelled booking %s', booking_id)
+
+    # Soft cancel if possible; fall back to delete
+    try:
+        if HAS_BOOKING_STATUS:
+            booking.status = 'cancelled'
+            db.session.commit()
+        else:
+            db.session.delete(booking)
+            db.session.commit()
+    except Exception:
+        app.logger.exception('Error cancelling booking %s', booking_id)
+
+    return {"ok": True}
+
+# --- Attendee: Booking reschedule (public via token) ---
+
+@app.route('/meet/bookings/<int:booking_id>/reschedule', methods=['POST'])
+def attendee_reschedule_booking(booking_id: int):
+    booking = Booking.query.get_or_404(booking_id)
+
+    token = request.args.get('token') or request.form.get('token')
+    if not _verify_booking_token(booking, token):
+        return {"error": "Unauthorized"}, 401
+
+    prev_window = _format_booking_window(booking)
+
+    tz = request.form.get('tz') or booking.timezone
+    date_str = request.form.get('date')
+    time_str = request.form.get('time')
+    if not (date_str and time_str):
+        return {"error": "Missing date/time"}, 400
+
+    the_date = parse_date(date_str)
+    the_time = parse_time(time_str)
+    tz_obj = pytz.timezone(tz)
+    start_local = tz_obj.localize(datetime.combine(the_date, the_time))
+    end_local = start_local + timedelta(minutes=EVENT_DURATION_MINUTES)
+
+    booking.timezone = tz
+    booking.start_utc = start_local.astimezone(pytz.UTC)
+    booking.end_utc = end_local.astimezone(pytz.UTC)
+    if HAS_BOOKING_STATUS and booking.status == 'cancelled':
+        booking.status = 'active'
+    db.session.commit()
+
+    # Update Google Calendar event to reflect new time
+    try:
+        update_google_calendar_event(booking)
+    except Exception:
+        app.logger.exception('Error updating Google event for attendee reschedule booking %s', booking_id)
+
+    # Notify admins
+    try:
+        send_admin_notification(booking, 'rescheduled', previous=prev_window)
+    except Exception:
+        app.logger.exception('Error sending admin notification for attendee reschedule booking %s', booking_id)
+
+    return {"ok": True}
+
 if __name__ == '__main__':
     port = int(os.getenv('PORT', '5000'))
     app.run(host='0.0.0.0', port=port, debug=True)
+else:
+    # Start Google sync polling when running under a WSGI server as well
+    with app.app_context():
+        start_google_sync_poll()
