@@ -366,7 +366,7 @@ def send_booking_email(coach_email, owner_email, visitor_email, coach_name, visi
             tzname = _tz_for_user_email(owner_email)
         else:
             tzname = None
-        body = "Your 30-minute session is booked.\n\n" + details_for(tzname)
+        body = "A 30-minute session is booked.\n\n" + details_for(tzname)
         send_email(subject, body, [e])
 
     # Admin recipients: send individually using their timezone, with admin phrasing
