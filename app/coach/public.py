@@ -34,6 +34,38 @@ def send_make_booking_event(webhook_url: str, coach_name: str, booking_time_iso:
     except Exception as e:
         logger.error(f"Make.com webhook failed: {type(e).__name__}: {e}")
 
+
+def _tz_for_user_email(email: str) -> str | None:
+    try:
+        u = User.query.filter_by(email=email).first()
+        if not u:
+            return None
+        # First check User timezone, then fall back to CoachProfile
+        if hasattr(u, 'timezone') and u.timezone:
+            return u.timezone
+        prof = CoachProfile.query.filter_by(user_id=u.id).first()
+        if prof and prof.timezone:
+            return prof.timezone
+    except Exception:
+        pass
+    return None
+
+def _format_dt_for_tz(dt: datetime, tzname: str | None) -> tuple[str, str]:
+    """Return (formatted, tzname_used)."""
+    try:
+        import pytz
+        aware = dt
+        if getattr(dt, 'tzinfo', None) is None:
+            aware = dt.replace(tzinfo=timezone.utc)
+        tzn = tzname or 'UTC'
+        local = aware.astimezone(pytz.timezone(tzn))
+        return local.strftime('%Y-%m-%d %H:%M'), tzn
+    except Exception:
+        try:
+            return dt.strftime('%Y-%m-%d %H:%M'), tzname or 'UTC'
+        except Exception:
+            return str(dt), tzname or 'UTC'
+
 @public_bp.route("/coaches")
 def coaches_list():
     # List all users with role host (and owner/admin who might also be coaches)
@@ -300,54 +332,51 @@ def send_booking_email(coach_email, owner_email, visitor_email, coach_name, visi
     subject = f"Booking confirmed: {visitor_name} with {coach_name}"
     manage = url_for('public.manage_booking', booking_id=booking.id, token=booking.token, _external=True)
 
-    # Common details section
-    details = (
-        f"Coach: {coach_name}\n"
-        f"Visitor: {visitor_name}\n"
-        f"Start (UTC): {start.isoformat()}\n"
-        f"Meet: {meet_link}\n\n"
-        f"Manage: {manage} (reschedule or cancel)\n"
-    )
-
-    # Attendee/coach-facing body
-    attendee_body = f"Your 30-minute session is booked.\n\n" + details
-
-    # Admin-facing body with required phrasing
-    admin_body = f"A demo session has been booked.\n\n" + details
+    # Helper to make details block per timezone
+    def details_for(tzname: str | None):
+        start_str, used_tz = _format_dt_for_tz(start, tzname)
+        return (
+            f"Coach: {coach_name}\n"
+            f"Visitor: {visitor_name}\n"
+            f"Start: {start_str} ({used_tz})\n"
+            f"Meet: {meet_link}\n\n"
+            f"Manage: {manage} (reschedule or cancel)\n"
+        )
 
     # Build recipients
     raw_admins = os.getenv('ADMIN_EMAILS', '')
     admin_emails = [e.strip() for e in raw_admins.split(',') if e.strip()]
 
-    # Participants: coach, visitor, owner
+    # Participants: send individually with their timezone
     participant_order = [coach_email, visitor_email] + ([owner_email] if owner_email else [])
-    # Dedupe and exclude any admins from participant list to avoid double-send
-    admin_set = {e.lower() for e in admin_emails}
-    participant_recipients: list[str] = []
-    seen = set()
+    sent_set = set()
     for e in participant_order:
         if not e:
             continue
         el = e.lower()
-        if el in seen or el in admin_set:
+        if el in sent_set:
             continue
-        participant_recipients.append(e)
-        seen.add(el)
+        sent_set.add(el)
+        # Determine tz
+        if e == visitor_email:
+            tzname = booking.timezone
+        elif e == coach_email:
+            tzname = _tz_for_user_email(coach_email)
+        elif owner_email and e == owner_email:
+            tzname = _tz_for_user_email(owner_email)
+        else:
+            tzname = None
+        body = "Your 30-minute session is booked.\n\n" + details_for(tzname)
+        send_email(subject, body, [e])
 
-    # Admin recipients (dedup)
-    admin_recipients: list[str] = []
-    seen_admin = set()
+    # Admin recipients: send individually using their timezone, with admin phrasing
     for e in admin_emails:
         el = e.lower()
-        if el and el not in seen_admin:
-            admin_recipients.append(e)
-            seen_admin.add(el)
-
-    # Send distinct emails
-    if participant_recipients:
-        send_email(subject, attendee_body, participant_recipients)
-    if admin_recipients:
-        send_email(subject, admin_body, admin_recipients)
+        if not el or el in sent_set:
+            continue
+        tzname = _tz_for_user_email(e)
+        body = "A demo session has been booked.\n\n" + details_for(tzname)
+        send_email(subject, body, [e])
 
 
 @public_bp.route("/booking/<int:booking_id>/<token>")
@@ -357,7 +386,13 @@ def manage_booking(booking_id: int, token: str):
         flash("Invalid booking link", "error")
         return redirect(url_for('main.index'))
     profile = CoachProfile.query.filter_by(user_id=b.coach_id).first()
-    return render_template("coaches/manage.html", booking=b, coach=b.coach, profile=profile)
+    
+    # Format booking time in visitor's timezone
+    visitor_tz = b.timezone or 'UTC'
+    start_local_str, tz_used = _format_dt_for_tz(b.start_utc, visitor_tz)
+    
+    return render_template("coaches/manage.html", booking=b, coach=b.coach, profile=profile,
+                         start_local_str=start_local_str, visitor_tz=tz_used)
 
 
 @public_bp.route("/booking/<int:booking_id>/<token>/cancel", methods=["POST"])
@@ -375,15 +410,34 @@ def cancel_booking(booking_id: int, token: str):
     # Notify
     owner = User.query.filter_by(role="owner").first() or User.query.filter_by(role="admin").first()
     subject = f"Booking cancelled: {b.visitor_name} x {b.coach.name}"
-    body = f"The session scheduled at {b.start_utc.isoformat()} (UTC) has been cancelled."
     raw_admins = os.getenv('ADMIN_EMAILS', '')
     admin_emails = [e.strip() for e in raw_admins.split(',') if e.strip()]
-    order = [b.coach.email, b.visitor_email] + ([owner.email] if owner else []) + admin_emails
-    recipients: list[str] = []
-    for e in order:
-        if e and e not in recipients:
-            recipients.append(e)
-    send_email(subject, body, recipients)
+
+    def cancel_body_for(tzname: str | None):
+        s, used = _format_dt_for_tz(b.start_utc, tzname)
+        return f"The session scheduled at {s} ({used}) has been cancelled."
+
+    sent = set()
+    # Coach
+    coach_tz = _tz_for_user_email(b.coach.email)
+    send_email(subject, cancel_body_for(coach_tz), [b.coach.email])
+    sent.add(b.coach.email.lower())
+    # Visitor
+    send_email(subject, cancel_body_for(b.timezone), [b.visitor_email])
+    sent.add(b.visitor_email.lower())
+    # Owner
+    if owner and owner.email and owner.email.lower() not in sent:
+        owner_tz = _tz_for_user_email(owner.email)
+        send_email(subject, cancel_body_for(owner_tz), [owner.email])
+        sent.add(owner.email.lower())
+    # Admins
+    for e in admin_emails:
+        el = e.lower()
+        if not el or el in sent:
+            continue
+        tzname = _tz_for_user_email(e)
+        send_email(subject, cancel_body_for(tzname), [e])
+        sent.add(el)
     return jsonify({"ok": True})
 
 
@@ -406,13 +460,32 @@ def reschedule_booking(booking_id: int, token: str):
     db.session.commit()
     owner = User.query.filter_by(role="owner").first() or User.query.filter_by(role="admin").first()
     subject = f"Booking rescheduled: {b.visitor_name} x {b.coach.name}"
-    body = f"The session has been moved to {b.start_utc.isoformat()} (UTC)."
     raw_admins = os.getenv('ADMIN_EMAILS', '')
     admin_emails = [e.strip() for e in raw_admins.split(',') if e.strip()]
-    order = [b.coach.email, b.visitor_email] + ([owner.email] if owner else []) + admin_emails
-    recipients: list[str] = []
-    for e in order:
-        if e and e not in recipients:
-            recipients.append(e)
-    send_email(subject, body, recipients)
+
+    def resched_body_for(tzname: str | None):
+        s, used = _format_dt_for_tz(b.start_utc, tzname)
+        return f"The session has been moved to {s} ({used})."
+
+    sent = set()
+    # Coach
+    coach_tz = _tz_for_user_email(b.coach.email)
+    send_email(subject, resched_body_for(coach_tz), [b.coach.email])
+    sent.add(b.coach.email.lower())
+    # Visitor
+    send_email(subject, resched_body_for(b.timezone), [b.visitor_email])
+    sent.add(b.visitor_email.lower())
+    # Owner
+    if owner and owner.email and owner.email.lower() not in sent:
+        owner_tz = _tz_for_user_email(owner.email)
+        send_email(subject, resched_body_for(owner_tz), [owner.email])
+        sent.add(owner.email.lower())
+    # Admins
+    for e in admin_emails:
+        el = e.lower()
+        if not el or el in sent:
+            continue
+        tzname = _tz_for_user_email(e)
+        send_email(subject, resched_body_for(tzname), [e])
+        sent.add(el)
     return jsonify({'ok': True})

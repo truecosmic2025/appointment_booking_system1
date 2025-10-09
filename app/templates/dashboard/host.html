@@ -5,7 +5,7 @@
   <div class="mx-auto max-w-7xl px-4">
     <nav class="text-sm text-slate-500"><a href="{{ url_for('dashboard.host') }}" class="hover:underline">Dashboard</a> <span class="mx-1">/</span> Coach</nav>
     <h1 class="mt-1 text-3xl font-bold text-slate-900">Coach dashboard <span class="align-middle ml-2 inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-200">Coach</span></h1>
-    <p class="text-slate-600 mt-1">Welcome, {{ current_user.name }}. Current time (UTC): <span id="utc-now">{{ now.strftime('%Y-%m-%d %H:%M') }}</span></p>
+    <p class="text-slate-600 mt-1">Welcome, {{ current_user.name }}. Current time ({{ tz_name }}): <span id="local-now">{{ now_local_str }}</span></p>
 
     <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
       <div class="rounded-lg border border-slate-200 bg-white p-4">
@@ -43,15 +43,15 @@
         <div class="mt-4 overflow-x-auto">
           <table class="min-w-full text-sm">
             <thead class="text-left text-slate-600">
-              <tr><th class="py-2 pr-4">Start (UTC)</th><th class="py-2 pr-4">Visitor</th><th class="py-2 pr-4">Status</th><th class="py-2 pr-4">Meet</th></tr>
+              <tr><th class="py-2 pr-4">Start ({{ tz_name }})</th><th class="py-2 pr-4">Visitor</th><th class="py-2 pr-4">Status</th><th class="py-2 pr-4">Meet</th></tr>
             </thead>
             <tbody class="divide-y divide-slate-200">
-              {% for b in upcoming %}
+              {% for r in upcoming_local %}
               <tr>
-                <td class="py-2 pr-4">{{ b.start_utc.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td class="py-2 pr-4">{{ b.visitor_name }} ({{ b.visitor_email }})</td>
-                <td class="py-2 pr-4">{{ b.status }}</td>
-                <td class="py-2 pr-4">{% if b.meet_link %}<a class="text-brand-700 hover:underline" href="{{ b.meet_link }}" target="_blank">Join</a>{% else %}-{% endif %}</td>
+                <td class="py-2 pr-4">{{ r.start_local_str }}</td>
+                <td class="py-2 pr-4">{{ r.visitor_name }} ({{ r.visitor_email }})</td>
+                <td class="py-2 pr-4">{{ r.status }}</td>
+                <td class="py-2 pr-4">{% if r.meet_link %}<a class="text-brand-700 hover:underline" href="{{ r.meet_link }}" target="_blank">Join</a>{% else %}-{% endif %}</td>
               </tr>
               {% else %}
               <tr><td class="py-4 text-slate-500" colspan="4">No upcoming sessions.</td></tr>
@@ -65,19 +65,32 @@
 </section>
 <script>
   (function(){
-    function pad(n){return n.toString().padStart(2,'0');}
-    function fmtUTC(d){
-      return d.getUTCFullYear() + '-' + pad(d.getUTCMonth()+1) + '-' + pad(d.getUTCDate()) + ' ' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes());
+    var tz = {{ tz_name|tojson }};
+    function fmtNow(){
+      try{
+        var parts = new Intl.DateTimeFormat('en-CA', {
+          timeZone: tz,
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', hour12: false
+        }).formatToParts(new Date());
+        var m = {};
+        parts.forEach(p=>{m[p.type]=p.value});
+        return m.year + '-' + m.month + '-' + m.day + ' ' + m.hour + ':' + m.minute;
+      }catch(e){
+        var d = new Date();
+        var pad = n=>String(n).padStart(2,'0');
+        return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+      }
     }
     function tick(){
-      var el = document.getElementById('utc-now');
-      if (!el) return;
-      el.textContent = fmtUTC(new Date());
+      var el = document.getElementById('local-now');
+      if(!el) return;
+      el.textContent = fmtNow();
     }
     document.addEventListener('DOMContentLoaded', function(){
       tick();
       setInterval(tick, 1000);
     });
   })();
-</script>
+  </script>
 {% endblock %}

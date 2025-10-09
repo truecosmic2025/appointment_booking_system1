@@ -49,6 +49,47 @@ def create_app():
     app.register_blueprint(dash_bp)
     app.register_blueprint(coach_bp)
 
+    # Jinja helpers: current timezone and local dt formatting
+    def _current_tz_name():
+        try:
+            from flask_login import current_user
+            from .models.coach_profile import CoachProfile
+            if getattr(current_user, 'is_authenticated', False):
+                # First check User timezone, then fall back to CoachProfile
+                if hasattr(current_user, 'timezone') and current_user.timezone:
+                    return current_user.timezone
+                prof = CoachProfile.query.filter_by(user_id=current_user.id).first()
+                if prof and prof.timezone:
+                    return prof.timezone
+        except Exception:
+            pass
+        return 'UTC'
+
+    def dt_local(dt, fmt='%Y-%m-%d %H:%M'):
+        try:
+            import pytz
+            tzname = _current_tz_name()
+            tz = pytz.timezone(tzname)
+            # Ensure aware UTC first
+            aware = dt
+            if getattr(dt, 'tzinfo', None) is None:
+                aware = dt.replace(tzinfo=pytz.UTC)
+            local = aware.astimezone(tz)
+            return local.strftime(fmt)
+        except Exception:
+            try:
+                return dt.strftime(fmt)
+            except Exception:
+                return str(dt)
+
+    app.jinja_env.filters['dt_local'] = dt_local
+
+    @app.context_processor
+    def inject_tz():
+        return {
+            'current_tz_name': _current_tz_name(),
+        }
+
     # Create tables if not exist
     with app.app_context():
         db.create_all()

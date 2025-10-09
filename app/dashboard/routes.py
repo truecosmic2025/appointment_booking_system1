@@ -56,6 +56,16 @@ def owner():
         .all()
     )
 
+    # Get current user's timezone for display
+    try:
+        import pytz
+        tz_name = current_user.timezone if hasattr(current_user, 'timezone') and current_user.timezone else 'UTC'
+        tz = pytz.timezone(tz_name)
+        now_local_str = now.astimezone(tz).strftime('%Y-%m-%d %H:%M')
+    except Exception:
+        tz_name = 'UTC'
+        now_local_str = now.strftime('%Y-%m-%d %H:%M')
+
     return render_template(
         "dashboard/owner.html",
         kpis={
@@ -68,6 +78,7 @@ def owner():
         upcoming=upcoming,
         coach_rows=coach_rows,
         now=now,
+        now_local_str=now_local_str,
     )
 
 
@@ -98,6 +109,34 @@ def host():
         .limit(25)
         .all()
     )
+    # Build localized view of upcoming sessions in host's timezone
+    try:
+        import pytz
+        tz_name = (prof.timezone if prof and prof.timezone else 'UTC')
+        tz = pytz.timezone(tz_name)
+    except Exception:
+        tz_name = 'UTC'
+        tz = None
+
+    # Current time formatted in host timezone
+    try:
+        now_local_str = now.astimezone(tz).strftime('%Y-%m-%d %H:%M') if tz else now.strftime('%Y-%m-%d %H:%M')
+    except Exception:
+        now_local_str = now.strftime('%Y-%m-%d %H:%M')
+
+    upcoming_local = []
+    for b in upcoming:
+        try:
+            start_local_str = b.start_utc.astimezone(tz).strftime('%Y-%m-%d %H:%M') if tz else b.start_utc.strftime('%Y-%m-%d %H:%M')
+        except Exception:
+            start_local_str = b.start_utc.strftime('%Y-%m-%d %H:%M')
+        upcoming_local.append({
+            'start_local_str': start_local_str,
+            'visitor_name': b.visitor_name,
+            'visitor_email': b.visitor_email,
+            'status': b.status,
+            'meet_link': getattr(b, 'meet_link', None),
+        })
 
     return render_template(
         "dashboard/host.html",
@@ -108,6 +147,9 @@ def host():
         },
         profile=prof,
         upcoming=upcoming,
+        upcoming_local=upcoming_local,
+        tz_name=tz_name,
+        now_local_str=now_local_str,
         now=now,
     )
 

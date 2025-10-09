@@ -11,6 +11,7 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(120), nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(20), nullable=False, default="invitee")  # admin, host, invitee
+    timezone = db.Column(db.String(64), default='UTC', nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def set_password(self, password: str) -> None:
