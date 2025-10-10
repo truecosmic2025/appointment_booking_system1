@@ -13,6 +13,7 @@ from app.models.booking import Booking
 from app.models.coach_settings import CoachSettings
 from app.integrations.google_service import list_freebusy, create_event_with_meet, cancel_event, reschedule_event
 import logging
+import threading
 import requests
 
 
@@ -215,7 +216,7 @@ def api_availability(slug):
     return jsonify({"slots": slots, "timezone": tzname})
 
 
-@public_bp.route("/api/book/<slug>", methods=["POST"])
+@public_bp.route("/api/book/<slug>", methods=["POST"]) 
 def api_book(slug):
     profile = CoachProfile.query.filter_by(slug=slug).first_or_404()
     coach = profile.user
@@ -265,27 +266,52 @@ def api_book(slug):
     db.session.add(booking)
     db.session.commit()
 
-    # Send emails (coach, visitor, owner)
-    send_booking_email(coach.email, owner.email if owner else None, email, coach.name, name, start, meet_link, booking)
-
-    # Best-effort BotPenguin sync
-    try:
-        import pytz
-        from app.integrations.botpenguin_service import sync_booking_to_botpenguin
+    # Kick off post-booking tasks (email + integrations) in a background thread
+    def _post_booking_tasks():
         try:
-            tz = pytz.timezone(tzname)
-            start_local = start.astimezone(tz)
-        except Exception:
-            start_local = start
-        sync_booking_to_botpenguin(visitor_email=email, booking_time_local_iso=start_local.isoformat(), coach_name=coach.name)
-        # Send Make.com webhook if configured
-        webhook_url = os.getenv("MAKE_WEBHOOK_URL", "").strip()
-        if webhook_url:
-            send_make_booking_event(webhook_url, coach.name, start_local.isoformat(), tzname, email)
-    except Exception:
-        pass
+            # Send emails (coach, visitor, owner)
+            try:
+                send_booking_email(coach.email, owner.email if owner else None, email, coach.name, name, start, meet_link, booking)
+            except Exception as e:
+                logging.getLogger(__name__).error("send_booking_email failed: %s: %s", type(e).__name__, e)
 
-    return jsonify({"ok": True, "meet_link": meet_link, "manage_url": url_for('public.manage_booking', booking_id=booking.id, token=token, _external=True)})
+            # Best-effort BotPenguin + Make.com webhook
+            try:
+                import pytz
+                from app.integrations.botpenguin_service import sync_booking_to_botpenguin
+                try:
+                    tz = pytz.timezone(tzname)
+                    start_local = start.astimezone(tz)
+                except Exception:
+                    start_local = start
+                try:
+                    sync_booking_to_botpenguin(visitor_email=email, booking_time_local_iso=start_local.isoformat(), coach_name=coach.name)
+                except Exception as e:
+                    logging.getLogger(__name__).warning("BotPenguin sync failed: %s: %s", type(e).__name__, e)
+                # Send Make.com webhook if configured
+                try:
+                    webhook_url = os.getenv("MAKE_WEBHOOK_URL", "").strip()
+                    if webhook_url:
+                        send_make_booking_event(webhook_url, coach.name, start_local.isoformat(), tzname, email)
+                except Exception as e:
+                    logging.getLogger(__name__).warning("Make.com webhook failed: %s: %s", type(e).__name__, e)
+            except Exception:
+                pass
+        except Exception as e:
+            logging.getLogger(__name__).exception("Post-booking tasks error: %s", e)
+
+    try:
+        threading.Thread(target=_post_booking_tasks, daemon=True).start()
+    except Exception as e:
+        logging.getLogger(__name__).warning("Failed to start background thread: %s: %s", type(e).__name__, e)
+
+    # Build a relative manage URL for the API response to avoid proxy/scheme issues
+    try:
+        manage_url = url_for('public.manage_booking', booking_id=booking.id, token=token)
+    except Exception:
+        manage_url = f"/booking/{booking.id}/{token}"
+
+    return jsonify({"ok": True, "meet_link": meet_link, "manage_url": manage_url})
 
 
 def send_email(subject: str, body: str, to_emails: list[str]):
@@ -316,12 +342,14 @@ def send_email(subject: str, body: str, to_emails: list[str]):
     msg.attach(MIMEText(body, 'plain'))
 
     # Use SMTP_SSL for port 465, SMTP with starttls for other ports
+    # Use short network timeouts to avoid blocking request threads
+    smtp_timeout = float(os.getenv('SMTP_TIMEOUT_SEC', '10'))
     if port == 465:
-        with smtplib.SMTP_SSL(host, port) as server:
+        with smtplib.SMTP_SSL(host, port, timeout=smtp_timeout) as server:
             server.login(user, pwd)
             server.sendmail(sender, to_emails, msg.as_string())
     else:
-        with smtplib.SMTP(host, port) as server:
+        with smtplib.SMTP(host, port, timeout=smtp_timeout) as server:
             if use_tls:
                 server.starttls()
             server.login(user, pwd)
