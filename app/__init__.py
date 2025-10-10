@@ -18,9 +18,12 @@ def create_app():
 
     # Basic config (override via env in production)
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-change-me")
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
-        "DATABASE_URL", f"sqlite:///{os.path.join(app.root_path, 'app.db')}"
-    )
+    # Use DATABASE_URL if provided (Railway Postgres), else fallback to SQLite.
+    db_uri = os.getenv("DATABASE_URL", f"sqlite:///{os.path.join(app.root_path, 'app.db')}")
+    # Normalize legacy postgres:// URIs to postgresql:// for SQLAlchemy
+    if db_uri.startswith("postgres://"):
+        db_uri = db_uri.replace("postgres://", "postgresql://", 1)
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     # Trust reverse proxy headers (Railway/Heroku-style) for scheme/host

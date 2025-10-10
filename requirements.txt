@@ -13,3 +13,4 @@ python-slugify==8.0.4
 
 cryptography>=46.0.0
 requests>=2.31.0
+psycopg2-binary>=2.9
