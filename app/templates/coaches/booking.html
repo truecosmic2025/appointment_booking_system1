@@ -50,6 +50,18 @@
     </div>
   </div>
 </section>
+<!-- Booking overlay shown during in-progress booking -->
+<div id="bookingOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+  <div class="rounded-lg bg-white shadow-lg p-6 flex items-center gap-3">
+    <div class="h-6 w-6 border-2 border-brand-600 border-t-transparent rounded-full animate-spin"></div>
+    <div class="text-slate-800 font-medium">Booking your session…</div>
+  </div>
+  <span class="sr-only" role="status" aria-live="polite">Booking in progress</span>
+  <style>
+    @keyframes tc-spin { to { transform: rotate(360deg); } }
+    .animate-spin { animation: tc-spin 1s linear infinite; }
+  </style>
+</div>
 <script>
 const slug = {{ profile.slug|tojson }}
 const dateInput = document.getElementById('date');
@@ -60,6 +72,7 @@ const resultEl = document.getElementById('result');
 let selectedStart = null;
 const tzInput = document.getElementById('tzInput');
 const TZ_KEY = 'tc_tz';
+const bookingOverlay = document.getElementById('bookingOverlay');
 
 function initTz(){
   const detected = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
@@ -126,12 +139,23 @@ bookForm.addEventListener('submit', async (e)=>{
   const payload = { name: form.get('name'), email: form.get('email'), start: selectedStart, timezone: (tzInput.value || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC') };
   bookBtn.disabled = true;
   bookBtn.textContent = 'Booking...';
+  if (bookingOverlay) bookingOverlay.classList.remove('hidden');
   try {
     const res = await fetch(`/api/book/${slug}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
     let data = {};
     try { data = await res.json(); } catch(_) {}
     if(res.ok && data.ok){
-      resultEl.innerHTML = `Booked! Meet link: <a class="text-brand-700 underline" href="${data.meet_link}" target="_blank">Join</a>. Manage: <a class="text-brand-700 underline" href="${data.manage_url}">Reschedule/Cancel</a>`;
+      resultEl.innerHTML = `Booked! Meet link: <a class="text-brand-700 underline" href="${data.meet_link}" target="_blank">Join</a>. <br>Manage: <a class="text-brand-700 underline" href="${data.manage_url}">Reschedule/Cancel</a>`;
+      resultEl.innerHTML = `
+        <div class="rounded-lg border border-green-300 bg-green-50 p-4">
+          <div class="flex items-start gap-3">
+            <div class="h-6 w-6 rounded-full bg-green-600 text-white flex items-center justify-center text-sm">✓</div>
+            <div class="text-xl sm:text-2xl font-semibold text-green-800">
+              Booked! Meet link: <a class="text-brand-700 underline font-bold" href="${data.meet_link}" target="_blank">Join</a>. Manage: <a class="text-brand-700 underline font-bold" href="${data.manage_url}">Reschedule/Cancel</a>
+            </div>
+          </div>
+        </div>`;
+      resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
       bookForm.reset();
       selectedStart = null;
       bookBtn.disabled = true;
@@ -145,6 +169,7 @@ bookForm.addEventListener('submit', async (e)=>{
     bookBtn.disabled = false;
   } finally {
     bookBtn.textContent = 'Book 30 min';
+    if (bookingOverlay) bookingOverlay.classList.add('hidden');
   }
 });
 </script>
