@@ -17,3 +17,7 @@ def index():
         return redirect(url_for("public.coaches_list"))
     return render_template("index.html")
 
+
+@main_bp.route("/privacy")
+def privacy():
+    return render_template("privacy.html")

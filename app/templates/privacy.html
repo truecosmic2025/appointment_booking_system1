@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Privacy Policy | TrueCosmic Calendar{% endblock %}
+{% block content %}
+<section class="py-16">
+  <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900">Privacy Policy</h1>
+
+    <div class="max-w-none mt-8 space-y-6 leading-7 text-slate-700">
+      <p>
+        Your privacy is important to us. This policy explains what information we collect,
+        how we use it, and your choices. By using this service, you agree to the practices
+        described here.
+      </p>
+
+      <h2 class="mt-10 text-xl font-semibold text-slate-900">Information We Collect</h2>
+      <ul class="list-disc pl-6 space-y-2">
+        <li>
+          Account information: name, email address, and password (hashed).
+        </li>
+        <li>
+          Scheduling details: meeting subject, invitee name and email, selected times, optional notes, and guests.
+        </li>
+        <li>
+          Calendar integrations: if you connect Google Calendar, we store tokens required to create and update
+          events on your behalf and metadata necessary to keep bookings in sync.
+        </li>
+        <li>
+          Usage data: basic app activity and diagnostic logs to maintain reliability and prevent abuse.
+        </li>
+      </ul>
+
+      <h2 class="mt-10 text-xl font-semibold text-slate-900">How We Use Information</h2>
+      <ul class="list-disc pl-6 space-y-2">
+        <li>Provide, operate, and improve scheduling features.</li>
+        <li>Create calendar events and send confirmations/reminders you enable.</li>
+        <li>Maintain account security and prevent misuse.</li>
+        <li>Communicate service updates and important notices.</li>
+      </ul>
+
+      <h2 class="mt-10 text-xl font-semibold text-slate-900">Google Calendar</h2>
+      <p>
+        When you connect Google Calendar, we request the minimum scopes needed to manage events you create via
+        this app. Tokens are stored securely and used only to perform actions you initiate (e.g., creating,
+        updating, or cancelling booked events). You can disconnect at any time and revoke access via your
+        Google Account security settings.
+      </p>
+
+      <h2 class="mt-10 text-xl font-semibold text-slate-900">Data Retention</h2>
+      <p>
+        Booking records and related metadata are retained to support your scheduling history and auditability.
+        You may request deletion of your account data by contacting support.
+      </p>
+
+      <h2 class="mt-10 text-xl font-semibold text-slate-900">Cookies</h2>
+      <p>
+        We use essential cookies and session storage to keep you signed in and remember preferences such as time
+        zone. We do not use cookies for third‑party advertising.
+      </p>
+
+      <h2 class="mt-10 text-xl font-semibold text-slate-900">Security</h2>
+      <p>
+        We take reasonable measures to protect your information, including encrypting credentials at rest when
+        stored and using TLS in transit. No method of transmission or storage is 100% secure; please use strong
+        passwords and protect your account.
+      </p>
+
+      <h2 class="mt-10 text-xl font-semibold text-slate-900">Your Choices</h2>
+      <ul class="list-disc pl-6 space-y-2">
+        <li>Access, update, or delete your account information from the account settings page.</li>
+        <li>Disconnect Google Calendar at any time.</li>
+        <li>Contact us for data inquiries or deletion requests.</li>
+      </ul>
+
+      <h2 class="mt-10 text-xl font-semibold text-slate-900">Contact</h2>
+      <p>
+        For questions about this policy or privacy requests, contact: info@truecosmic.com
+      </p>
+    </div>
+
+    <div class="mt-10">
+      <a href="{{ url_for('main.index') }}" class="inline-flex items-center rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Back to Home</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
