@@ -18,7 +18,7 @@ class ManyChatClient:
       - MANYCHAT_API_KEY (required)
       - MANYCHAT_BASE_URL (optional; default: https://api.manychat.com)
       - MANYCHAT_TAG_NAME (optional; default: lead_from_website_bot)
-      - MANYCHAT_BOOKING_TIME_FIELD (optional; default: booking_time)
+      - MANYCHAT_BOOKING_TIME_FIELD (optional; default: 30min_booking_time)
       - MANYCHAT_COACH_FIELD (optional; default: demo_session_coach)
     """
 
@@ -32,7 +32,7 @@ class ManyChatClient:
 
         # Defaults that can be overridden by env
         self.tag_name = os.getenv("MANYCHAT_TAG_NAME", "lead_from_website_bot").strip() or "lead_from_website_bot"
-        self.booking_time_field = os.getenv("MANYCHAT_BOOKING_TIME_FIELD", "booking_time").strip() or "booking_time"
+        self.booking_time_field = os.getenv("MANYCHAT_BOOKING_TIME_FIELD", "30min_booking_time").strip() or "30min_booking_time"
         self.coach_field = os.getenv("MANYCHAT_COACH_FIELD", "demo_session_coach").strip() or "demo_session_coach"
 
     def _headers(self) -> Dict[str, str]:
@@ -158,6 +158,93 @@ class ManyChatClient:
             log.info("ManyChat set field error: %s", e)
             return False
 
+    def _get_custom_fields_map(self) -> Dict[str, Dict[str, Any]]:
+        """Return a dict mapping lowercased field names to field objects."""
+        out: Dict[str, Dict[str, Any]] = {}
+        try:
+            r = requests.get(self._url("/fb/page/getCustomFields"), headers=self._headers(), timeout=20)
+            if r.status_code != 200:
+                return out
+            js = r.json() or {}
+            if isinstance(js, dict) and js.get("status") == "success":
+                for it in js.get("data", []) or []:
+                    nm = str(it.get("name") or it.get("caption") or "").strip()
+                    if nm:
+                        out[nm.lower()] = it
+        except Exception:
+            pass
+        return out
+
+    def set_fields_bulk_by_name(self, subscriber_id: int, fields: Dict[str, Any]) -> bool:
+        """Set multiple fields using a single API call by resolving names to IDs.
+
+        Falls back to per-field API if bulk fails.
+        """
+        try:
+            existing = self._get_custom_fields_map()
+            payload_items = []
+            missing: list[str] = []
+            for name, value in fields.items():
+                key = name.lower()
+                if key in existing and existing[key].get("id") is not None:
+                    try:
+                        fid = int(existing[key]["id"])
+                    except Exception:
+                        continue
+                    payload_items.append({
+                        "field_id": fid,
+                        "field_name": name,
+                        "field_value": value,
+                    })
+                else:
+                    missing.append(name)
+
+            # Create any missing fields (use type datetime for booking_time_field)
+            created_any = False
+            for name in missing:
+                if self._ensure_custom_field(name):
+                    created_any = True
+
+            if created_any:
+                # Refresh map
+                existing = self._get_custom_fields_map()
+                for name in missing:
+                    key = name.lower()
+                    if key in existing and existing[key].get("id") is not None:
+                        try:
+                            fid = int(existing[key]["id"])
+                        except Exception:
+                            continue
+                        payload_items.append({
+                            "field_id": fid,
+                            "field_name": name,
+                            "field_value": fields[name],
+                        })
+
+            if payload_items:
+                r = requests.post(
+                    self._url("/fb/subscriber/setCustomFields"),
+                    headers=self._headers(),
+                    json={
+                        "subscriber_id": subscriber_id,
+                        "fields": payload_items,
+                    },
+                    timeout=20,
+                )
+                if 200 <= r.status_code < 300 and (r.json() or {}).get("status") == "success":
+                    return True
+                log.info("ManyChat setCustomFields failed: %s %s", r.status_code, (r.text or "")[:300])
+
+            # Fallback: set individually
+            ok_all = True
+            for name, value in fields.items():
+                if not self.set_field_by_name(subscriber_id, name, value):
+                    ok_all = False
+            return ok_all
+        except Exception as e:
+            log.info("ManyChat bulk set error: %s", e)
+            return False
+
     def _ensure_custom_field(self, field_name: str) -> bool:
         """Ensure custom field exists; create as text if missing."""
         try:
@@ -172,10 +259,12 @@ class ManyChatClient:
                         if n == field_name.lower():
                             return True
             # Create if not present
+            # Choose appropriate field type: use 'datetime' for booking time field, else 'text'
+            ftype = "datetime" if field_name.lower() == self.booking_time_field.lower() else "text"
             r2 = requests.post(
                 self._url("/fb/page/createCustomField"),
                 headers=self._headers(),
-                json={"caption": field_name, "type": "text", "description": "Auto-created by booking sync"},
+                json={"caption": field_name, "type": ftype, "description": "Auto-created by booking sync"},
                 timeout=20,
             )
             if 200 <= r2.status_code < 300:
@@ -185,7 +274,7 @@ class ManyChatClient:
         return False
 
 
-def sync_booking_to_manychat(visitor_email: str, booking_time_local_iso: str, coach_name: str, visitor_name: str | None = None) -> None:
+def sync_booking_to_manychat(visitor_email: str, booking_time_utc_iso: str, coach_name: str, visitor_name: str | None = None) -> None:
     """Upsert visitor into ManyChat, add tag, and set custom fields.
 
     Best-effort: logs issues and returns without raising.
@@ -215,10 +304,14 @@ def sync_booking_to_manychat(visitor_email: str, booking_time_local_iso: str, co
         log.info("ManyChat: invalid subscriber id for %s", visitor_email)
         return
 
-    # Tag the contact
+    # Tag the contact (best-effort)
     client.add_tag_by_name(sid, client.tag_name)
 
-    # Set/update fields
-    client.set_field_by_name(sid, client.booking_time_field, booking_time_local_iso)
-    client.set_field_by_name(sid, client.coach_field, coach_name)
-
+    # Set/update fields in bulk for better reliability
+    client.set_fields_bulk_by_name(
+        sid,
+        {
+            client.booking_time_field: booking_time_utc_iso,
+            client.coach_field: coach_name,
+        },
+    )

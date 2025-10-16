@@ -325,12 +325,17 @@ def api_book(slug):
                         start_local = start_val.astimezone(tz)
                     except Exception:
                         start_local = start_val
+                    # Compute UTC ISO for ManyChat field
+                    try:
+                        start_utc_iso = start_val.astimezone(pytz.UTC).isoformat()
+                    except Exception:
+                        start_utc_iso = start_val.isoformat()
                     try:
                         sync_booking_to_botpenguin(visitor_email=visitor_email_val, booking_time_local_iso=start_local.isoformat(), coach_name=coach_name_val)
                     except Exception as e:
                         logging.getLogger(__name__).warning("BotPenguin sync failed: %s: %s", type(e).__name__, e)
                     try:
-                        sync_booking_to_manychat(visitor_email=visitor_email_val, booking_time_local_iso=start_local.isoformat(), coach_name=coach_name_val, visitor_name=visitor_name_val)
+                        sync_booking_to_manychat(visitor_email=visitor_email_val, booking_time_utc_iso=start_utc_iso, coach_name=coach_name_val, visitor_name=visitor_name_val)
                     except Exception as e:
                         logging.getLogger(__name__).warning("ManyChat sync failed: %s: %s", type(e).__name__, e)
                     # Send Make.com webhook if configured
