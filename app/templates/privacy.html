@@ -45,7 +45,7 @@
         Google Account security settings.
       </p>
       <p class="mt-2">
-        OAuth access tokens are stored in our database and used only by the server to call Google APIs. We do not send your Google tokens to third parties such as email providers, Make.com, or BotPenguin.
+        OAuth access tokens are stored in our database and used only by the server to call Google APIs. We do not send your Google tokens to third parties such as email providers, Make.com, BotPenguin, or ManyChat.
       </p>
 
       <h2 class="mt-10 text-xl font-semibold text-slate-900">Sharing and Disclosure</h2>
@@ -61,7 +61,10 @@
           Automation platform (Make.com webhook): we may send booking metadata (coach name, visitor email, booking time, timezone) to a webhook URL to trigger the workflows.
         </li>
         <li>
-          BotPenguin : we update your existing contact with booking time and coach name to keep your CRM/chat records in sync. We do not create new contacts or upload entire calendars.
+          BotPenguin: we update your existing contact with booking time and coach name to keep your CRM/chat records in sync. We do not create new contacts or upload entire calendars.
+        </li>
+        <li>
+          ManyChat: if configured, we look up a contact by email. If found, we add the tag <code>lead_from_website_bot</code> and update the <code>booking_time</code> and <code>demo_session_coach</code> fields. If not found, we create a new contact with your email (with opt‑in for email) and then apply the same tag and fields.
         </li>
         <li>
           Hosting and infrastructure providers (Hostinger): to operate, store, and secure the service.

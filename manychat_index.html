@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manychat API</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700"
+          rel="stylesheet">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.css">
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+
+        body {
+            margin: 0;
+            background: #fafafa;
+        }
+
+        img[alt="Online validator badge"] {
+            display: none !important;
+        }
+
+        .url {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+<div id="swagger-ui"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.js"></script>
+<script nonce="6bLDl2Nwcu12wRNlC9vShw==">
+    window.onload = function () {
+        // Build a system
+        const baseUrl = '/swagger/compileJson';
+        window.ui = SwaggerUIBundle({
+            urls: [
+                {
+                    url: baseUrl + '?type=Page_API',
+                    name: 'Page API',
+                },
+                {
+                    url: baseUrl + '?type=Profile_API',
+                    name: 'Profile API',
+                },
+            ],
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
+            ],
+            layout: "StandaloneLayout"
+        });
+    };
+
+    setTimeout(function () {
+        document.querySelectorAll('.auth-wrapper')[0].addEventListener('DOMSubtreeModified', function () {
+            const input = document.querySelectorAll('.auth-container input')[0];
+            if (input) {
+                input.setAttribute('placeholder', 'Bearer 123456:n3g42k...');
+            }
+        }, false)
+    }, 3000);
+</script>
+</body>
+</html>
+

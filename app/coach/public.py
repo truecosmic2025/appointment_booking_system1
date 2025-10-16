@@ -3,7 +3,8 @@ import json
 from datetime import datetime, timedelta, timezone, time
 import secrets
 
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, current_app
+from contextlib import nullcontext
 from flask_login import current_user
 
 from app import db
@@ -266,37 +267,81 @@ def api_book(slug):
     db.session.add(booking)
     db.session.commit()
 
+    # Capture primitives to avoid DetachedInstanceError in background thread
+    coach_email_val = coach.email
+    owner_email_val = owner.email if owner else None
+    visitor_email_val = email
+    coach_name_val = coach.name
+    visitor_name_val = name
+    booking_id_val = booking.id
+    booking_token_val = token
+    visitor_timezone_val = tzname
+    start_val = start
+    meet_link_val = meet_link
+    try:
+        from flask import request as _rq
+        base_url_val = (_rq.url_root or '').rstrip('/')
+    except Exception:
+        base_url_val = None
+
     # Kick off post-booking tasks (email + integrations) in a background thread
+    app_obj = None
+    try:
+        # Capture a real app object to use app context in the background thread
+        app_obj = current_app._get_current_object()
+    except Exception:
+        app_obj = None
+
     def _post_booking_tasks():
         try:
-            # Send emails (coach, visitor, owner)
-            try:
-                send_booking_email(coach.email, owner.email if owner else None, email, coach.name, name, start, meet_link, booking)
-            except Exception as e:
-                logging.getLogger(__name__).error("send_booking_email failed: %s: %s", type(e).__name__, e)
+            # Ensure Flask application context inside background thread
+            ctx_mgr = app_obj.app_context() if app_obj is not None else nullcontext()
+            with ctx_mgr:
+                # Send emails (coach, visitor, owner)
+                try:
+                    send_booking_email(
+                        coach_email_val,
+                        owner_email_val,
+                        visitor_email_val,
+                        coach_name_val,
+                        visitor_name_val,
+                        start_val,
+                        meet_link_val,
+                        booking_id_val,
+                        booking_token_val,
+                        visitor_timezone_val,
+                        base_url_val,
+                    )
+                except Exception as e:
+                    logging.getLogger(__name__).error("send_booking_email failed: %s: %s", type(e).__name__, e)
 
-            # Best-effort BotPenguin + Make.com webhook
-            try:
-                import pytz
-                from app.integrations.botpenguin_service import sync_booking_to_botpenguin
+                # Best-effort BotPenguin + ManyChat + Make.com webhook
                 try:
-                    tz = pytz.timezone(tzname)
-                    start_local = start.astimezone(tz)
+                    import pytz
+                    from app.integrations.botpenguin_service import sync_booking_to_botpenguin
+                    from app.integrations.manychat_service import sync_booking_to_manychat
+                    try:
+                        tz = pytz.timezone(visitor_timezone_val)
+                        start_local = start_val.astimezone(tz)
+                    except Exception:
+                        start_local = start_val
+                    try:
+                        sync_booking_to_botpenguin(visitor_email=visitor_email_val, booking_time_local_iso=start_local.isoformat(), coach_name=coach_name_val)
+                    except Exception as e:
+                        logging.getLogger(__name__).warning("BotPenguin sync failed: %s: %s", type(e).__name__, e)
+                    try:
+                        sync_booking_to_manychat(visitor_email=visitor_email_val, booking_time_local_iso=start_local.isoformat(), coach_name=coach_name_val, visitor_name=visitor_name_val)
+                    except Exception as e:
+                        logging.getLogger(__name__).warning("ManyChat sync failed: %s: %s", type(e).__name__, e)
+                    # Send Make.com webhook if configured
+                    try:
+                        webhook_url = os.getenv("MAKE_WEBHOOK_URL", "").strip()
+                        if webhook_url:
+                            send_make_booking_event(webhook_url, coach_name_val, start_local.isoformat(), visitor_timezone_val, visitor_email_val)
+                    except Exception as e:
+                        logging.getLogger(__name__).warning("Make.com webhook failed: %s: %s", type(e).__name__, e)
                 except Exception:
-                    start_local = start
-                try:
-                    sync_booking_to_botpenguin(visitor_email=email, booking_time_local_iso=start_local.isoformat(), coach_name=coach.name)
-                except Exception as e:
-                    logging.getLogger(__name__).warning("BotPenguin sync failed: %s: %s", type(e).__name__, e)
-                # Send Make.com webhook if configured
-                try:
-                    webhook_url = os.getenv("MAKE_WEBHOOK_URL", "").strip()
-                    if webhook_url:
-                        send_make_booking_event(webhook_url, coach.name, start_local.isoformat(), tzname, email)
-                except Exception as e:
-                    logging.getLogger(__name__).warning("Make.com webhook failed: %s: %s", type(e).__name__, e)
-            except Exception:
-                pass
+                    pass
         except Exception as e:
             logging.getLogger(__name__).exception("Post-booking tasks error: %s", e)
 
@@ -330,6 +375,7 @@ def send_email(subject: str, body: str, to_emails: list[str]):
     pwd = os.getenv('SMTP_PASSWORD') or os.getenv('SMTP_PASS')
     sender = os.getenv('EMAIL_FROM') or os.getenv('MAIL_FROM') or user
     use_tls = (os.getenv('SMTP_USE_TLS', 'true').lower() == 'true')
+    debug_level = int(os.getenv('SMTP_DEBUG', '0') or '0')
 
     if not (host and user and pwd and sender):
         # Skip actual sending in dev if not configured
@@ -344,21 +390,44 @@ def send_email(subject: str, body: str, to_emails: list[str]):
     # Use SMTP_SSL for port 465, SMTP with starttls for other ports
     # Use short network timeouts to avoid blocking request threads
     smtp_timeout = float(os.getenv('SMTP_TIMEOUT_SEC', '10'))
+    logger = logging.getLogger(__name__)
+    logger.info("SMTP: sending to %s via %s:%s as %s", ",".join(to_emails), host, port, sender)
     if port == 465:
         with smtplib.SMTP_SSL(host, port, timeout=smtp_timeout) as server:
+            if debug_level:
+                server.set_debuglevel(debug_level)
             server.login(user, pwd)
             server.sendmail(sender, to_emails, msg.as_string())
     else:
         with smtplib.SMTP(host, port, timeout=smtp_timeout) as server:
+            if debug_level:
+                server.set_debuglevel(debug_level)
             if use_tls:
                 server.starttls()
             server.login(user, pwd)
             server.sendmail(sender, to_emails, msg.as_string())
+    logger.info("SMTP: sent successfully to %s", ",".join(to_emails))
 
 
-def send_booking_email(coach_email, owner_email, visitor_email, coach_name, visitor_name, start, meet_link, booking):
+def send_booking_email(coach_email, owner_email, visitor_email, coach_name, visitor_name, start, meet_link, booking_id: int, booking_token: str, visitor_timezone: str | None, base_url: str | None = None):
     subject = f"Booking confirmed: {visitor_name} with {coach_name}"
-    manage = url_for('public.manage_booking', booking_id=booking.id, token=booking.token, _external=True)
+
+    # Build an absolute manage URL when possible; gracefully fall back
+    def _manage_url():
+        # Prefer explicit base_url captured from the request, if provided
+        if base_url:
+            return base_url.rstrip('/') + f"/booking/{booking_id}/{booking_token}"
+        try:
+            return url_for('public.manage_booking', booking_id=booking_id, token=booking_token, _external=True)
+        except RuntimeError:
+            # No request context or SERVER_NAME; compose path manually and prefix with base URL if provided
+            base = os.getenv('PUBLIC_BASE_URL') or os.getenv('APP_URL') or os.getenv('EXTERNAL_BASE_URL')
+            path = f"/booking/{booking_id}/{booking_token}"
+            if base:
+                return base.rstrip('/') + path
+            return path
+
+    manage = _manage_url()
 
     # Helper to make details block per timezone
     def details_for(tzname: str | None):
@@ -387,7 +456,7 @@ def send_booking_email(coach_email, owner_email, visitor_email, coach_name, visi
         sent_set.add(el)
         # Determine tz
         if e == visitor_email:
-            tzname = booking.timezone
+            tzname = visitor_timezone
         elif e == coach_email:
             tzname = _tz_for_user_email(coach_email)
         elif owner_email and e == owner_email:

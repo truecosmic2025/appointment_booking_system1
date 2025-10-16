@@ -1,0 +1,47 @@
+                tried.append((url, "EXC", str(e)))
+
+        # 2) If configured path used '/attributes', try updating the user resource directly
+        if "/attributes" in path:
+            alt_path = path.replace("/attributes", "")
+            alt_url = self._url(alt_path)
+            for payload in (attrs_array_payload(), flat_payload()):
+                try:
+                    r = requests.put(alt_url, headers=base_headers, json=payload, timeout=20)
+                    tried.append((alt_url, r.status_code, r.text[:300]))
+                    if 200 <= r.status_code < 300:
+                        return True
+                except Exception as e:
+                    tried.append((alt_url, "EXC", str(e)))
+
+        # Log attempts for debugging
+        for u, s, b in tried:
+            log.warning("BotPenguin update attempt: url=%s status=%s body=%s", u, s, b)
+        return False
+
+
+def sync_booking_to_botpenguin(visitor_email: str, booking_time_local_iso: str, coach_name: str) -> None:
+    try:
+        client = BotPenguinClient()
+    except Exception as e:
+        log.info("BotPenguin not configured: %s", e)
+        return
+
+    contact = client.find_contact_by_email(visitor_email)
+    if not contact:
+        log.info("BotPenguin: no contact found for %s", visitor_email)
+        return
+
+    contact_id = str(contact.get("_id") or contact.get("id") or contact.get("uuid") or "").strip()
+    if not contact_id:
+        log.info("BotPenguin: contact found without id, skipping")
+        return
+
+    ok = client.update_contact_attributes(contact_id, {
+        "booking_time": booking_time_local_iso,
+        "demo_session_coach": coach_name,
+    })
+    if ok:
+        log.info("BotPenguin: updated contact %s", contact_id)
+    else:
+        log.warning("BotPenguin: failed to update contact %s", contact_id)
+
