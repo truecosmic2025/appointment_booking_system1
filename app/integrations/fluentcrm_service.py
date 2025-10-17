@@ -349,6 +349,10 @@ class FluentCRMClient:
         """Try multiple payload shapes against contacts/subscribers update endpoints to attach lists."""
         target_set = set(int(x) for x in list_ids or [])
         payloads: list[Dict[str, Any]] = [
+            # Official documented format (https://developers.fluentcrm.com/rest-api/lists/)
+            {"subscriber": {"attach_lists": list_ids, "detach_lists": []}},
+            {"contact": {"attach_lists": list_ids, "detach_lists": []}},
+            # Legacy/alternative formats
             {"lists": list_ids},
             {"list_ids": list_ids},
             {"lists_map": {"attach": list_ids, "detach": []}},
