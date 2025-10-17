@@ -335,9 +335,28 @@ def api_book(slug):
                     except Exception as e:
                         logging.getLogger(__name__).warning("BotPenguin sync failed: %s: %s", type(e).__name__, e)
                     try:
-                        sync_booking_to_manychat(visitor_email=visitor_email_val, booking_time_utc_iso=start_utc_iso, coach_name=coach_name_val, visitor_name=visitor_name_val)
+                        logging.getLogger(__name__).info(
+                            "ManyChat: syncing visitor=%s coach=%s time_utc=%s",
+                            visitor_email_val,
+                            coach_name_val,
+                            start_utc_iso,
+                        )
+                        sync_booking_to_manychat(
+                            visitor_email=visitor_email_val,
+                            booking_time_utc_iso=start_utc_iso,
+                            coach_name=coach_name_val,
+                            visitor_name=visitor_name_val,
+                        )
                     except Exception as e:
                         logging.getLogger(__name__).warning("ManyChat sync failed: %s: %s", type(e).__name__, e)
+                    # After ManyChat: sync contact to FluentCRM
+                    try:
+                        from app.integrations.fluentcrm_service import sync_contact_to_fluentcrm
+                        logging.getLogger(__name__).info("FluentCRM: syncing contact email=%s name=%s", email, name)
+                        sync_contact_to_fluentcrm(email, name)
+                    except Exception as e:
+                        logging.getLogger(__name__).warning("FluentCRM sync failed: %s: %s", type(e).__name__, e)
+
                     # Send Make.com webhook if configured
                     try:
                         webhook_url = os.getenv("MAKE_WEBHOOK_URL", "").strip()
@@ -351,9 +370,13 @@ def api_book(slug):
             logging.getLogger(__name__).exception("Post-booking tasks error: %s", e)
 
     try:
-        threading.Thread(target=_post_booking_tasks, daemon=True).start()
+        if os.getenv('SYNC_POST_BOOKING', '0').lower() in ('1','true','yes'):
+            logging.getLogger(__name__).info("Running post-booking tasks synchronously (SYNC_POST_BOOKING=1)")
+            _post_booking_tasks()
+        else:
+            threading.Thread(target=_post_booking_tasks, daemon=True).start()
     except Exception as e:
-        logging.getLogger(__name__).warning("Failed to start background thread: %s: %s", type(e).__name__, e)
+        logging.getLogger(__name__).warning("Failed to dispatch post-booking tasks: %s: %s", type(e).__name__, e)
 
     # Build a relative manage URL for the API response to avoid proxy/scheme issues
     try:

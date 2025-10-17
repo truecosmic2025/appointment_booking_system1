@@ -46,24 +46,42 @@ class ManyChatClient:
         return f"{self.base_url}{path}"
 
     def find_contact_by_email(self, email: str) -> Optional[Dict[str, Any]]:
-        """Return subscriber object if found by email, else None."""
-        try:
-            r = requests.get(
-                self._url("/fb/subscriber/findBySystemField"),
-                headers=self._headers(),
-                params={"email": email},
-                timeout=20,
-            )
-            if r.status_code != 200:
-                log.info("ManyChat findBySystemField failed: %s %s", r.status_code, r.text[:300])
-                return None
-            data = r.json() if r.content else {}
-            if isinstance(data, dict) and data.get("status") == "success" and isinstance(data.get("data"), dict):
-                return data["data"]
-            return None
-        except Exception as e:
-            log.info("ManyChat find error: %s", e)
-            return None
+        """Return subscriber object if found by email, else None.
+
+        Tries both parameter styles used by ManyChat docs/SDKs.
+        """
+        attempts = [
+            {"field": "email", "value": email},
+            {"email": email},
+        ]
+        for idx, params in enumerate(attempts, start=1):
+            try:
+                r = requests.get(
+                    self._url("/fb/subscriber/findBySystemField"),
+                    headers=self._headers(),
+                    params=params,
+                    timeout=20,
+                )
+                if r.status_code != 200:
+                    log.info(
+                        "ManyChat findBySystemField attempt %s failed: %s %s",
+                        idx,
+                        r.status_code,
+                        (r.text or "")[:300],
+                    )
+                    continue
+                data = r.json() if r.content else {}
+                if isinstance(data, dict):
+                    if data.get("status") == "success" and isinstance(data.get("data"), dict):
+                        log.info("ManyChat findBySystemField success on attempt %s for %s", idx, email)
+                        return data["data"]
+                    if data.get("status") == "error":
+                        log.info("ManyChat findBySystemField attempt %s error: %s", idx, data)
+                else:
+                    log.info("ManyChat findBySystemField attempt %s unexpected payload: %s", idx, type(data).__name__)
+            except Exception as e:
+                log.info("ManyChat find error on attempt %s: %s", idx, e)
+        return None
 
     def _subscriber_id_to_int(self, subscriber: Dict[str, Any]) -> Optional[int]:
         sid = subscriber.get("id")
@@ -115,9 +133,14 @@ class ManyChatClient:
                 json={"subscriber_id": subscriber_id, "tag_name": tag_name},
                 timeout=15,
             )
-            if 200 <= r.status_code < 300 and r.json().get("status") == "success":
-                return True
-            log.info("ManyChat addTagByName failed: %s %s", r.status_code, r.text[:300])
+            if 200 <= r.status_code < 300:
+                js = r.json() if r.content else {}
+                if isinstance(js, dict) and js.get("status") == "success":
+                    log.info("ManyChat addTagByName success: tag=%s subscriber_id=%s", tag_name, subscriber_id)
+                    return True
+                log.info("ManyChat addTagByName error: %s", js)
+            else:
+                log.info("ManyChat addTagByName failed: %s %s", r.status_code, (r.text or "")[:300])
             return False
         except Exception as e:
             log.info("ManyChat tag error: %s", e)
@@ -231,9 +254,14 @@ class ManyChatClient:
                     },
                     timeout=20,
                 )
-                if 200 <= r.status_code < 300 and (r.json() or {}).get("status") == "success":
-                    return True
-                log.info("ManyChat setCustomFields failed: %s %s", r.status_code, (r.text or "")[:300])
+                if 200 <= r.status_code < 300:
+                    js = r.json() if r.content else {}
+                    if isinstance(js, dict) and js.get("status") == "success":
+                        log.info("ManyChat setCustomFields success for subscriber_id=%s fields=%s", subscriber_id, list(fields.keys()))
+                        return True
+                    log.info("ManyChat setCustomFields error: %s", js)
+                else:
+                    log.info("ManyChat setCustomFields failed: %s %s", r.status_code, (r.text or "")[:300])
 
             # Fallback: set individually
             ok_all = True
@@ -268,6 +296,7 @@ class ManyChatClient:
                 timeout=20,
             )
             if 200 <= r2.status_code < 300:
+                log.info("ManyChat created custom field '%s' of type %s", field_name, ftype)
                 return True
         except Exception as e:
             log.info("ManyChat ensure field error: %s", e)

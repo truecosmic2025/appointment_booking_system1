@@ -29,8 +29,17 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Logging
 LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
+level = getattr(logging, LOG_LEVEL, logging.INFO)
 try:
-    app.logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
+    # Configure root logger so module loggers are visible
+    root_logger = logging.getLogger()
+    if not root_logger.handlers:
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s: %(message)s')
+        handler.setFormatter(formatter)
+        root_logger.addHandler(handler)
+    root_logger.setLevel(level)
+    app.logger.setLevel(level)
 except Exception:
     app.logger.setLevel(logging.INFO)
 

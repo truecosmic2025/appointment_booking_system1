@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import os
 import click
+import logging
 from dotenv import load_dotenv
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -25,6 +26,20 @@ def create_app():
         db_uri = db_uri.replace("postgres://", "postgresql://", 1)
     app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    # Configure root logging once so integration modules log visibly
+    try:
+        log_level_name = os.getenv("LOG_LEVEL", "INFO").upper()
+        log_level = getattr(logging, log_level_name, logging.INFO)
+        root_logger = logging.getLogger()
+        if not root_logger.handlers:
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
+            handler.setFormatter(formatter)
+            root_logger.addHandler(handler)
+        root_logger.setLevel(log_level)
+    except Exception:
+        pass
 
     # Trust reverse proxy headers (Railway/Heroku-style) for scheme/host
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
