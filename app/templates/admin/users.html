@@ -3,10 +3,10 @@
 {% block content %}
 <section class="py-12">
   <div class="mx-auto max-w-6xl px-4">
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between flex-wrap gap-3">
       <h1 class="text-2xl font-bold text-slate-900">Users</h1>
-      <form method="get" class="flex items-center gap-2">
-        <input type="text" name="q" value="{{ q }}" placeholder="Search name or email" class="w-64 rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500" />
+      <form method="get" class="flex items-center gap-2 w-full sm:w-auto">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search name or email" class="w-full sm:w-64 rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500" />
         <button class="rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white">Search</button>
       </form>
     </div>
@@ -26,8 +26,8 @@
         <tbody class="divide-y divide-slate-200">
           {% for u in users %}
           <tr>
-            <td class="px-4 py-3 text-slate-900">{{ u.name }}</td>
-            <td class="px-4 py-3 text-slate-600">{{ u.email }}</td>
+            <td class="px-4 py-3 text-slate-900 break-words">{{ u.name }}</td>
+            <td class="px-4 py-3 text-slate-600 break-all">{{ u.email }}</td>
             <td class="px-4 py-3">
               <form method="post" action="{{ url_for('admin.users_set_role', user_id=u.id) }}" class="flex items-center gap-2">
                 <select name="role" class="rounded-md border border-slate-300 px-2 py-1 text-sm"

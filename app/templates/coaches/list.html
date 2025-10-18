@@ -8,7 +8,7 @@
       {% for u in users %}
         <a href="/c/{{ profiles.get(u.id).slug if profiles.get(u.id) else '#' }}" class="block rounded-lg border border-slate-200 bg-white p-5 hover:shadow">
           <div class="font-semibold text-slate-900">{{ u.name }}</div>
-          <div class="text-sm text-slate-600">{{ u.email }}</div>
+          <div class="text-sm text-slate-600 break-all">{{ u.email }}</div>
           {% if not profiles.get(u.id) or not profiles.get(u.id).google_credentials %}
             <div class="mt-2 text-xs text-amber-600">Google Calendar not connected</div>
           {% else %}
