@@ -43,7 +43,7 @@
         <div class="mt-4 overflow-x-auto">
           <table class="min-w-full text-sm">
             <thead class="text-left text-slate-600">
-              <tr><th class="py-2 pr-4">Start ({{ tz_name }})</th><th class="py-2 pr-4">Visitor</th><th class="py-2 pr-4">Status</th><th class="py-2 pr-4">Meet</th></tr>
+              <tr><th class="py-2 pr-4">Start ({{ tz_name }})</th><th class="py-2 pr-4">Visitor</th><th class="py-2 pr-4">Status</th><th class="py-2 pr-4">Meet</th><th class="py-2 pr-4">Actions</th></tr>
             </thead>
             <tbody class="divide-y divide-slate-200">
               {% for r in upcoming_local %}
@@ -52,9 +52,15 @@
                 <td class="py-2 pr-4">{{ r.visitor_name }} ({{ r.visitor_email }})</td>
                 <td class="py-2 pr-4">{{ r.status }}</td>
                 <td class="py-2 pr-4">{% if r.meet_link and r.status != 'cancelled' %}<a class="text-brand-700 hover:underline" href="{{ r.meet_link }}" target="_blank">Join</a>{% else %}-{% endif %}</td>
+                <td class="py-2 pr-4">
+                  {% if r.manage_url %}
+                    <a class="text-brand-700 hover:underline" href="{{ r.manage_url }}#reschedule">Reschedule</a>
+                    <button type="button" class="ml-3 text-red-700 hover:underline js-cancel-booking" data-cancel-url="{{ r.manage_url }}/cancel">Cancel</button>
+                  {% else %}-{% endif %}
+                </td>
               </tr>
               {% else %}
-              <tr><td class="py-4 text-slate-500" colspan="4">No upcoming sessions.</td></tr>
+              <tr><td class="py-4 text-slate-500" colspan="5">No upcoming sessions.</td></tr>
               {% endfor %}
             </tbody>
           </table>
@@ -123,6 +129,30 @@
         if(!isNaN(dt.getTime())){
           node.textContent = fmt(dt);
         }
+      });
+
+      // Inline cancel buttons
+      document.addEventListener('click', function(e){
+        var btn = e.target && e.target.closest('.js-cancel-booking');
+        if(!btn) return;
+        e.preventDefault();
+        var url = btn.getAttribute('data-cancel-url');
+        if(!url) return;
+        var prev = btn.textContent;
+        btn.textContent = 'Cancelling...';
+        btn.disabled = true;
+        fetch(url, {method:'POST'}).then(function(r){ return r.json(); }).then(function(d){
+          if(d && d.ok){ location.reload(); }
+          else {
+            btn.textContent = prev;
+            btn.disabled = false;
+            alert((d && d.error) ? ('Cancel failed: ' + d.error) : 'Cancel failed. Please try again.');
+          }
+        }).catch(function(){
+          btn.textContent = prev;
+          btn.disabled = false;
+          alert('Cancel failed. Please try again.');
+        });
       });
     });
   })();

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, url_for
 from flask_login import login_required, current_user
 
 from app import db
@@ -136,6 +136,7 @@ def host():
             'visitor_email': b.visitor_email,
             'status': b.status,
             'meet_link': getattr(b, 'meet_link', None),
+            'manage_url': url_for('public.manage_booking', booking_id=b.id, token=b.token),
         })
 
     return render_template(
