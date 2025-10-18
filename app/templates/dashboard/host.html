@@ -51,7 +51,7 @@
                 <td class="py-2 pr-4"><span class="js-local-dt" data-utc="{{ upcoming[loop.index0].start_utc.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ r.start_local_str }}</span></td>
                 <td class="py-2 pr-4">{{ r.visitor_name }} ({{ r.visitor_email }})</td>
                 <td class="py-2 pr-4">{{ r.status }}</td>
-                <td class="py-2 pr-4">{% if r.meet_link %}<a class="text-brand-700 hover:underline" href="{{ r.meet_link }}" target="_blank">Join</a>{% else %}-{% endif %}</td>
+                <td class="py-2 pr-4">{% if r.meet_link and r.status != 'cancelled' %}<a class="text-brand-700 hover:underline" href="{{ r.meet_link }}" target="_blank">Join</a>{% else %}-{% endif %}</td>
               </tr>
               {% else %}
               <tr><td class="py-4 text-slate-500" colspan="4">No upcoming sessions.</td></tr>

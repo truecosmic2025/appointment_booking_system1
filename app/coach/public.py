@@ -531,6 +531,9 @@ def cancel_booking(booking_id: int, token: str):
     if b.google_event_id:
         cancel_event(profile.google_credentials, b.google_event_id)
     b.status = 'cancelled'
+    # Clear joinable artifacts from the record so UIs don't show them
+    b.meet_link = None
+    b.google_event_id = None
     db.session.commit()
     # Notify
     owner = User.query.filter_by(role="owner").first() or User.query.filter_by(role="admin").first()
