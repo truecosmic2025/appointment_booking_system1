@@ -55,7 +55,13 @@
                 <td class="py-2 pr-4">
                   {% if r.manage_url %}
                     <a class="text-brand-700 hover:underline" href="{{ r.manage_url }}#reschedule">Reschedule</a>
-                    <button type="button" class="ml-3 text-red-700 hover:underline js-cancel-booking" data-cancel-url="{{ r.manage_url }}/cancel">Cancel</button>
+                    <button type="button" class="ml-3 inline-flex items-center gap-2 text-red-700 hover:underline js-cancel-booking" data-cancel-url="{{ r.manage_url }}/cancel">
+                      <svg class="js-cancel-spinner hidden h-4 w-4 animate-spin text-red-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                      </svg>
+                      <span class="js-cancel-text">Cancel</span>
+                    </button>
                   {% else %}-{% endif %}
                 </td>
               </tr>
@@ -136,21 +142,30 @@
         var btn = e.target && e.target.closest('.js-cancel-booking');
         if(!btn) return;
         e.preventDefault();
+        if(!confirm('Cancel this booking? This cannot be undone.')){ return; }
         var url = btn.getAttribute('data-cancel-url');
         if(!url) return;
-        var prev = btn.textContent;
-        btn.textContent = 'Cancelling...';
+        var spinner = btn.querySelector('.js-cancel-spinner');
+        var textEl = btn.querySelector('.js-cancel-text');
+        var prevText = textEl ? textEl.textContent : null;
         btn.disabled = true;
+        btn.classList.add('opacity-70','cursor-not-allowed');
+        if(spinner){ spinner.classList.remove('hidden'); }
+        if(textEl){ textEl.textContent = 'Cancelling...'; }
         fetch(url, {method:'POST'}).then(function(r){ return r.json(); }).then(function(d){
           if(d && d.ok){ location.reload(); }
           else {
-            btn.textContent = prev;
             btn.disabled = false;
+            btn.classList.remove('opacity-70','cursor-not-allowed');
+            if(spinner){ spinner.classList.add('hidden'); }
+            if(textEl && prevText !== null){ textEl.textContent = prevText; }
             alert((d && d.error) ? ('Cancel failed: ' + d.error) : 'Cancel failed. Please try again.');
           }
         }).catch(function(){
-          btn.textContent = prev;
           btn.disabled = false;
+          btn.classList.remove('opacity-70','cursor-not-allowed');
+          if(spinner){ spinner.classList.add('hidden'); }
+          if(textEl && prevText !== null){ textEl.textContent = prevText; }
           alert('Cancel failed. Please try again.');
         });
       });

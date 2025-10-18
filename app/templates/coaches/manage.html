@@ -47,6 +47,10 @@ const cancelBtnText = document.getElementById('cancelBtnText');
 const cancelSpinner = document.getElementById('cancelSpinner');
 document.getElementById('cancelForm')?.addEventListener('submit', async (e)=>{
   e.preventDefault();
+  // Confirm before proceeding
+  if(!confirm('Cancel this booking? This cannot be undone.')){
+    return;
+  }
   // Enter cancelling state
   cancelBtn?.classList.add('opacity-70','cursor-not-allowed');
   if(cancelBtn) cancelBtn.disabled = true;
