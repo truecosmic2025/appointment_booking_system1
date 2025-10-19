@@ -370,9 +370,25 @@ def api_book(slug):
             logging.getLogger(__name__).exception("Post-booking tasks error: %s", e)
 
     try:
-        if os.getenv('SYNC_POST_BOOKING', '0').lower() in ('1','true','yes'):
-            logging.getLogger(__name__).info("Running post-booking tasks synchronously (SYNC_POST_BOOKING=1)")
-            _post_booking_tasks()
+        sync_mode = os.getenv('SYNC_POST_BOOKING', '0').lower() in ('1','true','yes')
+        if sync_mode:
+            # Even in synchronous mode, cap how long we block the request thread
+            # to avoid Gunicorn timeouts under slow external APIs.
+            try:
+                budget_sec = int(os.getenv('POST_BOOKING_SYNC_BUDGET_SEC', '8'))
+            except Exception:
+                budget_sec = 8
+            logging.getLogger(__name__).info(
+                "Running post-booking tasks with budget=%ss (SYNC_POST_BOOKING=1)",
+                budget_sec,
+            )
+            t = threading.Thread(target=_post_booking_tasks, daemon=True)
+            t.start()
+            t.join(timeout=budget_sec)
+            if t.is_alive():
+                logging.getLogger(__name__).warning(
+                    "Post-booking tasks exceeded budget; continuing in background"
+                )
         else:
             threading.Thread(target=_post_booking_tasks, daemon=True).start()
     except Exception as e:
