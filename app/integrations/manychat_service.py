@@ -51,8 +51,8 @@ class ManyChatClient:
         Tries both parameter styles used by ManyChat docs/SDKs.
         """
         attempts = [
-            {"field": "email", "value": email},
             {"email": email},
+            {"field": "email", "value": email},
         ]
         for idx, params in enumerate(attempts, start=1):
             try:

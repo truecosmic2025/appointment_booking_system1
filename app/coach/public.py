@@ -408,49 +408,139 @@ def send_email(subject: str, body: str, to_emails: list[str]):
     from email.mime.text import MIMEText
     from email.mime.multipart import MIMEMultipart
 
+    logger = logging.getLogger(__name__)
+
     # Respect standard env names with fallbacks for older keys
     email_enabled = (os.getenv('EMAIL_ENABLED', 'false').lower() == 'true')
     if not email_enabled:
         return
 
+    # Configure sender meta
+    sender = os.getenv('EMAIL_FROM') or os.getenv('MAIL_FROM') or (os.getenv('SMTP_USERNAME') or os.getenv('SMTP_USER'))
+    sender_name = os.getenv('EMAIL_FROM_NAME', '').strip()
+    if not sender:
+        # Nothing configured; skip silently in dev
+        return
+
+    # Detect available HTTP providers (prefer HTTP API in PaaS environments where SMTP may be blocked)
+    sendgrid_key = os.getenv('SENDGRID_API_KEY', '').strip()
+    resend_key = os.getenv('RESEND_API_KEY', '').strip()
+    mailersend_key = os.getenv('MAILERSEND_API_TOKEN', '').strip()
+    transport = (os.getenv('EMAIL_TRANSPORT', 'auto').strip().lower() or 'auto')  # auto|smtp|api
+
+    def _send_via_http_provider() -> bool:
+        try:
+            headers = {"Accept": "application/json"}
+            timeout = float(os.getenv('EMAIL_HTTP_TIMEOUT_SEC', '10'))
+            # RESEND
+            if resend_key:
+                headers["Authorization"] = f"Bearer {resend_key}"
+                payload = {
+                    "from": f"{sender_name} <{sender}>" if sender_name else sender,
+                    "to": to_emails,
+                    "subject": subject,
+                    "text": body,
+                }
+                r = requests.post("https://api.resend.com/emails", json=payload, headers=headers, timeout=timeout)
+                if 200 <= r.status_code < 300:
+                    logger.info("Email: sent via Resend to %s", ",".join(to_emails))
+                    return True
+                logger.info("Resend send failed: %s %s", r.status_code, (r.text or '')[:300])
+            # SENDGRID
+            if sendgrid_key:
+                headers = {
+                    "Authorization": f"Bearer {sendgrid_key}",
+                    "Content-Type": "application/json",
+                }
+                content = [{"type": "text/plain", "value": body}]
+                tos = [{"email": e} for e in to_emails]
+                payload = {
+                    "personalizations": [{"to": tos}],
+                    "from": {"email": sender, **({"name": sender_name} if sender_name else {})},
+                    "subject": subject,
+                    "content": content,
+                }
+                r = requests.post("https://api.sendgrid.com/v3/mail/send", json=payload, headers=headers, timeout=timeout)
+                if r.status_code in (200, 202):
+                    logger.info("Email: sent via SendGrid to %s", ",".join(to_emails))
+                    return True
+                logger.info("SendGrid send failed: %s %s", r.status_code, (r.text or '')[:300])
+            # MAILERSEND
+            if mailersend_key:
+                headers = {
+                    "Authorization": f"Bearer {mailersend_key}",
+                    "Content-Type": "application/json",
+                }
+                payload = {
+                    "from": {"email": sender, **({"name": sender_name} if sender_name else {})},
+                    "to": [{"email": e} for e in to_emails],
+                    "subject": subject,
+                    "text": body,
+                }
+                r = requests.post("https://api.mailersend.com/v1/email", json=payload, headers=headers, timeout=timeout)
+                if 200 <= r.status_code < 300:
+                    logger.info("Email: sent via MailerSend to %s", ",".join(to_emails))
+                    return True
+                logger.info("MailerSend send failed: %s %s", r.status_code, (r.text or '')[:300])
+        except Exception as e:
+            logger.info("Email HTTP provider error: %s: %s", type(e).__name__, e)
+        return False
+
+    # If transport prefers API and a provider is configured, try it first
+    if transport in ('api', 'http') and (sendgrid_key or resend_key or mailersend_key):
+        if _send_via_http_provider():
+            return
+
+    # Otherwise, attempt SMTP (may be blocked on some PaaS)
     host = os.getenv('SMTP_HOST')
     port = int(os.getenv('SMTP_PORT', '587'))
     user = os.getenv('SMTP_USERNAME') or os.getenv('SMTP_USER')
     pwd = os.getenv('SMTP_PASSWORD') or os.getenv('SMTP_PASS')
-    sender = os.getenv('EMAIL_FROM') or os.getenv('MAIL_FROM') or user
     use_tls = (os.getenv('SMTP_USE_TLS', 'true').lower() == 'true')
     debug_level = int(os.getenv('SMTP_DEBUG', '0') or '0')
 
-    if not (host and user and pwd and sender):
-        # Skip actual sending in dev if not configured
+    if host and user and pwd:
+        msg = MIMEMultipart()
+        msg['From'] = f"{sender_name} <{sender}>" if sender_name else sender
+        msg['To'] = ", ".join(to_emails)
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Use SMTP_SSL for port 465, SMTP with starttls for other ports
+        # Use short network timeouts to avoid blocking request threads
+        smtp_timeout = float(os.getenv('SMTP_TIMEOUT_SEC', '8'))
+        try:
+            logger.info("SMTP: sending to %s via %s:%s as %s", ",".join(to_emails), host, port, sender)
+            if port == 465:
+                with smtplib.SMTP_SSL(host, port, timeout=smtp_timeout) as server:
+                    if debug_level:
+                        server.set_debuglevel(debug_level)
+                    server.login(user, pwd)
+                    server.sendmail(sender, to_emails, msg.as_string())
+            else:
+                with smtplib.SMTP(host, port, timeout=smtp_timeout) as server:
+                    if debug_level:
+                        server.set_debuglevel(debug_level)
+                    if use_tls:
+                        server.starttls()
+                    server.login(user, pwd)
+                    server.sendmail(sender, to_emails, msg.as_string())
+            logger.info("SMTP: sent successfully to %s", ",".join(to_emails))
+            return
+        except Exception as e:
+            logger.error("SMTP send failed: %s: %s", type(e).__name__, e)
+            # If API providers are available and transport is auto, try fallback via HTTP
+            if transport == 'auto' and (sendgrid_key or resend_key or mailersend_key):
+                if _send_via_http_provider():
+                    return
+            # else, give up silently (best-effort)
+            return
+
+    # No SMTP configured; if API available, try it
+    if _send_via_http_provider():
         return
-
-    msg = MIMEMultipart()
-    msg['From'] = sender
-    msg['To'] = ", ".join(to_emails)
-    msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'plain'))
-
-    # Use SMTP_SSL for port 465, SMTP with starttls for other ports
-    # Use short network timeouts to avoid blocking request threads
-    smtp_timeout = float(os.getenv('SMTP_TIMEOUT_SEC', '10'))
-    logger = logging.getLogger(__name__)
-    logger.info("SMTP: sending to %s via %s:%s as %s", ",".join(to_emails), host, port, sender)
-    if port == 465:
-        with smtplib.SMTP_SSL(host, port, timeout=smtp_timeout) as server:
-            if debug_level:
-                server.set_debuglevel(debug_level)
-            server.login(user, pwd)
-            server.sendmail(sender, to_emails, msg.as_string())
-    else:
-        with smtplib.SMTP(host, port, timeout=smtp_timeout) as server:
-            if debug_level:
-                server.set_debuglevel(debug_level)
-            if use_tls:
-                server.starttls()
-            server.login(user, pwd)
-            server.sendmail(sender, to_emails, msg.as_string())
-    logger.info("SMTP: sent successfully to %s", ",".join(to_emails))
+    # Nothing could send; log and exit
+    logger.info("Email: no available transport configured; skipped sending to %s", ",".join(to_emails))
 
 
 def send_booking_email(coach_email, owner_email, visitor_email, coach_name, visitor_name, start, meet_link, booking_id: int, booking_token: str, visitor_timezone: str | None, base_url: str | None = None):
