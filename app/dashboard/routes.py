@@ -30,10 +30,14 @@ def owner():
         Booking.query.filter(Booking.created_at >= last_30, Booking.status == "cancelled").count()
     )
 
-    coaches_q = User.query.filter(User.role.in_(["host", "owner", "admin"]))
+    # Active coaches (hosts only)
+    coaches_q = User.query.filter(User.role == "host", User.is_active == True)
     total_coaches = coaches_q.count()
     connected = (
-        CoachProfile.query.filter(CoachProfile.google_credentials.isnot(None)).count()
+        db.session.query(CoachProfile)
+        .join(User, CoachProfile.user_id == User.id)
+        .filter(User.role == "host", User.is_active == True, CoachProfile.google_credentials.isnot(None))
+        .count()
     )
 
     upcoming = (
@@ -51,7 +55,7 @@ def owner():
     coach_rows = (
         db.session.query(User, CoachProfile)
         .outerjoin(CoachProfile, CoachProfile.user_id == User.id)
-        .filter(User.role.in_(["host", "owner", "admin"]))
+        .filter(User.role == "host", User.is_active == True)
         .order_by(User.name.asc())
         .all()
     )
