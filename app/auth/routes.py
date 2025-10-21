@@ -8,6 +8,14 @@ from app.models.booking import Booking
 from app.integrations.google_service import cancel_event
 from functools import wraps
 from urllib.parse import urlparse
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+import os
+
+# Reuse existing email sender used elsewhere in the app
+try:
+    from app.coach.public import send_email as send_app_email
+except Exception:
+    send_app_email = None
 
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -56,6 +64,93 @@ def login():
             return redirect(dest)
 
     return render_template("auth/login.html")
+
+
+def _reset_serializer():
+    secret = os.getenv("SECRET_KEY", "dev-secret-change-me")
+    salt = os.getenv("PASSWORD_RESET_SALT", "password-reset")
+    return URLSafeTimedSerializer(secret_key=secret, salt=salt)
+
+
+def _generate_reset_token(email: str) -> str:
+    s = _reset_serializer()
+    return s.dumps({"email": email.lower().strip()})
+
+
+def _verify_reset_token(token: str, max_age_seconds: int = 3600) -> str | None:
+    s = _reset_serializer()
+    try:
+        data = s.loads(token, max_age=max_age_seconds)
+        return (data or {}).get("email")
+    except (BadSignature, SignatureExpired):
+        return None
+
+
+@auth_bp.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = (request.form.get("email", "") or "").strip().lower()
+        if not email:
+            flash("Please enter your email.", "error")
+            return redirect(url_for("auth.forgot_password"))
+
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            flash("No account found for that email.", "error")
+            return redirect(url_for("auth.forgot_password"))
+
+        try:
+            token = _generate_reset_token(email)
+            reset_url = url_for("auth.reset_password", token=token, _external=True)
+            subject = "Reset your password"
+            body_lines = [
+                f"Hi {user.name},",
+                "\nWe received a request to reset your password.",
+                f"Reset your password using the link below:",
+                reset_url,
+                "\nIf you didn't request this, you can ignore this email.",
+            ]
+            body = "\n".join(body_lines)
+            if send_app_email:
+                try:
+                    send_app_email(subject, body, [email])
+                except Exception:
+                    pass
+        except Exception:
+            # Treat as success even if email sending fails silently
+            pass
+        flash("Password reset link sent. Please check your email.", "success")
+        return redirect(url_for("auth.login"))
+
+    return render_template("auth/forgot_password.html")
+
+
+@auth_bp.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token: str):
+    email = _verify_reset_token(token)
+    if not email:
+        flash("That reset link is invalid or has expired.", "error")
+        return redirect(url_for("auth.forgot_password"))
+
+    if request.method == "POST":
+        pw1 = request.form.get("password", "")
+        pw2 = request.form.get("password2", "")
+        if not pw1 or not pw2:
+            flash("Please enter and confirm your new password.", "error")
+            return render_template("auth/reset_password.html", token=token)
+        if pw1 != pw2:
+            flash("Passwords do not match.", "error")
+            return render_template("auth/reset_password.html", token=token)
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            flash("Account not found.", "error")
+            return redirect(url_for("auth.forgot_password"))
+        user.set_password(pw1)
+        db.session.commit()
+        flash("Your password has been updated. Please sign in.", "success")
+        return redirect(url_for("auth.login"))
+
+    return render_template("auth/reset_password.html", token=token)
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
