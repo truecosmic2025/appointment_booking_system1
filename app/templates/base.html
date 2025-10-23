@@ -30,7 +30,16 @@
         }
       }
     </script>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement(
+                {pageLanguage: 'en'},
+                'google_translate_element'
+            );
+        }
+    </script>
 
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -135,6 +144,7 @@
             <span class="hidden inline-flex h-12 w-12 items-center justify-center rounded-md bg-slate-900 text-white font-bold text-lg">C</span>
             <span>© <span id="year"></span> TrueCosmic Calendar</span>
           </div>
+          <div id="google_translate_element"></div>
           <div class="flex items-center gap-6 text-sm text-slate-600">
             <a href="{{ url_for('main.privacy') }}" class="hover:text-slate-900">Privacy</a>
           </div>
