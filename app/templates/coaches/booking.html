@@ -42,6 +42,9 @@
         <form id="bookForm" class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
           <input type="text" name="name" placeholder="Your name" class="w-full rounded-md border border-slate-300 px-3 py-2" value="{{ prefill_name }}" {% if prefill_name %}readonly{% endif %} required>
           <input type="email" name="email" placeholder="Your email" class="w-full rounded-md border border-slate-300 px-3 py-2" value="{{ prefill_email }}" {% if prefill_email %}readonly{% endif %} required>
+          {% if prefill_phone %}
+          <input type="hidden" name="phone" value="{{ prefill_phone }}">
+          {% endif %}
           <button type="submit" class="rounded-md bg-slate-900 px-4 py-2 text-white" disabled id="bookBtn">Book 30 min</button>
         </form>
         <div id="slots" class="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"></div>
@@ -137,6 +140,10 @@ bookForm.addEventListener('submit', async (e)=>{
   if(!selectedStart){ alert('Select a time'); return; }
   const form = new FormData(bookForm);
   const payload = { name: form.get('name'), email: form.get('email'), start: selectedStart, timezone: (tzInput.value || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC') };
+  const phone = form.get('phone');
+  if (phone) {
+    payload.phone = phone;
+  }
   bookBtn.disabled = true;
   bookBtn.textContent = 'Booking...';
   if (bookingOverlay) bookingOverlay.classList.remove('hidden');

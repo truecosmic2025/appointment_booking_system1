@@ -155,6 +155,16 @@ def create_app():
                     # If migration fails (e.g., other DB), ignore silently to avoid crash
                     db.session.rollback()
                     pass
+            booking_columns = [col['name'] for col in inspector.get_columns('booking')]
+            if 'visitor_phone' not in booking_columns:
+                try:
+                    print("Running migration: Adding visitor_phone column to booking table...")
+                    db.session.execute(text("ALTER TABLE booking ADD COLUMN visitor_phone VARCHAR(32)"))
+                    db.session.commit()
+                    print("visitor_phone column added successfully")
+                except Exception as _e:
+                    db.session.rollback()
+                    pass
         except Exception as e:
             # Migration already done or error - continue silently
             pass

@@ -7,6 +7,7 @@ class Booking(db.Model):
     coach_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
     visitor_name = db.Column(db.String(120), nullable=False)
     visitor_email = db.Column(db.String(255), nullable=False, index=True)
+    visitor_phone = db.Column(db.String(32), nullable=True)
     start_utc = db.Column(db.DateTime, nullable=False, index=True)
     end_utc = db.Column(db.DateTime, nullable=False)
     timezone = db.Column(db.String(64), default='UTC', nullable=False)

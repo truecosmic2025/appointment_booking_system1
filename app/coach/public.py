@@ -96,9 +96,10 @@ def coach_page(slug):
     # Get query parameters for pre-filling the form
     prefill_name = request.args.get('name', '').strip()
     prefill_email = request.args.get('email', '').strip()
+    prefill_phone = request.args.get('phone', '').strip()
     
     return render_template("coaches/booking.html", coach=coach, profile=profile, hours=hours,
-                         prefill_name=prefill_name, prefill_email=prefill_email)
+                         prefill_name=prefill_name, prefill_email=prefill_email, prefill_phone=prefill_phone)
 
 
 def _parse_iso(s: str) -> datetime:
@@ -226,6 +227,7 @@ def api_book(slug):
     email = data.get("email", "").strip().lower()
     start_iso = data.get("start")
     tzname = (data.get("timezone") or "UTC").strip() or "UTC"
+    visitor_phone = (data.get("phone") or "").strip()
     if not (name and email and start_iso):
         return jsonify({"error": "Missing fields"}), 400
 
@@ -259,6 +261,7 @@ def api_book(slug):
         start_utc=start,
         end_utc=end,
         timezone=tzname,
+        visitor_phone=visitor_phone or None,
         status="booked",
         google_event_id=event_id,
         meet_link=meet_link,

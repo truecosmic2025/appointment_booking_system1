@@ -72,6 +72,7 @@ class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(255), nullable=False)
+    visitor_phone = db.Column(db.String(32), nullable=True)
     guests = db.Column(db.String(500), nullable=True)  # comma-separated emails
     notes = db.Column(db.Text, nullable=True)
     timezone = db.Column(db.String(64), nullable=False, default='UTC')
@@ -156,6 +157,20 @@ def init_db():
                 app.logger.warning('booking.status column missing; please run a migration in your DB')
     except Exception as e:
         app.logger.error('Error checking/adding booking.status column: %s', e)
+    try:
+        if not _has_column('booking', 'visitor_phone'):
+            if db.engine.url.drivername.startswith('sqlite'):
+                app.logger.info('Adding missing column booking.visitor_phone for caller metadata')
+                try:
+                    db.session.execute(text("ALTER TABLE booking ADD COLUMN visitor_phone VARCHAR(32)"))
+                    db.session.commit()
+                except Exception as e:
+                    app.logger.error('Failed to add booking.visitor_phone column: %s', e)
+                    db.session.rollback()
+            else:
+                app.logger.warning('booking.visitor_phone column missing; please run a migration in your DB')
+    except Exception as e:
+        app.logger.error('Error checking/adding booking.visitor_phone column: %s', e)
     AvailabilityWindow.seed_defaults()
     # Start scheduler when app first handles a request
     start_scheduler_once()
