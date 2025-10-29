@@ -3,7 +3,7 @@ import json
 from datetime import datetime, timedelta, timezone, time
 import secrets
 
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, current_app, session
 from contextlib import nullcontext
 from flask_login import current_user
 
@@ -96,7 +96,21 @@ def coach_page(slug):
     # Get query parameters for pre-filling the form
     prefill_name = request.args.get('name', '').strip()
     prefill_email = request.args.get('email', '').strip()
-    prefill_phone = request.args.get('phone', '').strip()
+    prefill_phone = (
+        request.args.get('phone')
+        or request.args.get('phone_number')
+        or request.args.get('tel')
+        or request.args.get('msisdn')
+        or request.args.get('mobile')
+        or ''
+    ).strip()
+    try:
+        if prefill_phone:
+            session['booking_phone'] = prefill_phone
+        else:
+            prefill_phone = (session.get('booking_phone') or '').strip()
+    except Exception:
+        pass
     
     return render_template("coaches/booking.html", coach=coach, profile=profile, hours=hours,
                          prefill_name=prefill_name, prefill_email=prefill_email, prefill_phone=prefill_phone)
@@ -228,6 +242,11 @@ def api_book(slug):
     start_iso = data.get("start")
     tzname = (data.get("timezone") or "UTC").strip() or "UTC"
     visitor_phone = (data.get("phone") or "").strip()
+    if not visitor_phone:
+        try:
+            visitor_phone = (session.get('booking_phone') or '').strip()
+        except Exception:
+            visitor_phone = ''
     if not (name and email and start_iso):
         return jsonify({"error": "Missing fields"}), 400
 
@@ -269,6 +288,10 @@ def api_book(slug):
     )
     db.session.add(booking)
     db.session.commit()
+    try:
+        session.pop('booking_phone', None)
+    except Exception:
+        pass
 
     # Capture primitives to avoid DetachedInstanceError in background thread
     coach_email_val = coach.email
