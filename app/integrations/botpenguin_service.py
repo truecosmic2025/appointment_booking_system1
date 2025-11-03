@@ -105,6 +105,61 @@ class BotPenguinClient:
                         return v.strip()
         return ""
 
+    def _extract_phone(self, contact: Dict[str, Any]) -> str:
+        """Extract phone number from contact data."""
+        # Check the nested phone.number structure first (BotPenguin v7 format)
+        phone_obj = (
+            contact.get("profile", {})
+            .get("userDetails", {})
+            .get("contact", {})
+            .get("phone", {})
+        )
+        if isinstance(phone_obj, dict):
+            number = phone_obj.get("number", "").strip()
+            if number:
+                # Optionally prepend prefix if available
+                prefix = phone_obj.get("prefix", "").strip()
+                if prefix and not number.startswith("+"):
+                    return f"{prefix}{number}"
+                return number
+        
+        # Check common direct paths as fallback
+        paths = [
+            ["phone"],
+            ["phoneNumber"],
+            ["phone_number"],
+            ["mobile"],
+            ["profile", "phone"],
+            ["profile", "phoneNumber"],
+            ["profile", "userDetails", "contact", "phone"],
+            ["profile", "userDetails", "contact", "phoneNumber"],
+        ]
+        for p in paths:
+            cur: Any = contact
+            ok = True
+            for k in p:
+                if not isinstance(cur, dict) or k not in cur:
+                    ok = False
+                    break
+                cur = cur[k]
+            if ok and isinstance(cur, str) and cur.strip():
+                return cur.strip()
+        
+        # Check attributes list for phone-related keys
+        attrs = (
+            contact.get("profile", {})
+            .get("userDetails", {})
+            .get("attributes", [])
+        )
+        if isinstance(attrs, list):
+            phone_keys = ("phone", "Phone", "phoneNumber", "phone_number", "mobile", "Mobile", "tel", "Tel")
+            for a in attrs:
+                if isinstance(a, dict) and a.get("key") in phone_keys:
+                    v = a.get("value")
+                    if isinstance(v, str) and v.strip():
+                        return v.strip()
+        return ""
+
     def find_contact_by_email(self, email: str) -> Optional[Dict[str, Any]]:
         """Page through inbox users and return the first contact whose email matches."""
         url = self._url(self.list_path)
@@ -217,6 +272,28 @@ class BotPenguinClient:
         for u, s, b in tried:
             log.warning("BotPenguin update attempt: url=%s status=%s body=%s", u, s, b)
         return False
+
+
+def get_phone_from_botpenguin(visitor_email: str) -> Optional[str]:
+    """Retrieve phone number from BotPenguin contact by email."""
+    try:
+        client = BotPenguinClient()
+    except Exception as e:
+        log.debug("BotPenguin not configured: %s", e)
+        return None
+
+    contact = client.find_contact_by_email(visitor_email)
+    if not contact:
+        log.debug("BotPenguin: no contact found for %s", visitor_email)
+        return None
+
+    phone = client._extract_phone(contact)
+    if phone:
+        log.info("BotPenguin: retrieved phone for %s", visitor_email)
+        return phone
+    
+    log.debug("BotPenguin: no phone found for %s", visitor_email)
+    return None
 
 
 def sync_booking_to_botpenguin(visitor_email: str, booking_time_local_iso: str, coach_name: str) -> None:

@@ -1,0 +1,5110 @@
+{
+  "success": true,
+  "message": "",
+  "data": [
+    {
+      "_id": "6908d0f26601992731b619e7",
+      "uuid": "aa952c4d-d4db-42fc-88aa-be94b22322e2",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "6903375559b0df5461a466f1",
+      "_user": "6908d0f1322e32b17de9ec31",
+      "_userWebsite": "6908d0f1322e32b17de9ec31",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T15:57:38.483Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": true,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Let's begin by covering the basics. What’s your first name?",
+        "at": "2025-11-03T15:58:16.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T15:58:16.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "86.137.186.155",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://6fbce2dc-58f3-43f5-b3ac-4326b3fc7445.lovableproject.com/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJub25jZSI6IjgwNTkwODM4ODliMTVkNGY1NTEzZTQyMTYyMGQ3ZTdiIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNzg3NzkyLCJuYmYiOjE3NjIxODI5OTIsImlhdCI6MTc2MjE4Mjk5Mn0._hUBOwG02oY5lgwODGYO81aM143t-pkmFhRGcuseRL8"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Camborne, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 1
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 1
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 1
+        }
+      ],
+      "unreadMessages": 1,
+      "updatedAt": "2025-11-03T15:58:16.018Z",
+      "userInteracted": true,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6908d0fb6601992731b64b53",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "99a06f4e-b38c-4207-aa5d-f36df781a311",
+      "__v": 0,
+      "_botWebsite": "6903375559b0df5461a466f1",
+      "_user": "6908d0fa322e32b17de9ed1b",
+      "_userWebsite": "6908d0fa322e32b17de9ed1b",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T15:57:47.117Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": true,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Sarah would love to get to know you a little first. This will only take a few minutes, and helps her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-03T15:57:57.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T15:57:57.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "86.137.186.155",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://id-preview--6fbce2dc-58f3-43f5-b3ac-4326b3fc7445.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJub25jZSI6IjlkYmZhYmZkMWNjODlhNDcyMjNkOGExNDZjNmQ4NjYwIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNzkwMjE1LCJuYmYiOjE3NjIxODU0MTUsImlhdCI6MTc2MjE4NTQxNX0.e_9KfbtXavoDQ85kJC4mxQd1qWBwcN8aBB9OGXvN5Yk"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Camborne, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T15:57:57.240Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6908cf376601992731ac7019",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "3580178b-31c0-4242-bfaf-f6721f33dda6",
+      "__v": 0,
+      "_botWebsite": "68f7797a163de8545550a5aa",
+      "_user": "6908cf36da5c1bff3650295d",
+      "_userWebsite": "6908cf36da5c1bff3650295d",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T15:50:15.241Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": true,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Welcome! I'm Janice, your Truecosmic AI assistant to guide you for scheduling a 30 min free consultation.",
+        "at": "2025-11-03T15:50:16.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T15:50:16.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "",
+          "browser": "",
+          "ip": "",
+          "operatingSystem": ""
+        },
+        "marketing": {
+          "urlsVisited": []
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "",
+          "country": "",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T15:50:16.655Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6908c76f66019927317c2fbf",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "32ab06fa-2046-4ff2-a674-9a6a5fa281f8",
+      "__v": 0,
+      "_botWebsite": "6903379b163de85455522eb9",
+      "_user": "6908c76eda5c1bff364f6dc8",
+      "_userWebsite": "6908c76eda5c1bff364f6dc8",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T15:17:03.343Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Valentine would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-03T15:17:11.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T15:17:11.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "86.137.186.155",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://6fbce2dc-58f3-43f5-b3ac-4326b3fc7445.lovableproject.com/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJub25jZSI6IjgwNTkwODM4ODliMTVkNGY1NTEzZTQyMTYyMGQ3ZTdiIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNzg3NzkyLCJuYmYiOjE3NjIxODI5OTIsImlhdCI6MTc2MjE4Mjk5Mn0._hUBOwG02oY5lgwODGYO81aM143t-pkmFhRGcuseRL8"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Camborne, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T15:57:33.670Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6908c75f66019927317b940a",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "40204f91-d935-4860-9c30-2e225ad97c03",
+      "__v": 0,
+      "_botWebsite": "6903379b163de85455522eb9",
+      "_user": "6908c75e322e32b17de90417",
+      "_userWebsite": "6908c75e322e32b17de90417",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T15:16:47.403Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Valentine would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-03T15:16:54.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T15:16:54.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "86.137.186.155",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://id-preview--6fbce2dc-58f3-43f5-b3ac-4326b3fc7445.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJub25jZSI6IjMyN2IwMDUxMDI2ZjlkODAzMTRlYjAzMjY1ZDRmZjVjIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNzg3ODAzLCJuYmYiOjE3NjIxODMwMDMsImlhdCI6MTc2MjE4MzAwM30.OEzFYRxuR_rYNdMyLMc0FNHEQqWqIjNq0fZgzs6uFqE",
+            "https://id-preview--6fbce2dc-58f3-43f5-b3ac-4326b3fc7445.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJub25jZSI6IjViODI0Y2ZmNTExOGVjZjFhNzI2MDc2ZTg4YWU3NWVlIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNzg3ODQwLCJuYmYiOjE3NjIxODMwNDAsImlhdCI6MTc2MjE4MzA0MH0.wNDkVYP1ev8PTHijYc_YWTxLXQdRcW2IqVzHFJ8a5Vs",
+            "https://id-preview--6fbce2dc-58f3-43f5-b3ac-4326b3fc7445.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJub25jZSI6IjViODI0Y2ZmNTExOGVjZjFhNzI2MDc2ZTg4YWU3NWVlIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNzg3ODQwLCJuYmYiOjE3NjIxODMwNDAsImlhdCI6MTc2MjE4MzA0MH0.wNDkVYP1ev8PTHijYc_YWTxLXQdRcW2IqVzHFJ8a5Vs",
+            "https://id-preview--6fbce2dc-58f3-43f5-b3ac-4326b3fc7445.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJub25jZSI6IjViODI0Y2ZmNTExOGVjZjFhNzI2MDc2ZTg4YWU3NWVlIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNzg3ODQwLCJuYmYiOjE3NjIxODMwNDAsImlhdCI6MTc2MjE4MzA0MH0.wNDkVYP1ev8PTHijYc_YWTxLXQdRcW2IqVzHFJ8a5Vs",
+            "https://id-preview--6fbce2dc-58f3-43f5-b3ac-4326b3fc7445.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJub25jZSI6IjViODI0Y2ZmNTExOGVjZjFhNzI2MDc2ZTg4YWU3NWVlIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNzg3ODQwLCJuYmYiOjE3NjIxODMwNDAsImlhdCI6MTc2MjE4MzA0MH0.wNDkVYP1ev8PTHijYc_YWTxLXQdRcW2IqVzHFJ8a5Vs",
+            "https://id-preview--6fbce2dc-58f3-43f5-b3ac-4326b3fc7445.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJub25jZSI6IjViODI0Y2ZmNTExOGVjZjFhNzI2MDc2ZTg4YWU3NWVlIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNzg3ODQwLCJuYmYiOjE3NjIxODMwNDAsImlhdCI6MTc2MjE4MzA0MH0.wNDkVYP1ev8PTHijYc_YWTxLXQdRcW2IqVzHFJ8a5Vs",
+            "https://id-preview--6fbce2dc-58f3-43f5-b3ac-4326b3fc7445.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJub25jZSI6IjViODI0Y2ZmNTExOGVjZjFhNzI2MDc2ZTg4YWU3NWVlIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNzg3ODQwLCJuYmYiOjE3NjIxODMwNDAsImlhdCI6MTc2MjE4MzA0MH0.wNDkVYP1ev8PTHijYc_YWTxLXQdRcW2IqVzHFJ8a5Vs",
+            "https://id-preview--6fbce2dc-58f3-43f5-b3ac-4326b3fc7445.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJub25jZSI6IjViODI0Y2ZmNTExOGVjZjFhNzI2MDc2ZTg4YWU3NWVlIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiI2ZmJjZTJkYy01OGYzLTQzZjUtYjNhYy00MzI2YjNmYzc0NDUiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNzg3ODQwLCJuYmYiOjE3NjIxODMwNDAsImlhdCI6MTc2MjE4MzA0MH0.wNDkVYP1ev8PTHijYc_YWTxLXQdRcW2IqVzHFJ8a5Vs"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Camborne, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T15:57:45.301Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6908c331660199273160aac2",
+      "uuid": "b87a1183-d939-4b2f-84a9-f9493f99f2f9",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "69025d5059b0df5461a43974",
+      "_user": "6908c330da5c1bff364f0219",
+      "_userWebsite": "6908c330da5c1bff364f0219",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T14:58:57.310Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": true,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Cheryl would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-03T14:59:07.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T14:59:07.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "86.137.186.155",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://new-page-spark-74.lovable.app/?utm_source=lovable-editor"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Camborne, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T14:59:07.235Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6908c27766019927315be2d2",
+      "uuid": "afb66256-c4a6-4ae3-8138-0a347e8aa094",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "69025d5059b0df5461a43974",
+      "_user": "6908c275da5c1bff364ef0b7",
+      "_userWebsite": "6908c275da5c1bff364ef0b7",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T14:55:51.002Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Cheryl would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-03T14:55:59.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T14:55:59.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Safari 18.5",
+          "ip": "86.137.186.155",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://cherylandrisani.truecosmic.com/?utm_source=lovable-editor"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Camborne, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T15:05:38.655Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "690362616601992731228986",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "8cd03394-cb6b-402f-8fe8-b549722fc414",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "690362615f6032c58ceb5e28",
+      "_userWebsite": "690362615f6032c58ceb5e28",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-30T13:04:33.361Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Shruti would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-03T14:35:55.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T14:35:55.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "86.137.186.155",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://id-preview--a08adcad-2367-4865-b6e2-a4c0c612386a.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6IjY1MGJjMmMxNzMxMmM1OWQyNDc2NjE0ZjgwNTkxNTU2IiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNDM0NTk0LCJuYmYiOjE3NjE4Mjk3OTQsImlhdCI6MTc2MTgyOTc5NH0.AJ4tWRQO690ofrxMtOlCwfzQKJrumrSJoWkuhDmEeiA",
+            "https://id-preview--a08adcad-2367-4865-b6e2-a4c0c612386a.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6ImE0N2UzNDcwZTY2OGU5MjM4MzkwNTJkYWEzM2JmYzU0IiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNTMwOTM3LCJuYmYiOjE3NjE5MjYxMzcsImlhdCI6MTc2MTkyNjEzN30.rQcJDMHpy33jkgnQ6up6ZHTHpSkHe6NtkmcAuptwFmg",
+            "https://id-preview--a08adcad-2367-4865-b6e2-a4c0c612386a.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6ImQ0MDlhODY4MzAyNjExZjI1YjYzZmViZGFhM2U0MzVmIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNTMwOTY2LCJuYmYiOjE3NjE5MjYxNjYsImlhdCI6MTc2MTkyNjE2Nn0.Hoop838-MbiBvRUilbOXf3DKk8c7MyiNjUPfZ8gOGoQ",
+            "https://id-preview--a08adcad-2367-4865-b6e2-a4c0c612386a.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6ImE0NzA5ZWZlNGI0MjM4MDNjMTAyNjc2ZjZkOWViMWVmIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNTMxMTQxLCJuYmYiOjE3NjE5MjYzNDEsImlhdCI6MTc2MTkyNjM0MX0.ceURCcuqEZaCEc1yEJ08vS-4Woj1He3NZ-qEzenR-0U",
+            "https://id-preview--a08adcad-2367-4865-b6e2-a4c0c612386a.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6ImQwNmU0MjIwNmJkMzAxY2RhZWRiYjlkZDY2ODg4MTI3IiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNTMxNjQxLCJuYmYiOjE3NjE5MjY4NDEsImlhdCI6MTc2MTkyNjg0MX0.HNfv0Ny67GWOK23azm9TV_mEIVzhnHEO5X_0UFL_8Jg",
+            "https://id-preview--a08adcad-2367-4865-b6e2-a4c0c612386a.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6ImI4Yzg2Yjg0MWYwNmNiYjE0MGVkMWFhMjZhODUyMzAzIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNTMxNzAwLCJuYmYiOjE3NjE5MjY5MDAsImlhdCI6MTc2MTkyNjkwMH0.W8qhZxydOrAyLLPCcA3LnSPHQHp_D1mxG6c2dvVXR7g",
+            "https://id-preview--a08adcad-2367-4865-b6e2-a4c0c612386a.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6ImI4Yzg2Yjg0MWYwNmNiYjE0MGVkMWFhMjZhODUyMzAzIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNTMxNzAwLCJuYmYiOjE3NjE5MjY5MDAsImlhdCI6MTc2MTkyNjkwMH0.W8qhZxydOrAyLLPCcA3LnSPHQHp_D1mxG6c2dvVXR7g",
+            "https://id-preview--a08adcad-2367-4865-b6e2-a4c0c612386a.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6ImI4Yzg2Yjg0MWYwNmNiYjE0MGVkMWFhMjZhODUyMzAzIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNTMxNzAwLCJuYmYiOjE3NjE5MjY5MDAsImlhdCI6MTc2MTkyNjkwMH0.W8qhZxydOrAyLLPCcA3LnSPHQHp_D1mxG6c2dvVXR7g",
+            "https://id-preview--a08adcad-2367-4865-b6e2-a4c0c612386a.lovable.app/",
+            "https://id-preview--a08adcad-2367-4865-b6e2-a4c0c612386a.lovable.app/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6ImFkYjQyYWY2NjVlNDIwOGVlMmJiY2I4MGRiYTIyYjlmIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNzg1MzQyLCJuYmYiOjE3NjIxODA1NDIsImlhdCI6MTc2MjE4MDU0Mn0.71cr1IrKGjBTn0DI7mI6WZO3PNkInM2tBPbBG6v4FLs"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Camborne, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T14:36:39.856Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6908a9cf6601992731ad2f3a",
+      "uuid": "6f5c0c76-c931-4e77-b34a-0c1bb79a9b8e",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6908a9ce43c60656603450cf",
+      "_userWebsite": "6908a9ce43c60656603450cf",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T13:10:39.843Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Thank you for sharing. Based on your readiness, you can now book your Free Virtual Consultation with Shruti below. 📅\n\n👉 Book My Free Session Now:\nhttps://calendar.truecosmic.com/c/shruti-aggarwal?name=Abiba %20OMAR MOUSSA &email=abibaomarmoussa@gmail.com&phone=22996993171",
+        "at": "2025-11-03T13:21:00.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T13:22:37.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile( K)",
+          "browser": "Samsung Internet 29.0",
+          "ip": "154.72.113.241",
+          "operatingSystem": "Android 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Abiba ",
+          "picture": "",
+          "contact": {
+            "email": "abibaomarmoussa@gmail.com",
+            "phone": {
+              "number": "96993171",
+              "prefix": "+229"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Cotonou, LI",
+          "country": "Benin",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_shruti",
+              "value": "OMAR MOUSSA "
+            },
+            {
+              "key": "email_id",
+              "value": "abibaomarmoussa@gmail.com"
+            },
+            {
+              "key": "wpn_shruti",
+              "value": "22996993171"
+            },
+            {
+              "key": "facebook_profile_shruti",
+              "value": "Abiba OMAR MOUSSA "
+            },
+            {
+              "key": "why_seek_coaching",
+              "value": "📉 Financial Challenges, 💼 Career Challenges, 🌧 Stress or Anxiety"
+            },
+            {
+              "key": "how_much_familiar",
+              "value": "🌱 Novice – I’m new and still learning"
+            },
+            {
+              "key": "how_often_practice",
+              "value": "🔄 Occasionally"
+            },
+            {
+              "key": "specific_user_issue",
+              "value": "Yes. I'm having a great challenge on my business."
+            },
+            {
+              "key": "top_three_goals",
+              "value": "Make my business more profitable; increase sales,mobilize enough ressources for building a new factory, "
+            },
+            {
+              "key": "whats_holding_back",
+              "value": "Skip"
+            },
+            {
+              "key": "worked_with_coach_before",
+              "value": "No"
+            },
+            {
+              "key": "hope_to_gain",
+              "value": "Support in overcoming obstacles"
+            },
+            {
+              "key": "how_much_committed_scale",
+              "value": "Skip"
+            },
+            {
+              "key": "willing_to_invest",
+              "value": "I’m not sure yet"
+            },
+            {
+              "key": "booking_time",
+              "value": "2025-11-03T17:30:00+01:00"
+            },
+            {
+              "key": "demo_session_coach",
+              "value": "Shruti Aggarwal"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 17
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 17
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T14:12:56.547Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "6908a9dd6601992731adb9d4",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "cb124485-999c-4afb-bd30-830945f2d010",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6908a9dc43c6065660345293",
+      "_userWebsite": "6908a9dc43c6065660345293",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T13:10:53.880Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Thank you for sharing. Based on your readiness, you can now book your Free Virtual Consultation with Shruti below. 📅\n\n👉 Book My Free Session Now:\nhttps://calendar.truecosmic.com/c/shruti-aggarwal?name=Kirsteen %20Glen &email=kirsteenglen@gmail.com&phone=4407717715664",
+        "at": "2025-11-03T13:15:00.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T13:16:15.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Mobile Safari 17.2",
+          "ip": "86.164.182.51",
+          "operatingSystem": "iOS 17.2.1"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Kirsteen ",
+          "picture": "",
+          "contact": {
+            "email": "kirsteenglen@gmail.com",
+            "phone": {
+              "number": "07717715664",
+              "prefix": "+44"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Kinlochleven, SCT",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_shruti",
+              "value": "Glen "
+            },
+            {
+              "key": "email_id",
+              "value": "kirsteenglen@gmail.com"
+            },
+            {
+              "key": "wpn_shruti",
+              "value": "4407717715664"
+            },
+            {
+              "key": "facebook_profile_shruti",
+              "value": "Skip"
+            },
+            {
+              "key": "why_seek_coaching",
+              "value": "🛋 Relationships"
+            },
+            {
+              "key": "how_much_familiar",
+              "value": "🌿 Practitioner – I apply them but want more clarity"
+            },
+            {
+              "key": "how_often_practice",
+              "value": "🔄 Daily"
+            },
+            {
+              "key": "specific_user_issue",
+              "value": "Relationship"
+            },
+            {
+              "key": "top_three_goals",
+              "value": "Relationship "
+            },
+            {
+              "key": "whats_holding_back",
+              "value": "😟 Fear of failure / self-doubt"
+            },
+            {
+              "key": "worked_with_coach_before",
+              "value": "Yes"
+            },
+            {
+              "key": "earlier_coaching_experience",
+              "value": "Good but not LoAssumption based "
+            },
+            {
+              "key": "hope_to_gain",
+              "value": "Help identifying action steps"
+            },
+            {
+              "key": "how_much_committed_scale",
+              "value": "from 10 to 10"
+            },
+            {
+              "key": "willing_to_invest",
+              "value": "I’m not sure yet"
+            },
+            {
+              "key": "booking_time",
+              "value": "2025-11-04T15:00:00+00:00"
+            },
+            {
+              "key": "demo_session_coach",
+              "value": "Shruti Aggarwal"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 18
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 18
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T16:15:33.889Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "6908a6a466019927318d9354",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "7820d8f2-7e36-4018-8ac4-11f374cef220",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6908a6a2da5c1bff364c26f6",
+      "_userWebsite": "6908a6a2da5c1bff364c26f6",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T12:57:08.049Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Thank you for sharing. Based on your readiness, you can now book your Free Virtual Consultation with Shruti below. 📅\n\n👉 Book My Free Session Now:\nhttps://calendar.truecosmic.com/c/shruti-aggarwal?name=Alan%20Harmon&email=Thealangroupllc1@gmail.com&phone=19193028696",
+        "at": "2025-11-03T13:09:15.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T13:11:21.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile( K)",
+          "browser": "Chrome 142.0.0.0",
+          "ip": "172.58.250.15",
+          "operatingSystem": "Android 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Alan",
+          "picture": "",
+          "contact": {
+            "email": "thealangroupllc1@gmail.com",
+            "phone": {
+              "number": "9193028696",
+              "prefix": "+1"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Washington, DC",
+          "country": "United States",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_shruti",
+              "value": "Harmon"
+            },
+            {
+              "key": "email_id",
+              "value": "Thealangroupllc1@gmail.com"
+            },
+            {
+              "key": "wpn_shruti",
+              "value": "19193028696"
+            },
+            {
+              "key": "facebook_profile_shruti",
+              "value": "@Tagxtalkmoneycoach"
+            },
+            {
+              "key": "why_seek_coaching",
+              "value": "📉 Financial Challenges, 🌧 Stress or Anxiety, 🛋 Relationships, 🌿 Health and Well-being"
+            },
+            {
+              "key": "how_much_familiar",
+              "value": "🌿 Practitioner – I apply them but want more clarity"
+            },
+            {
+              "key": "how_often_practice",
+              "value": "🔄 Occasionally"
+            },
+            {
+              "key": "specific_user_issue",
+              "value": "Using law of assumption for business,  income. Healing attachments wounds and some advance application on life"
+            },
+            {
+              "key": "top_three_goals",
+              "value": "Scalable prosperity and delegated freedom "
+            },
+            {
+              "key": "whats_holding_back",
+              "value": "💸 Financial constraints, 🌫 Lack of clarity or direction, 😟 Fear of failure / self-doubt, 📅 Work-life balance, 😪 Procrastination, 🕛 Time management"
+            },
+            {
+              "key": "worked_with_coach_before",
+              "value": "Yes"
+            },
+            {
+              "key": "earlier_coaching_experience",
+              "value": "Ineffective, they were a family friend,  and they were just talking"
+            },
+            {
+              "key": "hope_to_gain",
+              "value": "Support in overcoming obstacles"
+            },
+            {
+              "key": "how_much_committed_scale",
+              "value": "from 8 to 10"
+            },
+            {
+              "key": "willing_to_invest",
+              "value": "I’m not sure yet"
+            },
+            {
+              "key": "booking_time",
+              "value": "2025-11-03T11:00:00-05:00"
+            },
+            {
+              "key": "demo_session_coach",
+              "value": "Shruti Aggarwal"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 18
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 18
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T14:10:11.102Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "6908a367660199273171b3de",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "1bc18f44-2fac-4063-8539-28d7a23d3c42",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6908a366322e32b17de57044",
+      "_userWebsite": "6908a366322e32b17de57044",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T12:43:19.718Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Thank you for sharing. Based on your readiness, you can now book your Free Virtual Consultation with Shruti below. 📅\n\n👉 Book My Free Session Now:\nhttps://calendar.truecosmic.com/c/shruti-aggarwal?name=Dontre%20ATKINS&email=dontre.atkins@gmail.com&phone=14695818388",
+        "at": "2025-11-03T12:49:05.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T12:49:06.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile( K)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "172.59.97.209",
+          "operatingSystem": "Android 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Dontre",
+          "picture": "",
+          "contact": {
+            "email": "dontre.atkins@gmail.com",
+            "phone": {
+              "number": "4695818388",
+              "prefix": "+1"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Milwaukee, WI",
+          "country": "United States",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_shruti",
+              "value": "ATKINS"
+            },
+            {
+              "key": "email_id",
+              "value": "dontre.atkins@gmail.com"
+            },
+            {
+              "key": "wpn_shruti",
+              "value": "14695818388"
+            },
+            {
+              "key": "facebook_profile_shruti",
+              "value": "Skip"
+            },
+            {
+              "key": "why_seek_coaching",
+              "value": "💼 Career Challenges, 🌿 Health and Well-being, 🛋 Relationships"
+            },
+            {
+              "key": "how_much_familiar",
+              "value": "🌿 Practitioner – I apply them but want more clarity"
+            },
+            {
+              "key": "how_often_practice",
+              "value": "🔄 Occasionally"
+            },
+            {
+              "key": "specific_user_issue",
+              "value": "No. General. "
+            },
+            {
+              "key": "top_three_goals",
+              "value": "Skip"
+            },
+            {
+              "key": "whats_holding_back",
+              "value": "📅 Work-life balance, 😪 Procrastination, 💸 Financial constraints"
+            },
+            {
+              "key": "worked_with_coach_before",
+              "value": "No"
+            },
+            {
+              "key": "hope_to_gain",
+              "value": "Help identifying action steps"
+            },
+            {
+              "key": "how_much_committed_scale",
+              "value": "Skip"
+            },
+            {
+              "key": "willing_to_invest",
+              "value": "I’m not sure yet"
+            },
+            {
+              "key": "booking_time",
+              "value": "2025-11-04T11:30:00-05:00"
+            },
+            {
+              "key": "demo_session_coach",
+              "value": "Shruti Aggarwal"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 17
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 17
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T13:48:11.303Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "6908a364660199273171a283",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "ad26f92f-05ad-49a6-adc4-ad29e824008a",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6908a363da5c1bff364bd45a",
+      "_userWebsite": "6908a363da5c1bff364bd45a",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T12:43:16.831Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Thank you for sharing. Based on your readiness, you can now book your Free Virtual Consultation with Shruti below. 📅\n\n👉 Book My Free Session Now:\nhttps://calendar.truecosmic.com/c/shruti-aggarwal?name=Ankita%20Verma&email=Incorrigible.anky@gmail.com&phone=447939822889",
+        "at": "2025-11-03T12:45:47.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T12:46:41.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Mobile Safari 18.6",
+          "ip": "122.161.66.110",
+          "operatingSystem": "iOS 18.6.2"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Ankita",
+          "picture": "",
+          "contact": {
+            "email": "incorrigible.anky@gmail.com",
+            "phone": {
+              "number": "7939822889",
+              "prefix": "+44"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Noida, UP",
+          "country": "India",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_shruti",
+              "value": "Verma"
+            },
+            {
+              "key": "email_id",
+              "value": "Incorrigible.anky@gmail.com"
+            },
+            {
+              "key": "wpn_shruti",
+              "value": "447939822889"
+            },
+            {
+              "key": "facebook_profile_shruti",
+              "value": "Skip"
+            },
+            {
+              "key": "why_seek_coaching",
+              "value": "🛋 Relationships"
+            },
+            {
+              "key": "how_much_familiar",
+              "value": "🌳 Expert – I’ve been practicing for a long time"
+            },
+            {
+              "key": "how_often_practice",
+              "value": "🔄 Daily"
+            },
+            {
+              "key": "specific_user_issue",
+              "value": "Yes, want to find a life partner "
+            },
+            {
+              "key": "top_three_goals",
+              "value": "Marroage"
+            },
+            {
+              "key": "whats_holding_back",
+              "value": "Skip"
+            },
+            {
+              "key": "worked_with_coach_before",
+              "value": "Yes"
+            },
+            {
+              "key": "earlier_coaching_experience",
+              "value": "Skip"
+            },
+            {
+              "key": "hope_to_gain",
+              "value": "Accountability and motivation"
+            },
+            {
+              "key": "how_much_committed_scale",
+              "value": "Skip"
+            },
+            {
+              "key": "willing_to_invest",
+              "value": "I’m not sure yet"
+            },
+            {
+              "key": "booking_time",
+              "value": "2025-11-07T15:30:00+05:30"
+            },
+            {
+              "key": "demo_session_coach",
+              "value": "Shruti Aggarwal"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 18
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 18
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T14:10:16.097Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "6908a16b660199273164b924",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "48b4f197-2e8c-4002-ac34-9b5e6005c632",
+      "__v": 0,
+      "_botWebsite": "68f7797a163de8545550a5aa",
+      "_user": "6908a16a322e32b17de53d74",
+      "_userWebsite": "6908a16a322e32b17de53d74",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T12:34:51.557Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Thank you for sharing. Based on your readiness, you can now book your Free Virtual Consultation with Sarah below. 📅\n\n👉 Book My Free Session Now: \n\nhttps://calendar.truecosmic.com/c/sarah-ramsarran?name=Q%20B&email=Hsvg@gmail.com&phone=916778904521",
+        "at": "2025-11-03T12:37:28.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T12:38:16.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile( K)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "49.36.121.49",
+          "operatingSystem": "Android 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://truecosmic.com/academy/sarah-ramsarran/?fbclid=IwZXh0bgNhZW0CMTEAAR6Ga-8Ot4wox1QTG_IDVLtG5E54DbRIA1aWFinGJCFfb7TvwhNg-F6uzyE_1w_aem_NnWy2MahZ-sdZpmHzKPUOA",
+            "https://truecosmic.com/academy/sarah-ramsarran/?fbclid=IwZXh0bgNhZW0CMTEAAR6Ga-8Ot4wox1QTG_IDVLtG5E54DbRIA1aWFinGJCFfb7TvwhNg-F6uzyE_1w_aem_NnWy2MahZ-sdZpmHzKPUOA"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Q",
+          "picture": "",
+          "contact": {
+            "email": "hsvg@gmail.com",
+            "phone": {
+              "number": "6778904521",
+              "prefix": "+91"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Mumbai, MH",
+          "country": "India",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_sarah",
+              "value": "B"
+            },
+            {
+              "key": "email_id",
+              "value": "Hsvg@gmail.com"
+            },
+            {
+              "key": "wpn_sarah",
+              "value": "916778904521"
+            },
+            {
+              "key": "facebook_profile_sarah",
+              "value": "Skip"
+            },
+            {
+              "key": "why_seek_coaching",
+              "value": "🛋 Relationships"
+            },
+            {
+              "key": "how_much_familiar",
+              "value": "🌿 Practitioner – I apply them but want more clarity"
+            },
+            {
+              "key": "how_often_practice",
+              "value": "🔄 Occasionally"
+            },
+            {
+              "key": "specific_user_issue",
+              "value": "Yes"
+            },
+            {
+              "key": "top_three_goals",
+              "value": "Skip"
+            },
+            {
+              "key": "whats_holding_back",
+              "value": "Skip"
+            },
+            {
+              "key": "worked_with_coach_before",
+              "value": "No"
+            },
+            {
+              "key": "hope_to_gain",
+              "value": "Help identifying action steps"
+            },
+            {
+              "key": "how_much_committed_scale",
+              "value": "Skip"
+            },
+            {
+              "key": "willing_to_invest",
+              "value": "I’m not sure yet"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 19
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 19
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T14:45:58.455Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "68ff0ac166019927319130cb",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "7718451a-d314-41e7-b6f5-a5e1611d281c",
+      "__v": 0,
+      "_botWebsite": "68f7797a163de8545550a5aa",
+      "_user": "68ff0ac1c9a98e1828044204",
+      "_userWebsite": "68ff0ac1c9a98e1828044204",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-27T06:01:37.640Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Given you’ve already had a consultation, the next step would be a paid session/package.",
+        "at": "2025-11-03T06:23:35.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T06:24:41.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Facebook 536.0.0.41.69",
+          "ip": "41.76.102.177",
+          "operatingSystem": "iOS 18.6.2"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://truecosmic.com/academy/sarah-ramsarran/?fbclid=IwZXh0bgNhZW0CMTEAAR7fpHtsFI-YzaB2g_Q5Tv_ibrJb_uJHwjiALg9L1FT3J-fnFpXM3n_NHMnABA_aem_4_v86FT0iM48IYZW_wOVdQ",
+            "https://truecosmic.com/academy/sarah-ramsarran/?fbclid=IwZXh0bgNhZW0CMTEAAR6Ga-8Ot4wox1QTG_IDVLtG5E54DbRIA1aWFinGJCFfb7TvwhNg-F6uzyE_1w_aem_NnWy2MahZ-sdZpmHzKPUOA",
+            "https://truecosmic.com/academy/sarah-ramsarran/?fbclid=IwZXh0bgNhZW0CMTEAAR6Ga-8Ot4wox1QTG_IDVLtG5E54DbRIA1aWFinGJCFfb7TvwhNg-F6uzyE_1w_aem_NnWy2MahZ-sdZpmHzKPUOA",
+            "https://truecosmic.com/academy/sarah-ramsarran/?fbclid=IwZXh0bgNhZW0CMTEAAR6Ga-8Ot4wox1QTG_IDVLtG5E54DbRIA1aWFinGJCFfb7TvwhNg-F6uzyE_1w_aem_NnWy2MahZ-sdZpmHzKPUOA"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Dumisile ",
+          "picture": "",
+          "contact": {
+            "email": "dumisile.magudulela@gmail.com",
+            "phone": {
+              "number": "677022520",
+              "prefix": "+27"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Johannesburg, GP",
+          "country": "South Africa",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_sarah",
+              "value": "Nkosi"
+            },
+            {
+              "key": "email_id",
+              "value": "Dumisile.Magudulela@gmail.com"
+            },
+            {
+              "key": "wpn_sarah",
+              "value": "27677022520"
+            },
+            {
+              "key": "facebook_profile_sarah",
+              "value": "Skip"
+            },
+            {
+              "key": "why_seek_coaching",
+              "value": "📉 Financial Challenges, 🛋 Relationships"
+            },
+            {
+              "key": "how_much_familiar",
+              "value": "🌿 Practitioner – I apply them but want more clarity"
+            },
+            {
+              "key": "how_often_practice",
+              "value": "🔄 Daily"
+            },
+            {
+              "key": "specific_user_issue",
+              "value": "Yes 3D when manifesting"
+            },
+            {
+              "key": "top_three_goals",
+              "value": "1. Own a house 2. Make money 3. A serious committed relationship "
+            },
+            {
+              "key": "whats_holding_back",
+              "value": "😟 Fear of failure / self-doubt"
+            },
+            {
+              "key": "worked_with_coach_before",
+              "value": "Yes"
+            },
+            {
+              "key": "earlier_coaching_experience",
+              "value": "The Coach is not on this group, it was over 2 years ago. She helped me manifest what I wanted and the experience was amazing "
+            },
+            {
+              "key": "hope_to_gain",
+              "value": "Support in overcoming obstacles"
+            },
+            {
+              "key": "how_much_committed_scale",
+              "value": "from 10 to 10"
+            },
+            {
+              "key": "willing_to_invest",
+              "value": "I’m not sure yet"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 47
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 47
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T14:10:56.208Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "690835e36601992731eeeb35",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "374872ba-c1ec-4a5c-9130-ab2575fc293e",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "690835e343c6065660283662",
+      "_userWebsite": "690835e343c6065660283662",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-03T04:56:03.746Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Thank you for sharing. Based on your readiness, you can now book your Free Virtual Consultation with Shruti below. 📅\n\n👉 Book My Free Session Now:\nhttps://calendar.truecosmic.com/c/shruti-aggarwal?name=Gemma %20Greig&email=gemmagphysiotherapy@gmail.com&phone=12368634151",
+        "at": "2025-11-03T05:04:09.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-03T05:05:00.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Facebook 537.0.0.32.82",
+          "ip": "75.157.199.193",
+          "operatingSystem": "iOS 18.3"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/?fbclid=IwZXh0bgNhZW0CMTEAAR7USV5xTIwZhegEKSs_cszR_tw2TMmsDLQkxQWouzmxLidfZzk1c8Uze_1lKQ_aem_9o0CoNgBymQ-st6sCZeDzw"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Gemma ",
+          "picture": "",
+          "contact": {
+            "email": "gemmagphysiotherapy@gmail.com",
+            "phone": {
+              "number": "2368634151",
+              "prefix": "+1"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Vancouver, BC",
+          "country": "Canada",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_shruti",
+              "value": "Greig"
+            },
+            {
+              "key": "email_id",
+              "value": "gemmagphysiotherapy@gmail.com"
+            },
+            {
+              "key": "wpn_shruti",
+              "value": "12368634151"
+            },
+            {
+              "key": "facebook_profile_shruti",
+              "value": "Skip"
+            },
+            {
+              "key": "why_seek_coaching",
+              "value": "📉 Financial Challenges, 🛋 Relationships"
+            },
+            {
+              "key": "how_much_familiar",
+              "value": "🌿 Practitioner – I apply them but want more clarity"
+            },
+            {
+              "key": "how_often_practice",
+              "value": "🔄 Daily"
+            },
+            {
+              "key": "specific_user_issue",
+              "value": "A plan for manifesting financial abundance through my soul purpose work and manifest my specific person"
+            },
+            {
+              "key": "top_three_goals",
+              "value": "Skip"
+            },
+            {
+              "key": "whats_holding_back",
+              "value": "😪 Procrastination, 😟 Fear of failure / self-doubt, 🌫 Lack of clarity or direction, 🕛 Time management"
+            },
+            {
+              "key": "worked_with_coach_before",
+              "value": "Yes"
+            },
+            {
+              "key": "earlier_coaching_experience",
+              "value": "Skip"
+            },
+            {
+              "key": "hope_to_gain",
+              "value": "Help identifying action steps"
+            },
+            {
+              "key": "how_much_committed_scale",
+              "value": "Skip"
+            },
+            {
+              "key": "willing_to_invest",
+              "value": "$150 or more per month"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 18
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 18
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T12:17:59.594Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "69077f5a660199273101b4cc",
+      "uuid": "6379f546-c1d2-4c5a-bc9f-01b6e4e9dce7",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "69077f5a322e32b17dce65f4",
+      "_userWebsite": "69077f5a322e32b17dce65f4",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-02T15:57:14.794Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Please share your WhatsApp or phone number, including the country code (e.g., +44 for UK)?",
+        "at": "2025-11-02T15:59:55.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-02T16:00:04.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Facebook 537.0.0.32.82",
+          "ip": "70.161.214.205",
+          "operatingSystem": "iOS 18.6.2"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/?fbclid=IwZXh0bgNhZW0CMTEAAR5Mkfu_8bFRkqs9lSz0Q9z5W3ymvhsP3JdpUaV5mWzmpdFZQl02giwfZ9ojUg_aem_Q8DkeeMzx06EpxVpCPX62g",
+            "https://shrutiaggarwal.truecosmic.com/?fbclid=IwZXh0bgNhZW0CMTEAAR5o3xXDida7_2MaXXfWwSpAQd9bxh7ZHlW2hUAxMA3XVQaUs1N4hD5vy_JdxA_aem_phhWcucBbTCumgfTrcbLNw"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Adrienne ",
+          "picture": "",
+          "contact": {
+            "email": "adrienne.anglin@yahoo.com",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Chesapeake, VA",
+          "country": "United States",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_shruti",
+              "value": "Anglin"
+            },
+            {
+              "key": "email_id",
+              "value": "Adrienne.anglin@yahoo.com"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 5
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 5
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T14:44:35.489Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "6903347d6601992731d10144",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "4ae8c766-2861-4d28-9f4c-aee5df038131",
+      "__v": 0,
+      "_botWebsite": "69025d5059b0df5461a43974",
+      "_user": "6903347dc9a98e182869e861",
+      "_userWebsite": "6903347dc9a98e182869e861",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-30T09:48:45.307Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Cheryl would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-02T15:32:46.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-02T15:32:46.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Mobile Safari 18.6",
+          "ip": "104.28.86.115",
+          "operatingSystem": "iOS 18.6.2"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://cherylandrisani.truecosmic.com/",
+            "https://cherylandrisani.truecosmic.com/",
+            "https://cherylandrisani.truecosmic.com/",
+            "https://cherylandrisani.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Croydon, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-02T17:53:49.988Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "69065579660199273152b304",
+      "uuid": "b55eb90f-f85a-4857-9de3-c716bfec1191",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "69065579322e32b17dbd3ba0",
+      "_userWebsite": "69065579322e32b17dbd3ba0",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-01T18:46:17.553Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "May I have your WhatsApp or phone number, including the country code (e.g., +44 for UK)?",
+        "at": "2025-11-01T18:53:49.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-01T18:54:39.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Facebook 536.0.0.41.69",
+          "ip": "104.136.224.255",
+          "operatingSystem": "iOS 26.0.1"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/?fbclid=IwZXh0bgNhZW0CMTEAAR5dISTLGGyn0cdvbLduNBpS8OJ4ORM5cyXPU_6IHsmd2LVZJzG7G1G3Q8KyPg_aem_NaOYm2DWCLwAJT9wNdXhcQ"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Krystal",
+          "picture": "",
+          "contact": {
+            "email": "klzamora25@aol.com",
+            "phone": {
+              "number": "4072577457",
+              "prefix": "+1"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Orlando, FL",
+          "country": "United States",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_shruti",
+              "value": "Z"
+            },
+            {
+              "key": "email_id",
+              "value": "KLZAMORA25@AOL.COM"
+            },
+            {
+              "key": "wpn_shruti",
+              "value": "14072577457"
+            },
+            {
+              "key": "facebook_profile_shruti",
+              "value": "Skip"
+            },
+            {
+              "key": "why_seek_coaching",
+              "value": "🛋 Relationships"
+            },
+            {
+              "key": "how_much_familiar",
+              "value": "🌿 Practitioner – I apply them but want more clarity"
+            },
+            {
+              "key": "how_often_practice",
+              "value": "🔄 Daily"
+            },
+            {
+              "key": "specific_user_issue",
+              "value": "Relationship"
+            },
+            {
+              "key": "top_three_goals",
+              "value": "Be in a loving committed relationship with my forever man; have financial freedom; make my me house a home"
+            },
+            {
+              "key": "whats_holding_back",
+              "value": "Skip"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 17
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 17
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T12:19:48.544Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "6906537966019927314b2cae",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "aca3f21a-d5b4-488e-bce1-8a7a36756c26",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "69065379322e32b17dbd1b0a",
+      "_userWebsite": "69065379322e32b17dbd1b0a",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-01T18:37:45.192Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Alright Abha, we will stay in touch with you. You can always book a 1:1 session when you're ready for it !!",
+        "at": "2025-11-01T18:43:17.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-01T18:43:34.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile( K)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "49.36.121.49",
+          "operatingSystem": "Android 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/?fbclid=IwZXh0bgNhZW0CMTEAAR7WYclQ_r1NgR6FHwApwAja2kKz4uX0HaKB9xip1wMQpNf5KoSavoRnA-sZIQ_aem_ptKHobYNqcxA7hOodpFQnQ"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Abha",
+          "picture": "",
+          "contact": {
+            "email": "foolishnetworksocial@gmail.com",
+            "phone": {
+              "number": "9987649045",
+              "prefix": "+91"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Mumbai, MH",
+          "country": "India",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_shruti",
+              "value": "A"
+            },
+            {
+              "key": "email_id",
+              "value": "foolishnetworksocial@gmail.com"
+            },
+            {
+              "key": "wpn_shruti",
+              "value": "919987649045"
+            },
+            {
+              "key": "facebook_profile_shruti",
+              "value": "Skip"
+            },
+            {
+              "key": "why_seek_coaching",
+              "value": "🛋 Relationships"
+            },
+            {
+              "key": "how_much_familiar",
+              "value": "🌿 Practitioner – I apply them but want more clarity"
+            },
+            {
+              "key": "how_often_practice",
+              "value": "🔄 Occasionally"
+            },
+            {
+              "key": "specific_user_issue",
+              "value": "I don't yet understand the correlation between my thoughts and my reality. Sometimes, things happen that I haven't imagined or thought of in my wildest dreams (good & bad) and sometimes, things that I think of repeatedly, never actually happen."
+            },
+            {
+              "key": "top_three_goals",
+              "value": "Skip"
+            },
+            {
+              "key": "whats_holding_back",
+              "value": "😪 Procrastination, 🕛 Time management, 😟 Fear of failure / self-doubt"
+            },
+            {
+              "key": "worked_with_coach_before",
+              "value": "Yes"
+            },
+            {
+              "key": "earlier_coaching_experience",
+              "value": "It was not exactly a coach. It was a one hour consultation followed by a course work spanning a month. I quit 10 days in."
+            },
+            {
+              "key": "hope_to_gain",
+              "value": "Help identifying action steps"
+            },
+            {
+              "key": "how_much_committed_scale",
+              "value": "Skip"
+            },
+            {
+              "key": "willing_to_invest",
+              "value": "$0 – I’m just exploring"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 22
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 22
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T12:20:03.074Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "6903b6c46601992731f8c04a",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "74901297-40d5-469a-b4f5-1464432fd0e2",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6903b6c48ee15b98d2eeb160",
+      "_userWebsite": "6903b6c48ee15b98d2eeb160",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-30T19:04:36.251Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Let's start with the basics first. What's your first name?",
+        "at": "2025-11-01T14:20:33.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-01T14:20:33.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Mobile Safari 18.6",
+          "ip": "104.28.40.133",
+          "operatingSystem": "iOS 18.6.2"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Croydon, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 3
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 3
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T12:20:15.503Z",
+      "userInteracted": true,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "690611c366019927311b0cda",
+      "uuid": "4f35e118-d467-4218-ae1f-2b7e98c7f318",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "690611c3da5c1bff361f47a5",
+      "_userWebsite": "690611c3da5c1bff361f47a5",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-01T13:57:23.507Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Let's get started with the basics. What's your first name?",
+        "at": "2025-11-01T13:58:06.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-01T13:58:06.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile( K)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "37.111.206.150",
+          "operatingSystem": "Android 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Dhaka, C",
+          "country": "Bangladesh",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 1
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 1
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T12:20:20.264Z",
+      "userInteracted": true,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6904dee666019927312d3073",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "98b8ca34-2bb0-4faf-9f18-6d38baec93cf",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6904dee5fa80c2624e242142",
+      "_userWebsite": "6904dee5fa80c2624e242142",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T16:08:05.999Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "OK, that’s absolutely fine. Please feel free to come back here again when you are ready to begin that first important step in your transformation.",
+        "at": "2025-11-01T10:03:03.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-01T10:03:03.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "86.137.186.155",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Camborne, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 1
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 1
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T12:20:23.310Z",
+      "userInteracted": true,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6905d71866019927314d7d8e",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "17bc4799-5016-49c1-8ee8-0a92bcf94673",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6905d71843c606566002f7a7",
+      "_userWebsite": "6905d71843c606566002f7a7",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-01T09:47:04.902Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Shruti would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-01T09:47:15.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-01T09:47:15.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop( )",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "31.13.127.1",
+          "operatingSystem": "Linux x86_64"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/?fbclid=IwZXh0bgNhZW0CMTEAAR5EROxk2VyrU7Lep-j0HyI2chMw6AO719LzAV2RBA78XGz_arWa5DkogCbZUQ_aem_r13e2eVmWIdwwedNc8d76A"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Clonee, L",
+          "country": "Ireland",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-01T09:47:35.860Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6905d68f6601992731493fc6",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "8ddc3724-d113-4894-95b0-76c91f5f0068",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6905d68f43c606566002ee60",
+      "_userWebsite": "6905d68f43c606566002ee60",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-01T09:44:47.152Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Shruti would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-01T09:45:51.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-01T09:45:51.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Xiaomi M2101K6I)",
+          "browser": "Facebook 536.1.0.58.77",
+          "ip": "49.47.153.45",
+          "operatingSystem": "Android 12"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/?fbclid=IwY2xjawNytdpleHRuA2FlbQIxMQABHl4MdAx5l0aux0xL-8b-aGmWsPIQGLMPODQp2XV2st5AoDWEdzub9DLrLE9E_aem_dNVjfO9SrsKR_J-DgLwNzg"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Siliguri, WB",
+          "country": "India",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-01T09:46:00.248Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6905d52b66019927313cedac",
+      "uuid": "959c5c43-b322-41be-a729-4097a47118b6",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6905d52b322e32b17db4a5f8",
+      "_userWebsite": "6905d52b322e32b17db4a5f8",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-01T09:38:51.177Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Shruti would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-01T09:39:01.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-01T09:39:01.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop( )",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "31.13.127.116",
+          "operatingSystem": "Linux x86_64"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/?fbclid=IwZXh0bgNhZW0CMTEAAR5cSh2hs3N727SZSW1lo4Ai1iqPoKW4RS1lWzqT_JGm4HuTTNkKbo1Z3urVTw_aem_tTH4_LqTuaUzMmEMm76b5Q"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Clonee, L",
+          "country": "Ireland",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-01T09:39:22.896Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6905d4c16601992731389e10",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "c65eaa02-387f-4701-9737-72639635c790",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6905d4c1da5c1bff361af33a",
+      "_userWebsite": "6905d4c1da5c1bff361af33a",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-01T09:37:05.483Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Shruti would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-01T09:37:13.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-01T09:37:13.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop( )",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "103.122.251.4",
+          "operatingSystem": "Windows 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/",
+            "https://shrutiaggarwal.truecosmic.com/?fbclid=IwY2xjawN0DhRleHRuA2FlbQIxMAABHmQG4iLcDX-lU5IDKZyR3BnGSYojtuZDLGcigbT5hkpa2HM48vMFEHM0VLtT_aem_hA_CNSNvvTU-djH1Rck53Q"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Mymensingh, H",
+          "country": "Bangladesh",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-02T10:14:40.772Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6905a71366019927313aed24",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "280bbe2d-ba05-48fc-bf85-e38df8056726",
+      "__v": 0,
+      "_botWebsite": "68f7797a163de8545550a5aa",
+      "_user": "6905a713322e32b17db149e0",
+      "_userWebsite": "6905a713322e32b17db149e0",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-01T06:22:11.739Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, I would love to get to know you a little first. This will only take a few minutes, and helps me prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-01T06:22:40.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-01T06:22:40.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile( K)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "111.88.36.80",
+          "operatingSystem": "Android 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://truecosmic.com/academy/sarah-ramsarran/",
+            "https://truecosmic.com/academy/sarah-ramsarran/",
+            "https://truecosmic.com/academy/sarah-ramsarran/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Karachi, SD",
+          "country": "Pakistan",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-01T12:38:19.828Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "69059a276601992731fda389",
+      "uuid": "d2e875d9-eeec-4d74-a6cb-0fab294bf581",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "6903379b163de85455522eb9",
+      "_user": "69059a2743c6065660fe832b",
+      "_userWebsite": "69059a2743c6065660fe832b",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-01T05:27:03.960Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Valentine would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-01T05:27:22.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-01T05:27:22.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop( )",
+          "browser": "Chrome 79.0.3945.79",
+          "ip": "205.169.39.171",
+          "operatingSystem": "Windows 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://valentinewairimu.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Dallas, TX",
+          "country": "United States",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-01T05:27:25.561Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6905912a6601992731d8e11d",
+      "uuid": "42f44fa3-4b44-4a8b-9100-a1019cd94c54",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "68f7797a163de8545550a5aa",
+      "_user": "6905912a322e32b17dafbdd1",
+      "_userWebsite": "6905912a322e32b17dafbdd1",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-11-01T04:48:42.966Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, I would love to get to know you a little first. This will only take a few minutes, and helps me prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-11-01T04:48:51.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-11-01T04:48:51.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop( )",
+          "browser": "Edge 141.0.0.0",
+          "ip": "41.113.15.175",
+          "operatingSystem": "Windows 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://truecosmic.com/academy/sarah-ramsarran/?fbclid=IwY2xjawNycG5leHRuA2FlbQIxMABicmlkETFlVGpPY2ZwUVJndXBpVDdDAR6-O_ezNl2MhGVp9H6AGIt9mtUwsC4KAX3BKUWXn0MfaEcENm-Q6Rq9tcPaTw_aem_b0-HgNP3GWBz9YIhFJAjYQ"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Johannesburg, GP",
+          "country": "South Africa",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-01T04:51:11.699Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "690500666601992731d9a426",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "9d58f612-bcd1-43a0-a994-c98627fb9d80",
+      "__v": 0,
+      "_botWebsite": "68f7797a163de8545550a5aa",
+      "_user": "69050066da5c1bff360dc510",
+      "_userWebsite": "69050066da5c1bff360dc510",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T18:31:02.773Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Alright Gabriela , we will stay in touch with you. You can always book a 1:1 session when you're ready for it !!",
+        "at": "2025-10-31T18:38:17.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T18:39:07.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Facebook 536.0.0.41.69",
+          "ip": "206.83.103.0",
+          "operatingSystem": "iOS 18.3.2"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://truecosmic.com/academy/sarah-ramsarran/?fbclid=IwZXh0bgNhZW0CMTEAAR4t_wd9BomeYCWtSwA306SWphiKsB6LBeA1Vff4sBLhWImsQ6_SmuWYSVQA1g_aem_dRaByikTjovelWrHUdyrtg"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Gabriela ",
+          "picture": "",
+          "contact": {
+            "email": "gabriela.wojtyra@gmail.com",
+            "phone": {
+              "number": "509665775",
+              "prefix": "+48"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Auckland, AUK",
+          "country": "New Zealand",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_sarah",
+              "value": "Wojtyra "
+            },
+            {
+              "key": "email_id",
+              "value": "gabriela.wojtyra@gmail.com"
+            },
+            {
+              "key": "wpn_sarah",
+              "value": "48509665775"
+            },
+            {
+              "key": "facebook_profile_sarah",
+              "value": "Skip"
+            },
+            {
+              "key": "why_seek_coaching",
+              "value": "🛋 Relationships, 🌧 Stress or Anxiety, 🌿 Health and Well-being"
+            },
+            {
+              "key": "how_much_familiar",
+              "value": "🌳 Expert – I’ve been practicing for a long time"
+            },
+            {
+              "key": "how_often_practice",
+              "value": "🔄 Daily"
+            },
+            {
+              "key": "specific_user_issue",
+              "value": "I can’t detached and leave the old story. Became obsessed about my manifestation "
+            },
+            {
+              "key": "top_three_goals",
+              "value": "Get marry with my sp, start my own business, be healthy and happy "
+            },
+            {
+              "key": "whats_holding_back",
+              "value": "😟 Fear of failure / self-doubt"
+            },
+            {
+              "key": "worked_with_coach_before",
+              "value": "Yes"
+            },
+            {
+              "key": "earlier_coaching_experience",
+              "value": "Was good, but still all the homework didn’t make me feel better in a long perspective "
+            },
+            {
+              "key": "hope_to_gain",
+              "value": "Support in overcoming obstacles"
+            },
+            {
+              "key": "how_much_committed_scale",
+              "value": "from 2 to 10"
+            },
+            {
+              "key": "willing_to_invest",
+              "value": "$0 – I’m just exploring"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 22
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 22
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 22
+        }
+      ],
+      "unreadMessages": 22,
+      "updatedAt": "2025-10-31T18:39:07.144Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "6904ffca6601992731d7554c",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "1b84a389-42b1-4004-8e0c-09a024295f44",
+      "__v": 0,
+      "_botWebsite": "68f7797a163de8545550a5aa",
+      "_user": "6904ffca43c6065660f5958e",
+      "_userWebsite": "6904ffca43c6065660f5958e",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T18:28:26.864Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Thank you for sharing. Based on your readiness, you can now book your Free Virtual Consultation with Sarah below. 📅\n\n👉 Book My Free Session Now: \n\nhttps://calendar.truecosmic.com/c/sarah-ramsarran?name=Allyson %20Skip&email=allysonboyle30@gmail.com&phone=447983068351",
+        "at": "2025-10-31T18:31:44.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T18:35:28.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Facebook 536.0.0.41.69",
+          "ip": "81.102.118.209",
+          "operatingSystem": "iOS 26.0.1"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://truecosmic.com/academy/sarah-ramsarran/?fbclid=IwZXh0bgNhZW0CMTEAAR4t_wd9BomeYCWtSwA306SWphiKsB6LBeA1Vff4sBLhWImsQ6_SmuWYSVQA1g_aem_dRaByikTjovelWrHUdyrtg"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Allyson ",
+          "picture": "",
+          "contact": {
+            "email": "allysonboyle30@gmail.com",
+            "phone": {
+              "number": "7983068351",
+              "prefix": "+44"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Glasgow, SCT",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_sarah",
+              "value": "Skip"
+            },
+            {
+              "key": "email_id",
+              "value": "allysonboyle30@gmail.com"
+            },
+            {
+              "key": "wpn_sarah",
+              "value": "447983068351"
+            },
+            {
+              "key": "facebook_profile_sarah",
+              "value": "Skip"
+            },
+            {
+              "key": "why_seek_coaching",
+              "value": "🛋 Relationships"
+            },
+            {
+              "key": "how_much_familiar",
+              "value": "🌱 Novice – I’m new and still learning"
+            },
+            {
+              "key": "how_often_practice",
+              "value": "🔄 Occasionally"
+            },
+            {
+              "key": "specific_user_issue",
+              "value": "Specific person "
+            },
+            {
+              "key": "top_three_goals",
+              "value": "Skip"
+            },
+            {
+              "key": "whats_holding_back",
+              "value": "Skip"
+            },
+            {
+              "key": "worked_with_coach_before",
+              "value": "No"
+            },
+            {
+              "key": "hope_to_gain",
+              "value": "Support in overcoming obstacles"
+            },
+            {
+              "key": "how_much_committed_scale",
+              "value": "from 1 to 10"
+            },
+            {
+              "key": "willing_to_invest",
+              "value": "I’m not sure yet"
+            },
+            {
+              "key": "booking_time",
+              "value": "2025-11-05T15:00:00+00:00"
+            },
+            {
+              "key": "demo_session_coach",
+              "value": "Sarah Ramsarran"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 17
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 17
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 17
+        }
+      ],
+      "unreadMessages": 17,
+      "updatedAt": "2025-10-31T18:35:46.572Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "68ec9715fa680413a2d07abf",
+      "uuid": "a4747001-8014-4627-96e4-9c02fb0719f8",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "686e8a1ca306b60e50582d17",
+      "_user": "68ec9715115d3e74e83e8b51",
+      "_userWebsite": "68ec9715115d3e74e83e8b51",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-13T06:07:17.420Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, I would love to get to know you a little first. This will only take a few minutes, and helps me prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-10-31T18:28:23.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T18:28:23.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop( )",
+          "browser": "Edge 142.0.0.0",
+          "ip": "80.238.117.56",
+          "operatingSystem": "Windows 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://truecosmic.com/academy/isaac-adegbe/",
+            "https://truecosmic.com/academy/isaac-adegbe/",
+            "https://truecosmic.com/academy/isaac-adegbe/",
+            "https://truecosmic.com/academy/isaac-adegbe/",
+            "https://truecosmic.com/academy/isaac-adegbe/",
+            "https://truecosmic.com/academy/isaac-adegbe/",
+            "https://truecosmic.com/academy/isaac-adegbe/",
+            "https://truecosmic.com/academy/isaac-adegbe/",
+            "https://truecosmic.com/academy/isaac-adegbe/",
+            "https://truecosmic.com/academy/isaac-adegbe/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Warsaw, 14",
+          "country": "Poland",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T05:49:50.215Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6904fe5f6601992731cfff67",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "0e285faf-4873-49b9-a876-75de341ac88a",
+      "__v": 0,
+      "_botWebsite": "68f7797a163de8545550a5aa",
+      "_user": "6904fe5f322e32b17da7575c",
+      "_userWebsite": "6904fe5f322e32b17da7575c",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T18:22:23.402Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, I would love to get to know you a little first. This will only take a few minutes, and helps me prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-10-31T18:22:35.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T18:22:35.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop( )",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "173.252.87.16",
+          "operatingSystem": "Linux x86_64"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://truecosmic.com/academy/sarah-ramsarran/?fbclid=IwZXh0bgNhZW0CMTEAAR7O2M-mwWtQA1He0ETXOd6hxS305985937iJO25zb_g0O2EyNYsEsqqmfzm0g_aem_ye91wMru2XeDGGC2xlu76g"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Fort Worth, TX",
+          "country": "United States",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-31T18:22:47.729Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6904e4816601992731498a71",
+      "uuid": "2416d4c5-f1c2-4168-ac21-b57c69e01944",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6904e481fa80c2624e248d8a",
+      "_userWebsite": "6904e481fa80c2624e248d8a",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T16:32:01.917Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Shruti would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-10-31T16:32:05.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T16:32:05.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "86.137.186.155",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://page.botpenguin.com/69035f01163de85455523f7d/6862add8833c9f93263e210e"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Camborne, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-31T16:32:58.590Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6904e4086601992731478a9d",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "4b50f49b-6c73-4024-a680-ee0d9cb17b1f",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6904e4085170a5f2f97da7b3",
+      "_userWebsite": "6904e4085170a5f2f97da7b3",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T16:30:00.626Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Welcome! I'm Janice, your Truecosmic AI assistant to guide you for scheduling a 30 min free consultation.",
+        "at": "2025-10-31T16:30:01.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T16:30:01.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "86.137.186.155",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://page.botpenguin.com/69035f01163de85455523f7d/6862add8833c9f93263e210e"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Camborne, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-31T16:30:02.054Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6904e2c16601992731409e9f",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "94c0adbc-24c0-4ed4-8fcf-655b5e119b43",
+      "__v": 0,
+      "_botWebsite": "68f7797a163de8545550a5aa",
+      "_user": "6904e2c1e3138558f724ef29",
+      "_userWebsite": "6904e2c1e3138558f724ef29",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T16:24:33.932Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Thank you for sharing. Based on your readiness, you can now book your Free Virtual Consultation with Sarah below. 📅\n\n👉 Book My Free Session Now: \n\nhttps://calendar.truecosmic.com/c/sarah-ramsarran?name=J%20Ro&email=Jenniferlrosiak@gmail.com&phone=15164250680",
+        "at": "2025-10-31T16:28:22.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T16:30:37.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile( K)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "74.72.172.192",
+          "operatingSystem": "Android 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://truecosmic.com/academy/sarah-ramsarran/?fbclid=IwZXh0bgNhZW0CMTEAAR4t_wd9BomeYCWtSwA306SWphiKsB6LBeA1Vff4sBLhWImsQ6_SmuWYSVQA1g_aem_dRaByikTjovelWrHUdyrtg"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "J",
+          "picture": "",
+          "contact": {
+            "email": "jenniferlrosiak@gmail.com",
+            "phone": {
+              "number": "5164250680",
+              "prefix": "+1"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Queens, NY",
+          "country": "United States",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_sarah",
+              "value": "Ro"
+            },
+            {
+              "key": "email_id",
+              "value": "Jenniferlrosiak@gmail.com"
+            },
+            {
+              "key": "wpn_sarah",
+              "value": "15164250680"
+            },
+            {
+              "key": "facebook_profile_sarah",
+              "value": "Jennifer Lynne "
+            },
+            {
+              "key": "why_seek_coaching",
+              "value": "🛋 Relationships"
+            },
+            {
+              "key": "how_much_familiar",
+              "value": "🌱 Novice – I’m new and still learning"
+            },
+            {
+              "key": "how_often_practice",
+              "value": "🔄 Occasionally"
+            },
+            {
+              "key": "specific_user_issue",
+              "value": "I waiver, I'm not sure how to remain steady."
+            },
+            {
+              "key": "top_three_goals",
+              "value": "They are undefined atm."
+            },
+            {
+              "key": "whats_holding_back",
+              "value": "🌫 Lack of clarity or direction, 😟 Fear of failure / self-doubt, 🔄 Other "
+            },
+            {
+              "key": "worked_with_coach_before",
+              "value": "No"
+            },
+            {
+              "key": "hope_to_gain",
+              "value": "Clarity on my goals and vision"
+            },
+            {
+              "key": "how_much_committed_scale",
+              "value": "Skip"
+            },
+            {
+              "key": "willing_to_invest",
+              "value": "I’m not sure yet"
+            },
+            {
+              "key": "booking_time",
+              "value": "2025-11-03T11:30:00-05:00"
+            },
+            {
+              "key": "demo_session_coach",
+              "value": "Sarah Ramsarran"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 17
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 17
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-31T16:40:55.978Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "6904e2b766019927314078a0",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "684976d5-fee9-42ed-83e0-ca333fdf738d",
+      "__v": 0,
+      "_botWebsite": "6880c7ac63793209fdd9fbf7",
+      "_user": "6904e2b75170a5f2f97d8e05",
+      "_userWebsite": "6904e2b75170a5f2f97d8e05",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T16:24:23.865Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, I would love to get to know you a little first. This will only take a few minutes, and help me prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-10-31T16:24:29.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T16:24:29.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Mobile Safari 18.6",
+          "ip": "104.28.40.142",
+          "operatingSystem": "iOS 18.6.2"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://robertmeade.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "London, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-31T18:03:49.656Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6904e1fb66019927313cdeeb",
+      "uuid": "c3205119-bbc6-4b79-9699-e870f25a7422",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "68f7797a163de8545550a5aa",
+      "_user": "6904e1fbe3138558f724e087",
+      "_userWebsite": "6904e1fbe3138558f724e087",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T16:21:15.580Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": true,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "If you'd like Sarah to review your energy or posts, feel free to share your Facebook profile URL or ID. (This is optional.)",
+        "at": "2025-10-31T16:22:59.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T16:24:04.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Mobile Safari 18.6",
+          "ip": "93.114.62.179",
+          "operatingSystem": "iOS 18.6.2"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://truecosmic.com/academy/sarah-ramsarran/",
+            "https://truecosmic.com/academy/sarah-ramsarran/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Sal",
+          "picture": "",
+          "contact": {
+            "email": "salha11@me.com",
+            "phone": {
+              "number": "7597028298",
+              "prefix": "+44"
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "London, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_sarah",
+              "value": "Cecilia "
+            },
+            {
+              "key": "email_id",
+              "value": "salha11@me.com"
+            },
+            {
+              "key": "wpn_sarah",
+              "value": "447597028298"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 5
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 5
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-31T16:29:12.325Z",
+      "userInteracted": true,
+      "websiteVisits": 1,
+      "_agency": "5fed22a15383a9a5135e925d"
+    },
+    {
+      "_id": "6904e0806601992731356586",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "91e54a71-0c4a-4172-87f4-88dc9834c345",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6904e080fa80c2624e243f10",
+      "_userWebsite": "6904e080fa80c2624e243f10",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T16:14:56.552Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Shruti would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-10-31T16:22:14.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T16:22:14.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Mobile Safari 18.6",
+          "ip": "104.28.40.145",
+          "operatingSystem": "iOS 18.6.2"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "London, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-31T16:25:34.024Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "690362516601992731224273",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "33bcbe62-8c11-4a9e-9b78-380b1367bbfa",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "690362518ee15b98d2e72cd4",
+      "_userWebsite": "690362518ee15b98d2e72cd4",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-30T13:04:17.677Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Shruti would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-10-31T16:11:30.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T16:11:30.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "86.137.186.155",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://a08adcad-2367-4865-b6e2-a4c0c612386a.lovableproject.com/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6IjYyMTBjZDZmNGQ4NDJlNmQ1MzczY2U3MDAyNzQ2MGM2IiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNDM0MjE4LCJuYmYiOjE3NjE4Mjk0MTgsImlhdCI6MTc2MTgyOTQxOH0.86CFCQ4lG6AXjCX03m32x0XAYG3Qz2ZZDoWir3XAHTs",
+            "https://a08adcad-2367-4865-b6e2-a4c0c612386a.lovableproject.com/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6IjIwNDhkN2Q0MWM3OTE0NzliYzBkMjEzOTcyZmE1YTVmIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNDM0NTk0LCJuYmYiOjE3NjE4Mjk3OTQsImlhdCI6MTc2MTgyOTc5NH0.TIjFieA57U4SnFTCqBV8Zs4ZxREwBFmD0kCVamhXqZc",
+            "https://a08adcad-2367-4865-b6e2-a4c0c612386a.lovableproject.com/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6IjIwNDhkN2Q0MWM3OTE0NzliYzBkMjEzOTcyZmE1YTVmIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNDM0NTk0LCJuYmYiOjE3NjE4Mjk3OTQsImlhdCI6MTc2MTgyOTc5NH0.TIjFieA57U4SnFTCqBV8Zs4ZxREwBFmD0kCVamhXqZc",
+            "https://a08adcad-2367-4865-b6e2-a4c0c612386a.lovableproject.com/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6ImI0ZDBlMzg0NjhlNWIzMWY5YTMzZWMyZTlkOGQ5MWM1IiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNDM1Nzk3LCJuYmYiOjE3NjE4MzA5OTcsImlhdCI6MTc2MTgzMDk5N30.YrdwZir7wB47vLqEMapLyLQWWB5mfXA5mN6dL0-9XDg",
+            "https://a08adcad-2367-4865-b6e2-a4c0c612386a.lovableproject.com/?__lovable_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiSW9rVm14bTVuRVhiWDlkelQ3dEJGOENCWG9hMiIsInByb2plY3RfaWQiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJub25jZSI6IjI1NTlmMTkxOTIyZTEzZmJjM2Q5ZjlkNmFiZTQ5ZTdhIiwiaXNzIjoibG92YWJsZS1hcGkiLCJzdWIiOiJhMDhhZGNhZC0yMzY3LTQ4NjUtYjZlMi1hNGMwYzYxMjM4NmEiLCJhdWQiOlsibG92YWJsZS1hcHAiXSwiZXhwIjoxNzYyNTMxNjU5LCJuYmYiOjE3NjE5MjY4NTksImlhdCI6MTc2MTkyNjg1OX0.3XPVy33Fg-DvPRVVpWf0QwjFSSj4TQ-Fv2s_zg-srM8"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Camborne, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 1
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 1
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 0
+        }
+      ],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-31T16:49:06.579Z",
+      "userInteracted": true,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6904df7166019927312fb0be",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "8c10d692-fd9a-4f74-be90-a5fd52a504dd",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6904df715170a5f2f97d4bf4",
+      "_userWebsite": "6904df715170a5f2f97d4bf4",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T16:10:25.730Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Shruti would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-10-31T16:10:34.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T16:10:34.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop( )",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "103.122.251.4",
+          "operatingSystem": "Windows 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/",
+            "https://shrutiaggarwal.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Mymensingh, H",
+          "country": "Bangladesh",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-31T16:16:08.478Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6904df0f66019927312dfd2b",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "f632b4ad-2461-486e-8994-6237884fc135",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "6904df0fe3138558f724a68b",
+      "_userWebsite": "6904df0fe3138558f724a68b",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T16:08:47.596Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Shruti would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-10-31T16:08:55.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T16:08:55.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Safari 18.5",
+          "ip": "86.137.186.155",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor",
+            "https://shrutiaggarwal.truecosmic.com/?utm_source=lovable-editor"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Camborne, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-11-03T15:59:56.645Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6904cff866019927319ad58c",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "9b96c002-ea09-4752-94c8-14bff8336a9a",
+      "__v": 0,
+      "_botWebsite": "68f7797a163de8545550a5aa",
+      "_user": "6904cff8fa80c2624e22ee7e",
+      "_userWebsite": "6904cff8fa80c2624e22ee7e",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T15:04:24.474Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Thanks, Kirsteen! What is the best email to send your consultation details to?",
+        "at": "2025-10-31T15:08:45.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T15:08:45.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 140.0.0.0",
+          "ip": "86.143.205.195",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://truecosmic.com/academy/sarah-ramsarran/",
+            "https://truecosmic.com/academy/sarah-ramsarran/",
+            "https://truecosmic.com/academy/sarah-ramsarran/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Kirsteen",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Fort William, SCT",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_sarah",
+              "value": "Glen"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 3
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 3
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 3
+        }
+      ],
+      "unreadMessages": 3,
+      "updatedAt": "2025-10-31T15:46:06.068Z",
+      "userInteracted": true,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6904c6cd66019927313044ec",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "957c5f2d-d7ac-4af2-b280-bb3891d89882",
+      "__v": 0,
+      "_botWebsite": "68f7797a163de8545550a5aa",
+      "_user": "6904c6cdfa80c2624e22294d",
+      "_userWebsite": "6904c6cdfa80c2624e22294d",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-31T14:25:17.674Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Thanks, Su! What’s the best email for me to send your consultation details?",
+        "at": "2025-10-31T14:26:11.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-31T14:26:11.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "mobile(Apple iPhone)",
+          "browser": "Facebook 536.0.0.41.69",
+          "ip": "89.217.60.193",
+          "operatingSystem": "iOS 18.6.2"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://truecosmic.com/academy/sarah-ramsarran/?fbclid=IwZXh0bgNhZW0CMTEAAR6IDWgI1_zuzWQnJK-K_eKaAdQ3P3Ef2_5ykNigXvTVkHvBWIsM4rF6DQ70Rw_aem_BeRuJJjSV5L8RX8S9MdnZg"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "Su",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Rüti, ZH",
+          "country": "Switzerland",
+          "gender": "",
+          "tags": [],
+          "attributes": [
+            {
+              "key": "ln_sarah",
+              "value": "Kovi"
+            }
+          ]
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [
+        {
+          "userId": "6862b3210038c8933d64ab1b",
+          "count": 3
+        },
+        {
+          "userId": "68c3cfac12efca5607ca7e4e",
+          "count": 3
+        },
+        {
+          "userId": "6862add8833c9f93263e210e",
+          "count": 3
+        }
+      ],
+      "unreadMessages": 3,
+      "updatedAt": "2025-10-31T14:27:07.735Z",
+      "userInteracted": true,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6903b2fb6601992731e7d189",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "7b340fb1-df3b-474e-b808-0850d376b421",
+      "__v": 0,
+      "_botWebsite": "6903379b163de85455522eb9",
+      "_user": "6903b2fb8ee15b98d2ee678d",
+      "_userWebsite": "6903b2fb8ee15b98d2ee678d",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-30T18:48:27.741Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": true,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Valentine would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-10-30T18:48:44.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-30T18:48:44.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop( )",
+          "browser": "Chrome 119.0.0.0",
+          "ip": "23.27.145.217",
+          "operatingSystem": "Windows 10"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://valentinewairimu.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "San Jose, CA",
+          "country": "United States",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-30T18:48:44.735Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "690383ba6601992731f0feb8",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "7f4f4e30-bba0-4097-9d50-85884fdfd385",
+      "__v": 0,
+      "_botWebsite": "6903379b163de85455522eb9",
+      "_user": "690383ba8ee15b98d2ea8514",
+      "_userWebsite": "690383ba8ee15b98d2ea8514",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-30T15:26:50.911Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Welcome! I'm Janice, your Truecosmic AI assistant to guide you for scheduling a 30 min free consultation.",
+        "at": "2025-10-30T15:26:58.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-30T15:26:58.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 113.0.0.0",
+          "ip": "16.144.145.112",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://valentinewairimu.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Portland, OR",
+          "country": "United States",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-30T15:27:00.064Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "69037d976601992731ced7ca",
+      "uuid": "28d5381c-5310-4412-85db-5a160bb7e18a",
+      "_customer": "6862add8833c9f93263e210e",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "69037d975f6032c58cee2166",
+      "_userWebsite": "69037d975f6032c58cee2166",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-30T15:00:39.348Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "Welcome! I'm Janice, your Truecosmic AI assistant to guide you for scheduling a 30 min free consultation.",
+        "at": "2025-10-30T15:00:45.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-30T15:00:45.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 113.0.0.0",
+          "ip": "35.161.9.63",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Portland, OR",
+          "country": "United States",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-30T15:00:46.185Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "6903664166019927313a115f",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "8e12dc98-5f8b-40b8-9941-0f157ca728a7",
+      "__v": 0,
+      "_botWebsite": "68fced8059b0df5461a34dd3",
+      "_user": "690366408ee15b98d2e78f92",
+      "_userWebsite": "690366408ee15b98d2e78f92",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-30T13:21:05.035Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": true,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, I would love to get to know you a little first. This will only take a few minutes, and help me prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-10-30T13:21:09.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-30T13:21:09.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop(Apple Macintosh)",
+          "browser": "Chrome 141.0.0.0",
+          "ip": "86.137.186.155",
+          "operatingSystem": "Mac OS 10.15.7"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://page.botpenguin.com/68fced8059b0df5461a34dd3/6862add8833c9f93263e210e"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Camborne, ENG",
+          "country": "United Kingdom",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-30T13:21:09.460Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    },
+    {
+      "_id": "690363546601992731285b92",
+      "_customer": "6862add8833c9f93263e210e",
+      "uuid": "5427966c-4f28-4c11-b940-0be614364da7",
+      "__v": 0,
+      "_botWebsite": "69035f01163de85455523f7d",
+      "_user": "690363545f6032c58ceb763c",
+      "_userWebsite": "690363545f6032c58ceb763c",
+      "chatBotType": "FLOW_BASED",
+      "createdAt": "2025-10-30T13:08:36.394Z",
+      "hasOrdered": {
+        "status": false
+      },
+      "integrations": {
+        "zoho": {
+          "isTemplateSent": false
+        }
+      },
+      "isContact": false,
+      "isImported": false,
+      "isLiveChatActive": false,
+      "isMigrated": false,
+      "isOnline": false,
+      "isPaid": true,
+      "isSubscriber": true,
+      "isUserBlocked": false,
+      "lastMessage": {
+        "text": "To serve you in the best possible way, Shruti would love to get to know you a little first. This will only take a few minutes, and help her prepare a consultation tailored to you.\nReady to begin?",
+        "at": "2025-10-30T13:08:47.000Z",
+        "by": "bot"
+      },
+      "lastSeenAt": "2025-10-30T13:08:47.000Z",
+      "platform": [
+        "WEBSITE"
+      ],
+      "profile": {
+        "device": {
+          "device": "Desktop( )",
+          "browser": "Chrome Headless 125.0.6422.60",
+          "ip": "104.197.69.115",
+          "operatingSystem": "Linux x86_64"
+        },
+        "marketing": {
+          "urlsVisited": [
+            "https://shrutiaggarwal.truecosmic.com/"
+          ]
+        },
+        "notes": [],
+        "userDetails": {
+          "name": "",
+          "picture": "",
+          "contact": {
+            "email": "",
+            "phone": {
+              "number": "",
+              "prefix": ""
+            }
+          },
+          "telegramUserName": "",
+          "facebookProfileId": "",
+          "city": "Council Bluffs, IA",
+          "country": "United States",
+          "gender": "",
+          "tags": [],
+          "attributes": []
+        }
+      },
+      "secondaryPlatform": [
+        "website"
+      ],
+      "segments": [],
+      "status": "OPEN",
+      "unreadMessage": [],
+      "unreadMessages": 0,
+      "updatedAt": "2025-10-30T13:09:13.752Z",
+      "userInteracted": false,
+      "websiteVisits": 1
+    }
+  ],
+  "code": 200
+}

@@ -112,6 +112,21 @@ def coach_page(slug):
     except Exception:
         pass
     
+    # If no phone but email is provided, try to retrieve from BotPenguin
+    if not prefill_phone and prefill_email:
+        try:
+            from app.integrations.botpenguin_service import get_phone_from_botpenguin
+            bp_phone = get_phone_from_botpenguin(prefill_email)
+            if bp_phone:
+                prefill_phone = bp_phone
+                try:
+                    session['booking_phone'] = bp_phone
+                except Exception:
+                    pass
+                logging.getLogger(__name__).info("Retrieved phone from BotPenguin for prefill: %s", prefill_email)
+        except Exception as e:
+            logging.getLogger(__name__).debug("Failed to retrieve phone from BotPenguin for prefill: %s", e)
+    
     return render_template("coaches/booking.html", coach=coach, profile=profile, hours=hours,
                          prefill_name=prefill_name, prefill_email=prefill_email, prefill_phone=prefill_phone)
 
@@ -247,6 +262,18 @@ def api_book(slug):
             visitor_phone = (session.get('booking_phone') or '').strip()
         except Exception:
             visitor_phone = ''
+    
+    # If still no phone, try to retrieve from BotPenguin
+    if not visitor_phone and email:
+        try:
+            from app.integrations.botpenguin_service import get_phone_from_botpenguin
+            bp_phone = get_phone_from_botpenguin(email)
+            if bp_phone:
+                visitor_phone = bp_phone
+                logging.getLogger(__name__).info("Retrieved phone from BotPenguin for %s", email)
+        except Exception as e:
+            logging.getLogger(__name__).debug("Failed to retrieve phone from BotPenguin: %s", e)
+    
     if not (name and email and start_iso):
         return jsonify({"error": "Missing fields"}), 400
 
