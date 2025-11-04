@@ -1,7 +1,7 @@
 # Quick Start: Phone Retrieval Fix
 
 ## ✅ Problem Fixed
-Phone numbers from BotPenguin are now automatically retrieved and stored in bookings.
+Phone numbers from BotPenguin are now automatically retrieved, normalized to E.164 format, and stored in bookings.
 
 ## 🧪 Test It Works
 
@@ -128,8 +128,15 @@ visitor_phone: NULL (even though phone exists in BotPenguin)
 
 ### After Fix
 ```
-visitor_phone: +4407717715664 (retrieved from BotPenguin)
+visitor_phone: +447717715664 (retrieved from BotPenguin, E.164 format)
 ```
+
+**E.164 Format Benefits:**
+- ✓ Starts with `+` (international format)
+- ✓ No spaces, dashes, or formatting
+- ✓ Leading zeros removed (e.g., `+4407...` → `+447...`)
+- ✓ Compatible with SMS/WhatsApp/Twilio APIs
+- ✓ Consistent format across all bookings
 
 ## 📞 Support
 

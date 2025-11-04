@@ -10,10 +10,13 @@ The BotPenguin integration was **one-way only** - it synced booking data TO BotP
 
 ### Key Changes
 
-1. **Fixed Phone Extraction** (`app/integrations/botpenguin_service.py`)
+1. **Fixed Phone Extraction with E.164 Normalization** (`app/integrations/botpenguin_service.py`)
    - Updated `_extract_phone()` to correctly parse BotPenguin v7 API structure
    - Phone is at: `profile.userDetails.contact.phone.number`
    - Handles optional country prefix: `profile.userDetails.contact.phone.prefix`
+   - **NEW**: Normalizes all phones to E.164 format (e.g., `+447717715664`)
+   - Removes leading zeros after country code (e.g., `+4407...` → `+447...`)
+   - Strips all formatting (spaces, dashes, parentheses)
    - Includes fallback checks for other phone field formats
 
 2. **Added Phone Retrieval Function** (`app/integrations/botpenguin_service.py`)
@@ -21,10 +24,11 @@ The BotPenguin integration was **one-way only** - it synced booking data TO BotP
    - Looks up contact by email and extracts phone number
    - Returns None if not found (graceful fallback)
 
-3. **Integrated into Booking Flow** (`app/coach/public.py`)
-   - **Priority 1**: Checks URL parameters (`?phone=`, `?phone_number=`, `?tel=`, etc.)
+3. **Integrated into Booking Flow with E.164 Normalization** (`app/coach/public.py`)
+   - **Priority 1**: Checks URL parameters (`?phone=`, `?phone_number=`, `?tel=`, etc.) → Normalized to E.164
    - **Priority 2**: Checks session storage (`session['booking_phone']`)
-   - **Priority 3**: Only if both are empty, retrieves from BotPenguin API (fallback)
+   - **Priority 3**: Only if both are empty, retrieves from BotPenguin API (fallback) → Already E.164
+   - All phones normalized to E.164 format before storage
    - Phone is stored in session for reuse and passed to booking record
    - **Performance**: Minimizes API calls by using cached data when available
 

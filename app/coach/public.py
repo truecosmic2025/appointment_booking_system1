@@ -21,6 +21,93 @@ import requests
 public_bp = Blueprint("public", __name__, url_prefix="")
 
 
+def _normalize_phone_e164(phone: str, default_country_code: str = None) -> str:
+    """
+    Normalize phone number to E.164 format.
+    E.164: +[country code][subscriber number] (no spaces/formatting)
+    
+    Args:
+        phone: Phone number to normalize
+        default_country_code: Default country code to use if number has no + (e.g., "1" for US)
+    """
+    if not phone:
+        return ""
+    
+    # Remove all non-digit characters except leading +
+    cleaned = phone.strip()
+    has_plus = cleaned.startswith('+')
+    if has_plus:
+        cleaned = cleaned[1:]
+    
+    # Remove all non-digits
+    digits = ''.join(c for c in cleaned if c.isdigit())
+    
+    if not digits:
+        return ""
+    
+    # If had +, check for common formatting issues
+    if has_plus:
+        # UK: +44 should be followed by 10 digits (no leading 0)
+        # Common error: +4407... should be +447...
+        if digits.startswith('440') and len(digits) >= 12:
+            # Check if removing the 0 gives us valid length
+            without_zero = '44' + digits[3:]
+            if len(without_zero) <= 15:  # E.164 max length
+                digits = without_zero
+        
+        # France: +33 followed by 9 digits (no leading 0)
+        elif digits.startswith('330') and len(digits) >= 11:
+            without_zero = '33' + digits[3:]
+            if len(without_zero) <= 15:
+                digits = without_zero
+        
+        # Spain: +34 followed by 9 digits (no leading 0)
+        elif digits.startswith('340') and len(digits) >= 11:
+            without_zero = '34' + digits[3:]
+            if len(without_zero) <= 15:
+                digits = without_zero
+        
+        return f"+{digits}"
+    
+    # No + prefix - need to determine if country code is included
+    # This is ambiguous without knowing the source country
+    
+    # If exactly 10 digits, likely missing country code (US/Canada format)
+    if len(digits) == 10:
+        # Use default country code or assume US
+        country_code = default_country_code or "1"
+        return f"+{country_code}{digits}"
+    
+    # If 11 digits and starts with 1, likely US/Canada with country code
+    if len(digits) == 11 and digits.startswith('1'):
+        return f"+{digits}"
+    
+    # If 12+ digits, assume it includes country code
+    if len(digits) >= 12:
+        # Check for common patterns without +
+        # India: 91 followed by 10 digits
+        if digits.startswith('91') and len(digits) == 12:
+            return f"+{digits}"
+        # UK: 44 followed by 10 digits (but check for extra 0)
+        elif digits.startswith('44') and len(digits) >= 12:
+            # Check if there's an extra 0 after country code
+            if digits[2] == '0' and len(digits) == 13:
+                # Remove the extra 0: 4407... → 447...
+                return f"+44{digits[3:]}"
+            return f"+{digits}"
+        # Otherwise assume it has country code
+        return f"+{digits}"
+    
+    # 11 digits not starting with 1 - ambiguous
+    # Could be missing country code or have short country code
+    # Default: assume it has country code
+    if len(digits) >= 11:
+        return f"+{digits}"
+    
+    # Too short (< 10 digits), return original
+    return phone
+
+
 def send_make_booking_event(webhook_url: str, coach_name: str, booking_time_iso: str, user_timezone: str, email: str) -> None:
     """Post booking info to Make.com webhook. Best-effort, non-blocking."""
     logger = logging.getLogger(__name__)
@@ -104,6 +191,11 @@ def coach_page(slug):
         or request.args.get('mobile')
         or ''
     ).strip()
+    
+    # Normalize phone to E.164 format if provided
+    if prefill_phone:
+        prefill_phone = _normalize_phone_e164(prefill_phone)
+    
     try:
         if prefill_phone:
             session['booking_phone'] = prefill_phone
@@ -257,6 +349,11 @@ def api_book(slug):
     start_iso = data.get("start")
     tzname = (data.get("timezone") or "UTC").strip() or "UTC"
     visitor_phone = (data.get("phone") or "").strip()
+    
+    # Normalize phone from request if provided
+    if visitor_phone:
+        visitor_phone = _normalize_phone_e164(visitor_phone)
+    
     if not visitor_phone:
         try:
             visitor_phone = (session.get('booking_phone') or '').strip()
@@ -269,7 +366,7 @@ def api_book(slug):
             from app.integrations.botpenguin_service import get_phone_from_botpenguin
             bp_phone = get_phone_from_botpenguin(email)
             if bp_phone:
-                visitor_phone = bp_phone
+                visitor_phone = bp_phone  # Already normalized by BotPenguin service
                 logging.getLogger(__name__).info("Retrieved phone from BotPenguin for %s", email)
         except Exception as e:
             logging.getLogger(__name__).debug("Failed to retrieve phone from BotPenguin: %s", e)
