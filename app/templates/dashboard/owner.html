@@ -68,8 +68,9 @@
             </li>
           {% endfor %}
         </ul>
-        <div class="mt-4 text-sm">
+        <div class="mt-4 text-sm flex items-center gap-4">
           <a href="{{ url_for('admin.users_index') }}" class="text-brand-700 hover:underline">Manage users</a>
+          <a href="{{ url_for('admin.meetings_report') }}" class="text-brand-700 hover:underline">Meetings report</a>
         </div>
       </div>
     </div>

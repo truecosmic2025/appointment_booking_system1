@@ -65,6 +65,7 @@
               {% if current_user.role in ['owner','admin'] %}
                 <a class="hover:text-slate-900" href="{{ url_for('dashboard.owner') }}">Dashboard</a>
                 <a class="hover:text-slate-900" href="{{ url_for('admin.users_index') }}">Admin</a>
+                <a class="hover:text-slate-900" href="{{ url_for('admin.meetings_report') }}">Reports</a>
               {% elif current_user.role == 'host' %}
                 <a class="hover:text-slate-900" href="{{ url_for('dashboard.host') }}">Dashboard</a>
               {% else %}
@@ -92,18 +93,19 @@
           </button>
         </div>
       </div>
-      <div id="mobileMenu" class="md:hidden hidden border-t border-slate-200 bg-white">
-        <div class="mx-auto max-w-7xl px-4 py-3 space-y-2 text-sm">
-          <a class="block py-2" href="#features">Why TrueCosmic Calendar?</a>
-          {% if current_user.is_authenticated %}
-            {% if current_user.role in ['owner','admin'] %}
-              <a class="block py-2" href="{{ url_for('dashboard.owner') }}">Dashboard</a>
-              <a class="block py-2" href="{{ url_for('admin.users_index') }}">Admin</a>
-            {% elif current_user.role == 'host' %}
-              <a class="block py-2" href="{{ url_for('dashboard.host') }}">Dashboard</a>
-            {% else %}
-              <a class="block py-2" href="/coaches">Coaches</a>
-            {% endif %}
+          <div id="mobileMenu" class="md:hidden hidden border-t border-slate-200 bg-white">
+            <div class="mx-auto max-w-7xl px-4 py-3 space-y-2 text-sm">
+              <a class="block py-2" href="#features">Why TrueCosmic Calendar?</a>
+              {% if current_user.is_authenticated %}
+                {% if current_user.role in ['owner','admin'] %}
+                  <a class="block py-2" href="{{ url_for('dashboard.owner') }}">Dashboard</a>
+                  <a class="block py-2" href="{{ url_for('admin.users_index') }}">Admin</a>
+                  <a class="block py-2" href="{{ url_for('admin.meetings_report') }}">Reports</a>
+                {% elif current_user.role == 'host' %}
+                  <a class="block py-2" href="{{ url_for('dashboard.host') }}">Dashboard</a>
+                {% else %}
+                  <a class="block py-2" href="/coaches">Coaches</a>
+                {% endif %}
           {% else %}
             <a class="block py-2" href="#how">How it works</a>
             <a class="block py-2" href="/coaches">Coaches</a>

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Admin · Meetings Report | TrueCosmic Calendar{% endblock %}
+{% block content %}
+<section class="py-12">
+  <div class="mx-auto max-w-6xl px-4">
+    <div class="flex items-center justify-between flex-wrap gap-3">
+      <h1 class="text-2xl font-bold text-slate-900">Meetings Report</h1>
+      <form method="get" class="flex items-center gap-2 w-full sm:w-auto">
+        <select name="status" class="w-36 rounded-md border border-slate-300 px-3 py-2 text-sm">
+          <option value="past" {% if status=='past' %}selected{% endif %}>Past meetings</option>
+          <option value="cancelled" {% if status=='cancelled' %}selected{% endif %}>Cancelled meetings</option>
+        </select>
+        <select name="period" class="w-32 rounded-md border border-slate-300 px-3 py-2 text-sm">
+          <option value="30" {% if period==30 %}selected{% endif %}>Last 30 days</option>
+          <option value="60" {% if period==60 %}selected{% endif %}>Last 60 days</option>
+          <option value="90" {% if period==90 %}selected{% endif %}>Last 90 days</option>
+        </select>
+        <button class="rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white">Apply</button>
+      </form>
+    </div>
+
+    <div class="mt-2 text-sm text-slate-600">
+      Times shown in <span class="font-medium">{{ current_tz_name }}</span>.
+      <a class="text-brand-700 hover:underline"
+         href="?status={{ status }}&period={{ period }}{% if pagination and pagination.page %}&page={{ pagination.page }}{% endif %}{% if current_tz_name=='UTC' %}&tz=local{% else %}&tz=UTC{% endif %}">
+         Switch to {% if current_tz_name=='UTC' %}local{% else %}UTC{% endif %}
+      </a>
+    </div>
+
+    <div class="mt-4 overflow-x-auto rounded-lg border border-slate-200 bg-white">
+      <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50">
+          <tr>
+            <th class="px-4 py-3 text-left font-semibold text-slate-600">Coach</th>
+            <th class="px-4 py-3 text-left font-semibold text-slate-600">Visitor</th>
+            <th class="px-4 py-3 text-left font-semibold text-slate-600">Email</th>
+            <th class="px-4 py-3 text-left font-semibold text-slate-600">Meeting Date/Time</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+          {% for b in pagination.items %}
+          <tr>
+            <td class="px-4 py-3 text-slate-900 break-words">{{ b.coach.name if b.coach else '—' }}</td>
+            <td class="px-4 py-3 text-slate-900 break-words">{{ b.visitor_name }}</td>
+            <td class="px-4 py-3 text-slate-600 break-all">{{ b.visitor_email }}</td>
+            <td class="px-4 py-3 text-slate-600">{{ b.start_utc | dt_local('%Y-%m-%d %H:%M') }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td class="px-4 py-4 text-slate-500" colspan="4">No records found for the selected filters.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if pagination.pages > 1 %}
+    <div class="mt-4 flex items-center justify-between">
+      <div class="text-sm text-slate-600">
+        Page {{ pagination.page }} of {{ pagination.pages }} · {{ pagination.total }} total
+      </div>
+      <div class="flex items-center gap-2">
+        {% if pagination.has_prev %}
+          <a class="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+             href="?status={{ status }}&period={{ period }}&page={{ pagination.prev_num }}">Previous</a>
+        {% else %}
+          <span class="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-400">Previous</span>
+        {% endif %}
+        {% if pagination.has_next %}
+          <a class="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+             href="?status={{ status }}&period={{ period }}&page={{ pagination.next_num }}">Next</a>
+        {% else %}
+          <span class="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-400">Next</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  </section>
+{% endblock %}

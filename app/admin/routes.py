@@ -1,9 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
-from sqlalchemy import or_
+from sqlalchemy import or_, select, and_, desc
+from sqlalchemy.orm import joinedload
+from datetime import datetime, timedelta
 
 from app import db
 from app.models.user import User
+from app.models.booking import Booking
 from app.auth.routes import roles_required
 
 
@@ -81,3 +84,47 @@ def users_set_active(user_id: int):
     flash(f"{target.email} has been {state}.", "success")
     return redirect(url_for("admin.users_index"))
 
+
+@admin_bp.route("/reports/meetings")
+@roles_required("admin", "owner")
+def meetings_report():
+    period_raw = request.args.get("period", "30").strip()
+    try:
+        period = int(period_raw)
+    except ValueError:
+        period = 30
+    if period not in (30, 60, 90):
+        period = 30
+
+    status = (request.args.get("status", "past") or "").strip().lower()
+    if status not in ("past", "cancelled"):
+        status = "past"
+
+    page = request.args.get("page", 1, type=int)
+    per_page = 20
+
+    now = datetime.utcnow()
+    since = now - timedelta(days=period)
+
+    conditions = [Booking.start_utc >= since, Booking.start_utc <= now]
+    if status == "past":
+        conditions.append(Booking.status == "booked")
+    else:
+        conditions.append(Booking.status == "cancelled")
+
+    stmt = (
+        select(Booking)
+        .options(joinedload(Booking.coach))
+        .where(and_(*conditions))
+        .order_by(desc(Booking.start_utc))
+    )
+
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+
+    return render_template(
+        "admin/meetings_report.html",
+        pagination=pagination,
+        period=period,
+        status=status,
+        now=now,
+    )

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, g, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import os
@@ -67,11 +67,26 @@ def create_app():
     app.register_blueprint(dash_bp)
     app.register_blueprint(coach_bp)
 
+    # Optional per-request timezone override via query param (?tz=UTC or ?tz=local)
+    @app.before_request
+    def _tz_override():
+        try:
+            tz = (request.args.get('tz') or '').strip()
+            if tz.upper() == 'UTC':
+                g._tz_override = 'UTC'
+            elif tz.lower() == 'local' or tz == '':
+                g._tz_override = None
+        except Exception:
+            g._tz_override = None
+
     # Jinja helpers: current timezone and local dt formatting
     def _current_tz_name():
         try:
             from flask_login import current_user
             from .models.coach_profile import CoachProfile
+            # Per-request override (e.g., tz=UTC)
+            if getattr(g, '_tz_override', None):
+                return g._tz_override
             if getattr(current_user, 'is_authenticated', False):
                 # First check User timezone, then fall back to CoachProfile
                 if hasattr(current_user, 'timezone') and current_user.timezone:
