@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-brand-50 text-slate-800 antialiased;
+  }
+
+  ::selection {
+    @apply bg-brand-200 text-brand-950;
+  }
+}
+
+@layer components {
+  .tc-card {
+    @apply rounded-2xl border border-white/80 bg-white shadow-cosmic-sm;
+  }
+
+  .tc-card-muted {
+    @apply rounded-2xl border border-brand-100 bg-brand-50/60;
+  }
+
+  .tc-kpi {
+    @apply tc-card relative overflow-hidden p-5;
+  }
+
+  .tc-btn-primary {
+    @apply inline-flex items-center justify-center rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-800 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .tc-btn-secondary {
+    @apply inline-flex items-center justify-center rounded-xl border border-brand-200 bg-white px-4 py-2.5 text-sm font-semibold text-brand-800 transition hover:border-brand-300 hover:bg-brand-50 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .tc-input {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-100;
+  }
+
+  .tc-label {
+    @apply mb-1.5 block text-sm font-semibold text-slate-700;
+  }
+
+  .tc-badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+
+  .tc-table th {
+    @apply whitespace-nowrap px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-slate-500;
+  }
+
+  .tc-table td {
+    @apply px-4 py-4 align-top text-sm text-slate-600;
+  }
+}

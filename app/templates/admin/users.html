@@ -1,80 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Admin · Users | TrueCosmic Calendar{% endblock %}
 {% block content %}
-<section class="py-12">
-  <div class="mx-auto max-w-6xl px-4">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <h1 class="text-2xl font-bold text-slate-900">Users</h1>
-      <form method="get" class="flex items-center gap-2 w-full sm:w-auto">
-        <input type="text" name="q" value="{{ q }}" placeholder="Search name or email" class="w-full sm:w-64 rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500" />
-        <button class="rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white">Search</button>
-      </form>
-    </div>
-
-    <div class="mt-6 overflow-x-auto rounded-lg border border-slate-200 bg-white">
-      <table class="min-w-full divide-y divide-slate-200 text-sm">
-        <thead class="bg-slate-50">
-          <tr>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">Name</th>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">Email</th>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">Role</th>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">Status</th>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">Created</th>
-            <th class="px-4 py-3"></th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-200">
-          {% for u in users %}
-          <tr>
-            <td class="px-4 py-3 text-slate-900 break-words">{{ u.name }}</td>
-            <td class="px-4 py-3 text-slate-600 break-all">{{ u.email }}</td>
-            <td class="px-4 py-3">
-              <form method="post" action="{{ url_for('admin.users_set_role', user_id=u.id) }}" class="flex items-center gap-2">
-                <select name="role" class="rounded-md border border-slate-300 px-2 py-1 text-sm"
-                        {% if u.id == current_user.id and u.role == 'owner' %}disabled{% endif %}>
-                  {% for r in ['owner','admin','host','invitee'] %}
-                    <option value="{{ r }}" {% if u.role == r %}selected{% endif %}
-                      {% if r == 'owner' and current_user.role != 'owner' %}disabled{% endif %}>{{ r }}</option>
-                  {% endfor %}
-                </select>
-                <button class="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                        {% if u.id == current_user.id and u.role == 'owner' %}disabled{% endif %}>Update</button>
-              </form>
-            </td>
-            <td class="px-4 py-3">
-              {% if u.role == 'host' %}
-                <div class="flex items-center gap-2">
-                  <span class="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium {{ 'bg-green-100 text-green-800' if u.is_active else 'bg-red-100 text-red-800' }}">
-                    {{ 'Active' if u.is_active else 'Inactive' }}
-                  </span>
-                  {% if current_user.role == 'owner' %}
-                  <form method="post" action="{{ url_for('admin.users_set_active', user_id=u.id) }}">
-                    {% if u.is_active %}
-                      <input type="hidden" name="active" value="0" />
-                      <button class="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50">Deactivate</button>
-                    {% else %}
-                      <input type="hidden" name="active" value="1" />
-                      <button class="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50">Activate</button>
-                    {% endif %}
-                  </form>
-                  {% endif %}
-                </div>
-              {% else %}
-                <span class="text-slate-400 text-xs">—</span>
-              {% endif %}
-            </td>
-            <td class="px-4 py-3 text-slate-500">{{ u.created_at.strftime('%Y-%m-%d') }}</td>
-            <td class="px-4 py-3 text-right"></td>
-          </tr>
-          {% else %}
-          <tr><td class="px-4 py-4 text-slate-500" colspan="6">No users found.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    <p class="mt-3 text-xs text-slate-500">Note: Only the owner can grant the owner role, and the last owner cannot be demoted.</p>
+<section class="py-8 sm:py-12">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><nav class="text-sm font-medium text-slate-500"><a href="{{ url_for('dashboard.owner') }}" class="hover:text-brand-700">Workspace</a> <span class="mx-1.5 text-brand-300">/</span> People</nav><h1 class="mt-2 font-display text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl">People &amp; access</h1><p class="mt-2 text-sm text-slate-600 sm:text-base">Search accounts, manage roles, and control coach availability.</p></div><form method="get" class="flex w-full gap-2 sm:w-auto"><label class="sr-only" for="q">Search people</label><input id="q" type="text" name="q" value="{{ q }}" placeholder="Search name or email" class="tc-input min-w-0 sm:w-72" /><button class="tc-btn-primary shrink-0" type="submit">Search</button></form></div>
+    <article class="tc-card mt-7 overflow-hidden"><div class="border-b border-brand-100 px-5 py-5 sm:px-6"><p class="text-sm text-slate-500">{{ users|length }} account{{ '' if users|length == 1 else 's' }} shown</p></div><div class="overflow-x-auto"><table class="tc-table min-w-[850px] w-full divide-y divide-brand-100"><thead class="bg-brand-50/70"><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th></tr></thead><tbody class="divide-y divide-slate-100 bg-white">
+      {% for user in users %}<tr><td class="font-semibold text-slate-900">{{ user.name }}</td><td class="break-anywhere">{{ user.email }}</td><td><form method="post" action="{{ url_for('admin.users_set_role', user_id=user.id) }}" class="flex items-center gap-2"><select name="role" class="tc-input !w-auto !py-2" {% if user.id == current_user.id and user.role == 'owner' %}disabled{% endif %}>{% for role in ['owner','admin','host','invitee'] %}<option value="{{ role }}" {% if user.role == role %}selected{% endif %} {% if role == 'owner' and current_user.role != 'owner' %}disabled{% endif %}>{{ role }}</option>{% endfor %}</select><button class="tc-btn-secondary !px-3 !py-2" {% if user.id == current_user.id and user.role == 'owner' %}disabled{% endif %}>Update</button></form></td><td>{% if user.role == 'host' %}<div class="flex items-center gap-2"><span class="tc-badge {{ 'bg-emerald-100 text-emerald-800' if user.is_active else 'bg-red-100 text-red-800' }}">{{ 'Active' if user.is_active else 'Inactive' }}</span>{% if current_user.role == 'owner' %}<form method="post" action="{{ url_for('admin.users_set_active', user_id=user.id) }}"><input type="hidden" name="active" value="{{ '0' if user.is_active else '1' }}" /><button class="text-xs font-bold {{ 'text-red-700' if user.is_active else 'text-emerald-700' }} hover:underline">{{ 'Deactivate' if user.is_active else 'Activate' }}</button></form>{% endif %}</div>{% else %}<span class="text-slate-400">—</span>{% endif %}</td><td class="whitespace-nowrap">{{ user.created_at.strftime('%-d %b %Y') }}</td></tr>
+      {% else %}<tr><td class="px-5 py-14 text-center text-sm text-slate-500" colspan="5">No users found.</td></tr>{% endfor %}
+    </tbody></table></div></article><p class="mt-4 text-xs leading-5 text-slate-500">Only an owner can grant the owner role, and the final owner cannot be demoted.</p>
   </div>
 </section>
 {% endblock %}
-

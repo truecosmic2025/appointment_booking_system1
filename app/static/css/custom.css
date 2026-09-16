@@ -1,6 +1,40 @@
-/* Minimal overrides for landing visuals */
-.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1) }
+/* TrueCosmic Calendar visual refinements layered on the compiled Tailwind build. */
+:root {
+  --tc-display: "Fraunces", Georgia, serif;
+  --tc-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
 
-/* Prevent long tokens from causing horizontal overflow on mobile */
-code { overflow-wrap: anywhere; word-break: break-word; }
+html,
+body {
+  font-family: var(--tc-body);
+}
 
+.font-display {
+  font-family: var(--tc-display);
+}
+
+/* Google Translate injects an iframe; keep it compact in the footer. */
+.goog-te-gadget {
+  color: #64748b !important;
+  font-family: var(--tc-body) !important;
+  font-size: 12px !important;
+}
+
+.goog-te-gadget img {
+  display: inline;
+}
+
+/* Long email addresses and links must never create a horizontal mobile scroll. */
+code,
+.break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@keyframes tc-spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: tc-spin 1s linear infinite;
+}

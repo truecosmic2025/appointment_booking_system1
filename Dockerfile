@@ -1,5 +1,15 @@
 # syntax=docker/dockerfile:1
 
+# Compile the exact Tailwind classes used by the Jinja templates before shipping.
+FROM node:22-alpine AS frontend
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY tailwind.config.js ./
+COPY app/templates ./app/templates
+COPY app/static ./app/static
+RUN npm run build:css
+
 # Minimal, production-oriented image for TrueCosmic Calendar (Flask)
 FROM python:3.11-slim
 
@@ -20,6 +30,8 @@ RUN pip install --no-cache-dir -r requirements.txt \
 
 # Copy the rest of the application
 COPY . .
+# Copy the optimized production stylesheet generated in the frontend build stage.
+COPY --from=frontend /app/app/static/css/tailwind.css ./app/static/css/tailwind.css
 
 # Expose HTTP port (use 8000 by convention for app servers)
 EXPOSE 8000
