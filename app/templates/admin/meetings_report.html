@@ -1,80 +1,38 @@
 {% extends "base.html" %}
 {% block title %}Admin · Meetings Report | TrueCosmic Calendar{% endblock %}
 {% block content %}
-<section class="py-12">
-  <div class="mx-auto max-w-6xl px-4">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <h1 class="text-2xl font-bold text-slate-900">Meetings Report</h1>
-      <form method="get" class="flex items-center gap-2 w-full sm:w-auto">
-        <select name="status" class="w-36 rounded-md border border-slate-300 px-3 py-2 text-sm">
-          <option value="past" {% if status=='past' %}selected{% endif %}>Past meetings</option>
-          <option value="cancelled" {% if status=='cancelled' %}selected{% endif %}>Cancelled meetings</option>
-        </select>
-        <select name="period" class="w-32 rounded-md border border-slate-300 px-3 py-2 text-sm">
-          <option value="30" {% if period==30 %}selected{% endif %}>Last 30 days</option>
-          <option value="60" {% if period==60 %}selected{% endif %}>Last 60 days</option>
-          <option value="90" {% if period==90 %}selected{% endif %}>Last 90 days</option>
-        </select>
-        <button class="rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white">Apply</button>
-      </form>
+<section class="py-8 sm:py-12">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div><nav class="text-sm font-medium text-slate-500"><a href="{{ url_for('dashboard.owner') }}" class="hover:text-brand-700">Workspace</a> <span class="mx-1.5 text-brand-300">/</span> Reports</nav><h1 class="mt-2 font-display text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl">Meeting history</h1><p class="mt-2 text-sm text-slate-600 sm:text-base">Review completed and cancelled meetings. Times are shown in <span class="font-semibold text-brand-800">{{ current_tz_name }}</span>.</p></div>
+      <a class="text-sm font-bold text-brand-700 hover:text-brand-900 hover:underline" href="?status={{ status }}&period={{ period }}{% if selected_coach_id %}&coach_id={{ selected_coach_id }}{% endif %}{% if current_tz_name=='UTC' %}&tz=local{% else %}&tz=UTC{% endif %}">Switch to {% if current_tz_name=='UTC' %}local{% else %}UTC{% endif %} time</a>
     </div>
 
-    <div class="mt-2 text-sm text-slate-600">
-      Times shown in <span class="font-medium">{{ current_tz_name }}</span>.
-      <a class="text-brand-700 hover:underline"
-         href="?status={{ status }}&period={{ period }}{% if pagination and pagination.page %}&page={{ pagination.page }}{% endif %}{% if current_tz_name=='UTC' %}&tz=local{% else %}&tz=UTC{% endif %}">
-         Switch to {% if current_tz_name=='UTC' %}local{% else %}UTC{% endif %}
-      </a>
-    </div>
+    <form method="get" class="tc-card mt-7 grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-4 lg:items-end sm:p-6">
+      <div><label class="tc-label" for="status">Meeting type</label><select id="status" name="status" class="tc-input"><option value="past" {% if status=='past' %}selected{% endif %}>Completed meetings</option><option value="cancelled" {% if status=='cancelled' %}selected{% endif %}>Cancelled meetings</option></select></div>
+      <div><label class="tc-label" for="period">Period</label><select id="period" name="period" class="tc-input"><option value="30" {% if period==30 %}selected{% endif %}>Last 30 days</option><option value="60" {% if period==60 %}selected{% endif %}>Last 60 days</option><option value="90" {% if period==90 %}selected{% endif %}>Last 90 days</option></select></div>
+      <div><label class="tc-label" for="coach_id">Coach</label><select id="coach_id" name="coach_id" class="tc-input"><option value="">All coaches</option>{% for coach in coach_choices %}<option value="{{ coach.id }}" {% if selected_coach_id == coach.id %}selected{% endif %}>{{ coach.name }}</option>{% endfor %}</select></div>
+      <button class="tc-btn-primary w-full" type="submit">Apply filters</button>
+    </form>
 
-    <div class="mt-4 overflow-x-auto rounded-lg border border-slate-200 bg-white">
-      <table class="min-w-full divide-y divide-slate-200 text-sm">
-        <thead class="bg-slate-50">
-          <tr>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">Coach</th>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">Visitor</th>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">Email</th>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600">Meeting Date/Time</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-200">
-          {% for b in pagination.items %}
-          <tr>
-            <td class="px-4 py-3 text-slate-900 break-words">{{ b.coach.name if b.coach else '—' }}</td>
-            <td class="px-4 py-3 text-slate-900 break-words">{{ b.visitor_name }}</td>
-            <td class="px-4 py-3 text-slate-600 break-all">{{ b.visitor_email }}</td>
-            <td class="px-4 py-3 text-slate-600">{{ b.start_utc | dt_local('%Y-%m-%d %H:%M') }}</td>
-          </tr>
-          {% else %}
-          <tr>
-            <td class="px-4 py-4 text-slate-500" colspan="4">No records found for the selected filters.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
+    <article class="tc-card mt-6 overflow-hidden">
+      <div class="flex flex-col gap-1 border-b border-brand-100 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6"><h2 class="text-lg font-bold text-brand-950">Results</h2><p class="text-sm text-slate-500">{{ pagination.total }} meeting{{ '' if pagination.total == 1 else 's' }} found</p></div>
+      <div class="overflow-x-auto">
+        <table class="tc-table min-w-[680px] w-full divide-y divide-brand-100">
+          <thead class="bg-brand-50/70"><tr><th>Coach</th><th>Visitor</th><th>Email</th><th>Meeting date &amp; time</th></tr></thead>
+          <tbody class="divide-y divide-slate-100 bg-white">
+            {% for booking in pagination.items %}
+              <tr><td class="font-semibold text-slate-900">{{ booking.coach.name if booking.coach else '—' }}</td><td class="font-semibold text-slate-800">{{ booking.visitor_name }}</td><td class="break-anywhere">{{ booking.visitor_email }}</td><td class="whitespace-nowrap">{{ booking.start_utc | dt_local('%-d %b %Y, %-I:%M %p') }}</td></tr>
+            {% else %}
+              <tr><td class="px-5 py-14 text-center text-sm text-slate-500" colspan="4">No records found for the selected filters.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </article>
     {% if pagination.pages > 1 %}
-    <div class="mt-4 flex items-center justify-between">
-      <div class="text-sm text-slate-600">
-        Page {{ pagination.page }} of {{ pagination.pages }} · {{ pagination.total }} total
-      </div>
-      <div class="flex items-center gap-2">
-        {% if pagination.has_prev %}
-          <a class="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
-             href="?status={{ status }}&period={{ period }}&page={{ pagination.prev_num }}">Previous</a>
-        {% else %}
-          <span class="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-400">Previous</span>
-        {% endif %}
-        {% if pagination.has_next %}
-          <a class="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
-             href="?status={{ status }}&period={{ period }}&page={{ pagination.next_num }}">Next</a>
-        {% else %}
-          <span class="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-400">Next</span>
-        {% endif %}
-      </div>
-    </div>
+      <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><p class="text-sm text-slate-500">Page {{ pagination.page }} of {{ pagination.pages }}</p><div class="flex gap-2">{% if pagination.has_prev %}<a class="tc-btn-secondary !px-3 !py-2" href="?status={{ status }}&period={{ period }}{% if selected_coach_id %}&coach_id={{ selected_coach_id }}{% endif %}&page={{ pagination.prev_num }}">Previous</a>{% endif %}{% if pagination.has_next %}<a class="tc-btn-primary !px-3 !py-2" href="?status={{ status }}&period={{ period }}{% if selected_coach_id %}&coach_id={{ selected_coach_id }}{% endif %}&page={{ pagination.next_num }}">Next</a>{% endif %}</div></div>
     {% endif %}
   </div>
-  </section>
+</section>
 {% endblock %}

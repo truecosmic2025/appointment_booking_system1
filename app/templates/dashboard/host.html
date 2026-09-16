@@ -1,175 +1,154 @@
 {% extends "base.html" %}
 {% block title %}Coach Dashboard | TrueCosmic Calendar{% endblock %}
 {% block content %}
-<section class="py-12">
-  <div class="mx-auto max-w-7xl px-4">
-    <nav class="text-sm text-slate-500"><a href="{{ url_for('dashboard.host') }}" class="hover:underline">Dashboard</a> <span class="mx-1">/</span> Coach</nav>
-    <h1 class="mt-1 text-3xl font-bold text-slate-900">Coach dashboard <span class="align-middle ml-2 inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-200">Coach</span></h1>
-    <p class="text-slate-600 mt-1">Welcome, {{ current_user.name }}. Current time (<span id="tz-name">{{ tz_name }}</span>): <span id="local-now">{{ now_local_str }}</span></p>
-
-    <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="rounded-lg border border-slate-200 bg-white p-4">
-        <div class="text-xs text-slate-500">Bookings (30d)</div>
-        <div class="text-2xl font-bold text-slate-900">{{ kpis.bookings_30 }}</div>
+<section class="py-8 sm:py-12">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <nav class="text-sm font-medium text-slate-500"><a href="{{ url_for('dashboard.host') }}" class="hover:text-brand-700">Workspace</a> <span class="mx-1.5 text-brand-300">/</span> Coach dashboard</nav>
+        <h1 class="mt-2 font-display text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl">Your coaching rhythm</h1>
+        <p class="mt-2 text-sm text-slate-600 sm:text-base">A clear view of your new requests and the sessions ahead. <span class="hidden sm:inline">Current time in </span><span class="font-semibold text-brand-800">{{ tz_name }}</span><span class="hidden sm:inline">: {{ now_local_str }}</span></p>
       </div>
-      <div class="rounded-lg border border-slate-200 bg-white p-4">
-        <div class="text-xs text-slate-500">Cancellations (30d)</div>
-        <div class="text-2xl font-bold text-slate-900">{{ kpis.cancellations_30 }}</div>
-      </div>
-      <div class="rounded-lg border border-slate-200 bg-white p-4">
-        <div class="text-xs text-slate-500">Upcoming (7d)</div>
-        <div class="text-2xl font-bold text-slate-900">{{ kpis.upcoming_7 }}</div>
-      </div>
+      {% if profile %}
+        <a class="tc-btn-secondary" href="/c/{{ profile.slug }}" target="_blank" rel="noopener">Open booking page <span aria-hidden="true" class="ml-1">↗</span></a>
+      {% endif %}
     </div>
 
-    <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-      <div class="rounded-lg border border-slate-200 bg-white p-6">
-        <h2 class="text-lg font-semibold text-slate-900">Your booking link</h2>
-        {% if profile %}
-          <div class="mt-2 text-sm"><a class="text-brand-700 hover:underline" href="/c/{{ profile.slug }}" target="_blank">/c/{{ profile.slug }}</a></div>
-          <div class="mt-2 text-xs {{ 'text-emerald-600' if profile.google_credentials else 'text-amber-600' }}">
-            {{ 'Google Calendar connected' if profile.google_credentials else 'Not connected' }}
-          </div>
-          {% if not profile.google_credentials %}
-            <div class="mt-3"><a href="{{ url_for('google.connect') }}" class="text-sm rounded-md border border-slate-300 px-3 py-2">Connect Google</a></div>
-          {% endif %}
+    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="tc-kpi">
+        <div class="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-brand-100"></div>
+        <p class="relative text-xs font-bold uppercase tracking-wide text-slate-500">Booking requests</p>
+        <p class="relative mt-2 text-3xl font-bold text-brand-950">{{ kpis.bookings_30 }}</p>
+        <p class="relative mt-1 text-sm text-slate-500">Created in the last 30 days</p>
+      </div>
+      <div class="tc-kpi">
+        <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Cancellation rate</p>
+        <p class="mt-2 text-3xl font-bold text-brand-950">{{ kpis.cancellation_rate }}<span class="text-lg">%</span></p>
+        <p class="mt-1 text-sm text-slate-500">{{ kpis.cancellations_30 }} cancellation{{ '' if kpis.cancellations_30 == 1 else 's' }} in 30 days</p>
+      </div>
+      <div class="tc-kpi">
+        <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Next 7 days</p>
+        <p class="mt-2 text-3xl font-bold text-brand-950">{{ kpis.upcoming_7 }}</p>
+        <p class="mt-1 text-sm text-slate-500">Scheduled sessions</p>
+      </div>
+      <div class="tc-kpi {{ 'bg-emerald-50/70' if profile and profile.google_credentials else 'bg-amber-50/80' }}">
+        <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Google Calendar</p>
+        {% if profile and profile.google_credentials %}
+          <p class="mt-2 text-lg font-bold text-emerald-800">Connected</p>
+          <p class="mt-1 text-sm text-emerald-700">Your calendar is ready.</p>
         {% else %}
-          <div class="mt-2 text-sm text-slate-600">No profile yet. Visit your <a class="text-brand-700 hover:underline" href="{{ url_for('auth.me') }}">Account</a> to create one.</div>
+          <p class="mt-2 text-lg font-bold text-amber-800">Action needed</p>
+          <a href="{{ url_for('google.connect') }}" class="mt-1 inline-block text-sm font-semibold text-amber-800 underline decoration-amber-300 underline-offset-4">Connect Google Calendar</a>
         {% endif %}
       </div>
+    </div>
 
-      <div class="lg:col-span-2 rounded-lg border border-slate-200 bg-white p-6">
-        <h2 class="text-lg font-semibold text-slate-900">Upcoming sessions</h2>
-        <div class="mt-4 overflow-x-auto">
-          <table class="min-w-full text-sm">
-            <thead class="text-left text-slate-600">
-              <tr><th class="py-2 pr-4">Start ({{ tz_name }})</th><th class="py-2 pr-4">Visitor</th><th class="py-2 pr-4">Status</th><th class="py-2 pr-4">Meet</th><th class="py-2 pr-4">Actions</th></tr>
-            </thead>
-            <tbody class="divide-y divide-slate-200">
-              {% for r in upcoming_local %}
-              <tr>
-                <td class="py-2 pr-4"><span class="js-local-dt" data-utc="{{ upcoming[loop.index0].start_utc.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ r.start_local_str }}</span></td>
-                <td class="py-2 pr-4 break-all">{{ r.visitor_name }} ({{ r.visitor_email }})</td>
-                <td class="py-2 pr-4">{{ r.status }}</td>
-                <td class="py-2 pr-4">{% if r.meet_link and r.status != 'cancelled' %}<a class="text-brand-700 hover:underline" href="{{ r.meet_link }}" target="_blank">Join</a>{% else %}-{% endif %}</td>
-                <td class="py-2 pr-4">
-                  {% if r.manage_url %}
-                    <a class="text-brand-700 hover:underline" href="{{ r.manage_url }}#reschedule">Reschedule</a>
-                    <button type="button" class="ml-3 inline-flex items-center gap-2 text-red-700 hover:underline js-cancel-booking" data-cancel-url="{{ r.manage_url }}/cancel">
-                      <svg class="js-cancel-spinner hidden h-4 w-4 animate-spin text-red-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                      </svg>
+    <div class="mt-7 grid gap-6 lg:grid-cols-3">
+      <article class="tc-card p-5 sm:p-6 lg:col-span-2">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Momentum</p>
+            <h2 class="mt-1 text-xl font-bold text-brand-950">Booking requests over 8 weeks</h2>
+            <p class="mt-1 text-sm text-slate-500">Based on the date a booking request was created.</p>
+          </div>
+          <span class="tc-badge bg-brand-50 text-brand-700">{{ booking_trend.total }} total</span>
+        </div>
+        <div class="mt-5 rounded-xl border border-brand-100 bg-brand-50/40 p-3 sm:p-5">
+          <svg class="h-40 w-full overflow-visible" viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="Weekly booking request trend">
+            <line x1="0" y1="34" x2="100" y2="34" stroke="#e0d4fb" stroke-width="0.6"></line>
+            <line x1="0" y1="19" x2="100" y2="19" stroke="#eee8fa" stroke-width="0.45" stroke-dasharray="1.5 1.5"></line>
+            <polyline points="{{ booking_trend.points }}" fill="none" stroke="#693b9b" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" vector-effect="non-scaling-stroke"></polyline>
+          </svg>
+          <div class="mt-1 grid grid-cols-8 gap-1 text-center text-[10px] font-semibold text-slate-400 sm:text-xs">
+            {% for label in booking_trend.labels %}<span>{{ label }}</span>{% endfor %}
+          </div>
+          <div class="mt-3 grid grid-cols-8 gap-1 text-center text-xs font-bold text-brand-800">
+            {% for value in booking_trend.series %}<span>{{ value }}</span>{% endfor %}
+          </div>
+        </div>
+      </article>
+
+      <article class="tc-card p-5 sm:p-6">
+        <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Your link</p>
+        <h2 class="mt-1 text-xl font-bold text-brand-950">Share your availability</h2>
+        {% if profile %}
+          <div class="mt-5 rounded-xl border border-brand-100 bg-brand-50/60 p-4">
+            <p class="break-all font-mono text-sm font-semibold text-brand-800">/c/{{ profile.slug }}</p>
+          </div>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a href="/c/{{ profile.slug }}" target="_blank" rel="noopener" class="tc-btn-primary">View link</a>
+            <a href="{{ url_for('coach.settings') }}" class="tc-btn-secondary">Availability</a>
+          </div>
+        {% else %}
+          <p class="mt-3 text-sm leading-6 text-slate-600">Your profile has not been set up yet. Visit <a class="font-semibold text-brand-700 underline underline-offset-4" href="{{ url_for('auth.me') }}">Account</a> to create it.</p>
+        {% endif %}
+      </article>
+    </div>
+
+    <article class="tc-card mt-7 overflow-hidden">
+      <div class="border-b border-brand-100 px-5 py-5 sm:px-6">
+        <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Schedule</p>
+        <h2 class="mt-1 text-xl font-bold text-brand-950">Upcoming sessions</h2>
+        <p class="mt-1 text-sm text-slate-500">Grouped by day in <span class="font-semibold">{{ tz_name }}</span>. Showing your next 25 booked sessions.</p>
+      </div>
+      <div class="divide-y divide-brand-100">
+        {% for day in upcoming_by_day %}
+          <div class="px-5 py-5 sm:px-6">
+            <h3 class="text-sm font-bold text-brand-800">{{ day.label }}</h3>
+            <div class="mt-3 grid gap-3">
+              {% for session in day.sessions %}
+                <div class="flex flex-col gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-4 sm:flex-row sm:items-center">
+                  <div class="min-w-24 font-bold text-brand-950">{{ session.time }}</div>
+                  <div class="min-w-0 flex-1">
+                    <p class="font-semibold text-slate-900">{{ session.visitor_name }}</p>
+                    <p class="break-anywhere text-sm text-slate-500">{{ session.visitor_email }}</p>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-semibold">
+                    {% if session.meet_link %}<a class="text-brand-700 hover:text-brand-900 hover:underline" href="{{ session.meet_link }}" target="_blank" rel="noopener">Join Meet</a>{% endif %}
+                    <a class="text-brand-700 hover:text-brand-900 hover:underline" href="{{ session.manage_url }}#reschedule">Reschedule</a>
+                    <button type="button" class="inline-flex items-center gap-2 text-red-700 hover:underline js-cancel-booking" data-cancel-url="{{ session.manage_url }}/cancel">
+                      <svg class="js-cancel-spinner hidden h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
                       <span class="js-cancel-text">Cancel</span>
                     </button>
-                  {% else %}-{% endif %}
-                </td>
-              </tr>
-              {% else %}
-              <tr><td class="py-4 text-slate-500" colspan="5">No upcoming sessions.</td></tr>
+                  </div>
+                </div>
               {% endfor %}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="px-5 py-12 text-center sm:px-6"><p class="font-semibold text-slate-700">No upcoming sessions yet.</p><p class="mt-1 text-sm text-slate-500">New sessions will appear here as they are booked.</p></div>
+        {% endfor %}
       </div>
-    </div>
+    </article>
   </div>
 </section>
 <script>
-  (function(){
-    var serverTz = {{ tz_name|tojson }};
-    var tz = (function(){
-      try { return Intl.DateTimeFormat().resolvedOptions().timeZone || serverTz; } catch(e) { return serverTz; }
-    })();
-    var tzEl = document.getElementById('tz-name');
-    if (tzEl && tz) { tzEl.textContent = tz; }
-    function fmt(dt){
-      try{
-        var parts = new Intl.DateTimeFormat('en-CA', {
-          timeZone: tz,
-          year: 'numeric', month: '2-digit', day: '2-digit',
-          hour: '2-digit', minute: '2-digit', hour12: false
-        }).formatToParts(dt);
-        var m = {}; parts.forEach(function(p){ m[p.type] = p.value; });
-        return m.year + '-' + m.month + '-' + m.day + ' ' + m.hour + ':' + m.minute;
-      }catch(e){
-        var d = dt; var pad=function(n){return String(n).padStart(2,'0');};
-        return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+" "+pad(d.getHours())+":"+pad(d.getMinutes());
-      }
-    }
-    function fmtNow(){
-      try{
-        var parts = new Intl.DateTimeFormat('en-CA', {
-          timeZone: tz,
-          year: 'numeric', month: '2-digit', day: '2-digit',
-          hour: '2-digit', minute: '2-digit', hour12: false
-        }).formatToParts(new Date());
-        var m = {};
-        parts.forEach(p=>{m[p.type]=p.value});
-        return m.year + '-' + m.month + '-' + m.day + ' ' + m.hour + ':' + m.minute;
-      }catch(e){
-        var d = new Date();
-        var pad = n=>String(n).padStart(2,'0');
-        return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
-      }
-    }
-    function tick(){
-      var el = document.getElementById('local-now');
-      if(!el) return;
-      el.textContent = fmtNow();
-    }
-    document.addEventListener('DOMContentLoaded', function(){
-      tick();
-      setInterval(tick, 1000);
-      // Convert all UTC timestamps in the table to local
-      var nodes = document.querySelectorAll('.js-local-dt[data-utc]');
-      nodes.forEach(function(node){
-        var iso = node.getAttribute('data-utc');
-        if(!iso) return;
-        if(iso.charAt(iso.length-1) !== 'Z'){
-          var plus = iso.indexOf('+', 19);
-          var minus = iso.indexOf('-', 19);
-          if(plus === -1 && minus === -1){ iso += 'Z'; }
-        }
-        var dt = new Date(iso);
-        if(!isNaN(dt.getTime())){
-          node.textContent = fmt(dt);
-        }
+  document.addEventListener('click', function (event) {
+    var button = event.target && event.target.closest('.js-cancel-booking');
+    if (!button) return;
+    event.preventDefault();
+    if (!confirm('Cancel this booking? This cannot be undone.')) return;
+    var url = button.getAttribute('data-cancel-url');
+    if (!url) return;
+    var spinner = button.querySelector('.js-cancel-spinner');
+    var text = button.querySelector('.js-cancel-text');
+    button.disabled = true;
+    button.classList.add('opacity-70', 'cursor-not-allowed');
+    if (spinner) spinner.classList.remove('hidden');
+    if (text) text.textContent = 'Cancelling…';
+    fetch(url, {method: 'POST'})
+      .then(function (response) { return response.json(); })
+      .then(function (data) {
+        if (data && data.ok) { window.location.reload(); return; }
+        throw new Error((data && data.error) || 'Cancel failed. Please try again.');
+      })
+      .catch(function (error) {
+        button.disabled = false;
+        button.classList.remove('opacity-70', 'cursor-not-allowed');
+        if (spinner) spinner.classList.add('hidden');
+        if (text) text.textContent = 'Cancel';
+        alert(error.message);
       });
-
-      // Inline cancel buttons
-      document.addEventListener('click', function(e){
-        var btn = e.target && e.target.closest('.js-cancel-booking');
-        if(!btn) return;
-        e.preventDefault();
-        if(!confirm('Cancel this booking? This cannot be undone.')){ return; }
-        var url = btn.getAttribute('data-cancel-url');
-        if(!url) return;
-        var spinner = btn.querySelector('.js-cancel-spinner');
-        var textEl = btn.querySelector('.js-cancel-text');
-        var prevText = textEl ? textEl.textContent : null;
-        btn.disabled = true;
-        btn.classList.add('opacity-70','cursor-not-allowed');
-        if(spinner){ spinner.classList.remove('hidden'); }
-        if(textEl){ textEl.textContent = 'Cancelling...'; }
-        fetch(url, {method:'POST'}).then(function(r){ return r.json(); }).then(function(d){
-          if(d && d.ok){ location.reload(); }
-          else {
-            btn.disabled = false;
-            btn.classList.remove('opacity-70','cursor-not-allowed');
-            if(spinner){ spinner.classList.add('hidden'); }
-            if(textEl && prevText !== null){ textEl.textContent = prevText; }
-            alert((d && d.error) ? ('Cancel failed: ' + d.error) : 'Cancel failed. Please try again.');
-          }
-        }).catch(function(){
-          btn.disabled = false;
-          btn.classList.remove('opacity-70','cursor-not-allowed');
-          if(spinner){ spinner.classList.add('hidden'); }
-          if(textEl && prevText !== null){ textEl.textContent = prevText; }
-          alert('Cancel failed. Please try again.');
-        });
-      });
-    });
-  })();
-  </script>
+  });
+</script>
 {% endblock %}

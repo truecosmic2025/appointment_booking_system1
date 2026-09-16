@@ -100,6 +100,12 @@ def meetings_report():
     if status not in ("past", "cancelled"):
         status = "past"
 
+    selected_coach_id = request.args.get("coach_id", type=int)
+    coach_choices = User.query.filter(User.role == "host").order_by(User.name.asc()).all()
+    allowed_coach_ids = {coach.id for coach in coach_choices}
+    if selected_coach_id not in allowed_coach_ids:
+        selected_coach_id = None
+
     page = request.args.get("page", 1, type=int)
     per_page = 20
 
@@ -111,6 +117,8 @@ def meetings_report():
         conditions.append(Booking.status == "booked")
     else:
         conditions.append(Booking.status == "cancelled")
+    if selected_coach_id:
+        conditions.append(Booking.coach_id == selected_coach_id)
 
     stmt = (
         select(Booking)
@@ -126,5 +134,7 @@ def meetings_report():
         pagination=pagination,
         period=period,
         status=status,
+        coach_choices=coach_choices,
+        selected_coach_id=selected_coach_id,
         now=now,
     )

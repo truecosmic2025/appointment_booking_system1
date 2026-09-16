@@ -1,107 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Availability Settings | TrueCosmic Calendar{% endblock %}
 {% block content %}
-<section class="py-12">
-  <div class="mx-auto max-w-3xl px-4">
-    <h1 class="text-3xl font-bold text-slate-900">Availability settings</h1>
-    <p class="text-slate-600 mt-1">Set your time zone and working hours. Visitors will see times in their own time zone.</p>
-
-    <form method="post" class="mt-6 space-y-6">
-      <div class="grid grid-cols-1 gap-3">
-        <label class="text-sm font-medium text-slate-700">Time zone</label>
-        <input name="timezone" id="timezone" value="{{ tz }}" list="tzlist" class="rounded-md border border-slate-300 px-3 py-2" />
-        <datalist id="tzlist"></datalist>
-        <p class="text-xs text-slate-500">Tip: Your browser time zone is auto-detected below; you can copy it into this field.</p>
-        <div class="text-xs text-slate-600">Detected: <span id="detectedTz">...</span></div>
-      </div>
-
-      <div>
-        <div class="text-sm font-medium text-slate-700">Working hours (per day)</div>
-        <div class="mt-2 space-y-2 text-sm">
-          {% for d, label in [('mon','Mon'),('tue','Tue'),('wed','Wed'),('thu','Thu'),('fri','Fri'),('sat','Sat'),('sun','Sun')] %}
-            {% set ranges = hours.get(d, []) %}
-            <div class="border rounded-md p-2">
-              <div class="flex items-center justify-between">
-                <label class="inline-flex items-center gap-2"><input type="checkbox" name="day" value="{{ d }}" {% if d in selected_days %}checked{% endif %}> {{ label }}</label>
-                <button type="button" class="text-xs rounded-md border border-slate-300 px-2 py-1" onclick="addRange('{{ d }}')">Add range</button>
-              </div>
-              <div id="ranges_{{ d }}" class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {% for r in ranges %}
-                  <div class="flex items-center gap-2">
-                    <input type="time" name="start_{{ d }}" value="{{ r[0] }}" class="rounded-md border border-slate-300 px-2 py-1" />
-                    <span>–</span>
-                    <input type="time" name="end_{{ d }}" value="{{ r[1] }}" class="rounded-md border border-slate-300 px-2 py-1" />
-                    <button type="button" class="text-xs rounded-md border border-red-300 bg-red-50 px-2 py-1 text-red-700" onclick="this.parentElement.remove()">Remove</button>
-                  </div>
-                {% endfor %}
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div>
-          <label class="block text-sm font-medium text-slate-700">Buffer (minutes)</label>
-          <input type="number" min="0" name="buffer_min" value="{{ buffer_min }}" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-700">Min notice (minutes)</label>
-          <input type="number" min="0" name="min_notice_min" value="{{ min_notice_min }}" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-700">Max days ahead</label>
-          <input type="number" min="1" name="max_days_ahead" value="{{ max_days_ahead }}" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
-        </div>
-      </div>
-
-      <div>
-        <button class="rounded-md bg-slate-900 px-4 py-2 text-white font-semibold">Save settings</button>
-        <a href="{{ url_for('dashboard.host') }}" class="ml-2 text-sm text-slate-700 hover:underline">Back to dashboard</a>
-      </div>
-    </form>
-  </div>
-</section>
+<section class="py-8 sm:py-12"><div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8"><nav class="text-sm font-medium text-slate-500"><a href="{{ url_for('dashboard.host') }}" class="hover:text-brand-700">Workspace</a> <span class="mx-1.5 text-brand-300">/</span> Availability</nav><h1 class="mt-2 font-display text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl">Shape your availability</h1><p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">Set the hours clients can request. Visitors will always see appointment times in their own time zone.</p>
+  <form method="post" class="mt-7 space-y-6"><article class="tc-card p-5 sm:p-6"><p class="text-xs font-bold uppercase tracking-wide text-brand-600">Time zone</p><h2 class="mt-1 text-xl font-bold text-brand-950">Where you work from</h2><div class="mt-5"><label class="tc-label" for="timezone">IANA time zone</label><input name="timezone" id="timezone" value="{{ tz }}" list="tzlist" class="tc-input" /><datalist id="tzlist"></datalist><div class="mt-3 rounded-xl bg-brand-50 px-4 py-3 text-sm text-brand-800">Browser-detected: <span id="detectedTz" class="font-bold">…</span></div><p class="mt-2 text-xs text-slate-500">Use a standard IANA value, such as America/New_York or Europe/London.</p></div></article>
+  <article class="tc-card p-5 sm:p-6"><p class="text-xs font-bold uppercase tracking-wide text-brand-600">Weekly rhythm</p><h2 class="mt-1 text-xl font-bold text-brand-950">Working hours</h2><p class="mt-1 text-sm text-slate-500">Enable days and add one or more availability windows for each day.</p><div class="mt-5 space-y-3 text-sm">{% for d, label in [('mon','Mon'),('tue','Tue'),('wed','Wed'),('thu','Thu'),('fri','Fri'),('sat','Sat'),('sun','Sun')] %}{% set ranges = hours.get(d, []) %}<div class="rounded-xl border border-brand-100 bg-brand-50/40 p-4"><div class="flex flex-wrap items-center justify-between gap-3"><label class="inline-flex items-center gap-3 font-bold text-brand-950"><input type="checkbox" name="day" value="{{ d }}" class="h-4 w-4 rounded border-brand-300 text-brand-700 focus:ring-brand-500" {% if d in selected_days %}checked{% endif %}> {{ label }}</label><button type="button" class="tc-btn-secondary !px-3 !py-2" onclick="addRange('{{ d }}')">Add window</button></div><div id="ranges_{{ d }}" class="mt-3 grid gap-3 md:grid-cols-2">{% for r in ranges %}<div class="flex items-center gap-2"><input type="time" name="start_{{ d }}" value="{{ r[0] }}" class="tc-input !py-2" /><span class="text-slate-400">–</span><input type="time" name="end_{{ d }}" value="{{ r[1] }}" class="tc-input !py-2" /><button type="button" class="shrink-0 text-xs font-bold text-red-700 hover:underline" onclick="this.parentElement.remove()">Remove</button></div>{% endfor %}</div></div>{% endfor %}</div></article>
+  <article class="tc-card p-5 sm:p-6"><p class="text-xs font-bold uppercase tracking-wide text-brand-600">Booking rules</p><h2 class="mt-1 text-xl font-bold text-brand-950">Protect your focus time</h2><div class="mt-5 grid gap-4 sm:grid-cols-3"><div><label class="tc-label">Buffer (minutes)</label><input type="number" min="0" name="buffer_min" value="{{ buffer_min }}" class="tc-input" /></div><div><label class="tc-label">Minimum notice (minutes)</label><input type="number" min="0" name="min_notice_min" value="{{ min_notice_min }}" class="tc-input" /></div><div><label class="tc-label">Maximum days ahead</label><input type="number" min="1" name="max_days_ahead" value="{{ max_days_ahead }}" class="tc-input" /></div></div></article>
+  <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center"><a href="{{ url_for('dashboard.host') }}" class="tc-btn-secondary">Back to dashboard</a><button class="tc-btn-primary" type="submit">Save availability</button></div></form>
+</div></section>
 <script>
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   document.getElementById('detectedTz').textContent = tz || 'Unavailable';
-  // Populate IANA time zones in datalist (client-side search)
-  try {
-    const zones = (Intl.supportedValuesOf && Intl.supportedValuesOf('timeZone')) || [];
-    const dl = document.getElementById('tzlist');
-    if (dl && zones.length) {
-      zones.forEach(z => { const o = document.createElement('option'); o.value = z; dl.appendChild(o); });
-    } else if (dl) {
-      // Fallback small set
-      ['UTC','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','Europe/London','Europe/Berlin','Asia/Kolkata','Asia/Tokyo','Australia/Sydney'].forEach(z=>{const o=document.createElement('option');o.value=z;dl.appendChild(o);});
-    }
-    // Ensure detected zone appears as a choice
-    if (dl && tz) {
-      const exists = Array.from(dl.options).some(o => o.value === tz);
-      if (!exists) { const o = document.createElement('option'); o.value = tz; dl.appendChild(o); }
-    }
-  } catch (e) {}
-
-  // Auto-fill timezone input with detected zone if it looks unset
-  const tzInput = document.getElementById('timezone');
-  if (tzInput && tz) {
-    const current = (tzInput.value || '').trim();
-    if (!current || current.toUpperCase() === 'UTC') {
-      tzInput.value = tz;
-    }
-  }
-
-  function addRange(day){
-    const wrap = document.getElementById('ranges_'+day);
-    const row = document.createElement('div');
-    row.className = 'flex items-center gap-2';
-    row.innerHTML = `
-      <input type="time" name="start_${day}" class="rounded-md border border-slate-300 px-2 py-1" />
-      <span>–</span>
-      <input type="time" name="end_${day}" class="rounded-md border border-slate-300 px-2 py-1" />
-      <button type="button" class="text-xs rounded-md border border-red-300 bg-red-50 px-2 py-1 text-red-700" onclick="this.parentElement.remove()">Remove</button>
-    `;
-    wrap.appendChild(row);
-  }
+  try { const zones = (Intl.supportedValuesOf && Intl.supportedValuesOf('timeZone')) || []; const dl = document.getElementById('tzlist'); if (dl && zones.length) { zones.forEach(z => { const o = document.createElement('option'); o.value = z; dl.appendChild(o); }); } else if (dl) { ['UTC','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','Europe/London','Europe/Berlin','Asia/Kolkata','Asia/Tokyo','Australia/Sydney'].forEach(z => { const o = document.createElement('option'); o.value = z; dl.appendChild(o); }); } if (dl && tz && !Array.from(dl.options).some(o => o.value === tz)) { const o = document.createElement('option'); o.value = tz; dl.appendChild(o); } } catch (e) {}
+  const tzInput = document.getElementById('timezone'); if (tzInput && tz && (!tzInput.value.trim() || tzInput.value.trim().toUpperCase() === 'UTC')) tzInput.value = tz;
+  function addRange(day) { const wrap = document.getElementById('ranges_' + day); const row = document.createElement('div'); row.className = 'flex items-center gap-2'; row.innerHTML = `<input type="time" name="start_${day}" class="tc-input !py-2" /><span class="text-slate-400">–</span><input type="time" name="end_${day}" class="tc-input !py-2" /><button type="button" class="shrink-0 text-xs font-bold text-red-700 hover:underline" onclick="this.parentElement.remove()">Remove</button>`; wrap.appendChild(row); }
 </script>
 {% endblock %}
