@@ -383,31 +383,3 @@ def get_phone_from_botpenguin(visitor_email: str) -> Optional[str]:
     
     log.debug("BotPenguin: no phone found for %s", visitor_email)
     return None
-
-
-def sync_booking_to_botpenguin(visitor_email: str, booking_time_local_iso: str, coach_name: str) -> None:
-    try:
-        client = BotPenguinClient()
-    except Exception as e:
-        log.info("BotPenguin not configured: %s", e)
-        return
-
-    contact = client.find_contact_by_email(visitor_email)
-    if not contact:
-        log.info("BotPenguin: no contact found for %s", visitor_email)
-        return
-
-    contact_id = str(contact.get("_id") or contact.get("id") or contact.get("uuid") or "").strip()
-    if not contact_id:
-        log.info("BotPenguin: contact found without id, skipping")
-        return
-
-    ok = client.update_contact_attributes(contact_id, {
-        "booking_time": booking_time_local_iso,
-        "demo_session_coach": coach_name,
-    })
-    if ok:
-        log.info("BotPenguin: updated contact %s", contact_id)
-    else:
-        log.warning("BotPenguin: failed to update contact %s", contact_id)
-

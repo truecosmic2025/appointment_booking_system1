@@ -39,7 +39,7 @@ Recipients include:
 - Coach (uses User.timezone or CoachProfile.timezone)
 - Visitor (uses Booking.timezone - the timezone they selected during booking)
 - Owner (uses User.timezone)
-- Admin emails from ADMIN_EMAILS env var (uses User.timezone if they have an account)
+- Fixed internal recipients `admin@truecosmic.com` and `info@truecosmic.com` (uses User.timezone if an account exists)
 
 ## Implementation Details
 

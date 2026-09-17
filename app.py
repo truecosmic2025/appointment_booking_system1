@@ -51,7 +51,6 @@ SMTP_USERNAME = os.getenv('SMTP_USERNAME')
 SMTP_PASSWORD = os.getenv('SMTP_PASSWORD')
 SMTP_USE_TLS = os.getenv('SMTP_USE_TLS', 'true').lower() == 'true'
 EMAIL_FROM = os.getenv('EMAIL_FROM', SMTP_USERNAME or 'no-reply@example.com')
-ADMIN_EMAILS = os.getenv('ADMIN_EMAILS', '')  # comma-separated list of owner/admin emails
 
 # Fixed event configuration (30 minutes)
 EVENT_NAME = os.getenv('EVENT_NAME', 'Intro Meeting')
@@ -332,12 +331,6 @@ def event_30_details():
             # Ignore integration failures for now
             pass
 
-        # Notify admins/owners about the new booking (non-blocking)
-        try:
-            send_admin_notification(booking, 'booked')
-        except Exception:
-            pass
-
         # Send confirmation email (optional)
         try:
             send_confirmation_email(booking)
@@ -441,12 +434,6 @@ def send_confirmation_email(booking: Booking):
         f"If you need to reschedule, please reply to this email.\n"
     )
 
-# --- Admin email notifications ---
-
-def _admin_recipients() -> list[str]:
-    raw = ADMIN_EMAILS or ''
-    return [e.strip() for e in raw.split(',') if e.strip()]
-
 def _format_booking_window(booking: Booking) -> str:
     tz_obj = pytz.timezone(booking.timezone)
     start_local = booking.start_utc.astimezone(tz_obj)
@@ -460,38 +447,6 @@ def _format_booking_window(booking: Booking) -> str:
         if end_str.startswith('0'):
             end_str = end_str[1:]
     return f"{start_str} — {end_str} ({booking.timezone})"
-
-def send_admin_notification(booking: Booking, action: str, previous: str | None = None):
-    if not EMAIL_ENABLED:
-        return
-    recipients = _admin_recipients()
-    if not recipients:
-        return
-
-    window = _format_booking_window(booking)
-    subject = f"[{BRAND_COMPANY}] {EVENT_NAME} {action.capitalize()}"
-
-    lines = [
-        f"Event: {EVENT_NAME}",
-        f"Action: {action}",
-        f"When: {window}",
-        f"Booker: {booking.name} <{booking.email}>",
-    ]
-    if booking.guests:
-        lines.append(f"Guests: {booking.guests}")
-    if booking.notes:
-        lines.append(f"Notes: {booking.notes}")
-    if previous:
-        lines.append(f"Previous time: {previous}")
-
-    body = "\n".join(lines)
-
-    for r in recipients:
-        try:
-            send_email(r, subject, body)
-        except Exception:
-            # Non-blocking; consider logging
-            pass
 
 # --- Attendee self-service security helpers ---
 
@@ -727,10 +682,6 @@ def _process_google_event_change(event: dict):
 
     if status == 'cancelled':
         try:
-            send_admin_notification(booking, 'cancelled')
-        except Exception:
-            app.logger.exception('Error sending admin notification for external cancel booking %s', booking.id)
-        try:
             # Remove integration mapping then soft-cancel booking
             db.session.delete(link)
             if HAS_BOOKING_STATUS:
@@ -762,11 +713,6 @@ def _process_google_event_change(event: dict):
     except Exception:
         app.logger.exception('Error updating booking from Google change %s', booking.id)
         return
-
-    try:
-        send_admin_notification(booking, 'rescheduled', previous=prev_window)
-    except Exception:
-        app.logger.exception('Error sending admin reschedule notification for booking %s', booking.id)
 
 def sync_google_calendar_changes():
     with app.app_context():
@@ -1000,11 +946,6 @@ def admin_reschedule_booking(booking_id: int):
     except Exception:
         app.logger.exception('Error updating Google event for admin reschedule booking %s', booking_id)
 
-    try:
-        send_admin_notification(booking, 'rescheduled', previous=prev_window)
-    except Exception:
-        app.logger.exception('Error sending admin notification for admin reschedule booking %s', booking_id)
-
     return {"ok": True}
 
 @app.route('/admin/bookings/<int:booking_id>/cancel', methods=['POST'])
@@ -1021,11 +962,6 @@ def admin_cancel_booking(booking_id: int):
         delete_google_calendar_event(booking)
     except Exception:
         app.logger.exception('Error deleting Google Calendar event for booking %s', booking_id)
-
-    try:
-        send_admin_notification(booking, 'cancelled')
-    except Exception:
-        app.logger.exception('Error sending admin notification for cancelled booking %s', booking_id)
 
     # Soft cancel if possible; fall back to delete
     try:
@@ -1076,12 +1012,6 @@ def attendee_reschedule_booking(booking_id: int):
         update_google_calendar_event(booking)
     except Exception:
         app.logger.exception('Error updating Google event for attendee reschedule booking %s', booking_id)
-
-    # Notify admins
-    try:
-        send_admin_notification(booking, 'rescheduled', previous=prev_window)
-    except Exception:
-        app.logger.exception('Error sending admin notification for attendee reschedule booking %s', booking_id)
 
     return {"ok": True}
 

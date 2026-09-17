@@ -20,6 +20,76 @@ import requests
 
 public_bp = Blueprint("public", __name__, url_prefix="")
 
+# These are intentional fixed internal recipients for multi-coach booking
+# notifications. They replace the retired configurable administrator fan-out.
+INTERNAL_BOOKING_RECIPIENTS = ("admin@truecosmic.com", "info@truecosmic.com")
+
+
+def _booking_context_request(params: dict) -> dict | None:
+    """Best-effort read of bounded Claudde context for an internal email.
+
+    A missing secret, slow CRM gateway, unavailable migration, or no matching
+    conversation must never block a booking or stop the normal email path.
+    The calendar owns only the dedicated booking-context secret, not the
+    primary Claudde proxy secret.
+    """
+    url = os.getenv("BOOKING_CONTEXT_PROXY_URL", "").strip()
+    secret = os.getenv("BOOKING_CONTEXT_PROXY_SECRET", "").strip()
+    if not url or not secret:
+        return None
+
+    try:
+        timeout = max(0.5, min(float(os.getenv("BOOKING_CONTEXT_TIMEOUT_SEC", "3")), 8.0))
+    except ValueError:
+        timeout = 3.0
+
+    try:
+        response = requests.post(
+            url,
+            json={"op": "get_summary_by_contact", "params": params},
+            headers={"x-booking-context-secret": secret, "Content-Type": "application/json"},
+            timeout=timeout,
+        )
+        if not response.ok:
+            logging.getLogger(__name__).warning(
+                "Claudde booking-context lookup unavailable (status=%s)", response.status_code
+            )
+            return None
+        payload = response.json()
+        if not isinstance(payload, dict):
+            return None
+        if payload.get("found") is not True or not isinstance(payload.get("summary"), str):
+            return None
+        return payload
+    except (requests.RequestException, ValueError, TypeError):
+        logging.getLogger(__name__).warning("Claudde booking-context lookup failed")
+        return None
+
+
+def lookup_booking_context(visitor_email: str, visitor_phone: str | None) -> dict | None:
+    """Resolve one uniquely matched summary using email, then E.164 phone."""
+    email = (visitor_email or "").strip().lower()
+    if email and "@" in email:
+        context = _booking_context_request({"email": email})
+        if context:
+            return context
+
+    phone = (visitor_phone or "").strip()
+    if phone.startswith("+") and phone[1:].isdigit() and 8 <= len(phone[1:]) <= 15:
+        return _booking_context_request({"phoneE164": phone})
+    return None
+
+
+def _internal_booking_recipients(existing: set[str]) -> list[str]:
+    """Return fixed internal recipients once each, excluding prior recipients."""
+    recipients: list[str] = []
+    for recipient in INTERNAL_BOOKING_RECIPIENTS:
+        normalized = recipient.lower()
+        if normalized not in existing:
+            recipients.append(recipient)
+            existing.add(normalized)
+    return recipients
+
 
 def _normalize_phone_e164(phone: str, default_country_code: str = None) -> str:
     """
@@ -204,21 +274,6 @@ def coach_page(slug):
     except Exception:
         pass
     
-    # If no phone but email is provided, try to retrieve from BotPenguin
-    if not prefill_phone and prefill_email:
-        try:
-            from app.integrations.botpenguin_service import get_phone_from_botpenguin
-            bp_phone = get_phone_from_botpenguin(prefill_email)
-            if bp_phone:
-                prefill_phone = bp_phone
-                try:
-                    session['booking_phone'] = bp_phone
-                except Exception:
-                    pass
-                logging.getLogger(__name__).info("Retrieved phone from BotPenguin for prefill: %s", prefill_email)
-        except Exception as e:
-            logging.getLogger(__name__).debug("Failed to retrieve phone from BotPenguin for prefill: %s", e)
-    
     return render_template("coaches/booking.html", coach=coach, profile=profile, hours=hours,
                          prefill_name=prefill_name, prefill_email=prefill_email, prefill_phone=prefill_phone)
 
@@ -360,17 +415,6 @@ def api_book(slug):
         except Exception:
             visitor_phone = ''
     
-    # If still no phone, try to retrieve from BotPenguin
-    if not visitor_phone and email:
-        try:
-            from app.integrations.botpenguin_service import get_phone_from_botpenguin
-            bp_phone = get_phone_from_botpenguin(email)
-            if bp_phone:
-                visitor_phone = bp_phone  # Already normalized by BotPenguin service
-                logging.getLogger(__name__).info("Retrieved phone from BotPenguin for %s", email)
-        except Exception as e:
-            logging.getLogger(__name__).debug("Failed to retrieve phone from BotPenguin: %s", e)
-    
     if not (name and email and start_iso):
         return jsonify({"error": "Missing fields"}), 400
 
@@ -421,6 +465,7 @@ def api_book(slug):
     coach_email_val = coach.email
     owner_email_val = owner.email if owner else None
     visitor_email_val = email
+    visitor_phone_val = visitor_phone or None
     coach_name_val = coach.name
     visitor_name_val = name
     booking_id_val = booking.id
@@ -447,7 +492,12 @@ def api_book(slug):
             # Ensure Flask application context inside background thread
             ctx_mgr = app_obj.app_context() if app_obj is not None else nullcontext()
             with ctx_mgr:
-                # Send emails (coach, visitor, owner)
+                # Context is optional and bounded. It is retrieved before the
+                # internal message is composed but never blocks the booking API.
+                context = lookup_booking_context(visitor_email_val, visitor_phone_val)
+                summary = context.get("summary") if context else None
+
+                # Send confirmation and internal booking notices.
                 try:
                     send_booking_email(
                         coach_email_val,
@@ -460,15 +510,16 @@ def api_book(slug):
                         booking_id_val,
                         booking_token_val,
                         visitor_timezone_val,
+                        visitor_phone_val,
                         base_url_val,
+                        summary,
                     )
                 except Exception as e:
                     logging.getLogger(__name__).error("send_booking_email failed: %s: %s", type(e).__name__, e)
 
-                # Best-effort BotPenguin + ManyChat + Make.com webhook
+                # Best-effort ManyChat, FluentCRM, and Make.com updates.
                 try:
                     import pytz
-                    from app.integrations.botpenguin_service import sync_booking_to_botpenguin
                     from app.integrations.manychat_service import sync_booking_to_manychat
                     try:
                         tz = pytz.timezone(visitor_timezone_val)
@@ -480,10 +531,6 @@ def api_book(slug):
                         start_utc_iso = start_val.astimezone(pytz.UTC).isoformat()
                     except Exception:
                         start_utc_iso = start_val.isoformat()
-                    try:
-                        sync_booking_to_botpenguin(visitor_email=visitor_email_val, booking_time_local_iso=start_local.isoformat(), coach_name=coach_name_val)
-                    except Exception as e:
-                        logging.getLogger(__name__).warning("BotPenguin sync failed: %s: %s", type(e).__name__, e)
                     try:
                         logging.getLogger(__name__).info(
                             "ManyChat: syncing visitor=%s coach=%s time_utc=%s",
@@ -693,7 +740,21 @@ def send_email(subject: str, body: str, to_emails: list[str]):
     logger.info("Email: no available transport configured; skipped sending to %s", ",".join(to_emails))
 
 
-def send_booking_email(coach_email, owner_email, visitor_email, coach_name, visitor_name, start, meet_link, booking_id: int, booking_token: str, visitor_timezone: str | None, base_url: str | None = None):
+def send_booking_email(
+    coach_email,
+    owner_email,
+    visitor_email,
+    coach_name,
+    visitor_name,
+    start,
+    meet_link,
+    booking_id: int,
+    booking_token: str,
+    visitor_timezone: str | None,
+    visitor_phone: str | None = None,
+    base_url: str | None = None,
+    conversation_summary: str | None = None,
+):
     subject = f"Booking confirmed: {visitor_name} with {coach_name}"
 
     # Build an absolute manage URL when possible; gracefully fall back
@@ -713,22 +774,32 @@ def send_booking_email(coach_email, owner_email, visitor_email, coach_name, visi
 
     manage = _manage_url()
 
-    # Helper to make details block per timezone
-    def details_for(tzname: str | None):
+    # Helper to make details block per timezone.
+    def details_for(tzname: str | None, include_manage_link: bool):
         start_str, used_tz = _format_dt_for_tz(start, tzname)
-        return (
+        details = (
             f"Coach: {coach_name}\n"
             f"Visitor: {visitor_name}\n"
             f"Start: {start_str} ({used_tz})\n"
-            f"Meet: {meet_link}\n\n"
-            f"Manage: {manage} (reschedule or cancel)\n"
+            f"Meet: {meet_link}\n"
         )
+        if include_manage_link:
+            details += f"\nManage: {manage} (reschedule or cancel)\n"
+        return details
 
-    # Build recipients
-    raw_admins = os.getenv('ADMIN_EMAILS', '')
-    admin_emails = [e.strip() for e in raw_admins.split(',') if e.strip()]
+    summary = conversation_summary.strip()[:2_000] if isinstance(conversation_summary, str) else ""
 
-    # Participants: send individually with their timezone
+    def internal_body(tzname: str | None) -> str:
+        body = "A 30-minute session is booked.\n\n" + details_for(tzname, include_manage_link=True)
+        body += f"\nVisitor email: {visitor_email}\n"
+        if visitor_phone:
+            body += f"Visitor phone: {visitor_phone}\n"
+        if summary:
+            body += f"\nClaudde conversation summary:\n{summary}\n"
+        return body
+
+    # Participants receive individual messages. The visitor's existing
+    # confirmation intentionally remains context-free.
     participant_order = [coach_email, visitor_email] + ([owner_email] if owner_email else [])
     sent_set = set()
     for e in participant_order:
@@ -747,16 +818,17 @@ def send_booking_email(coach_email, owner_email, visitor_email, coach_name, visi
             tzname = _tz_for_user_email(owner_email)
         else:
             tzname = None
-        body = "A 30-minute session is booked.\n\n" + details_for(tzname)
+        if e.lower() == visitor_email.lower():
+            body = "A 30-minute session is booked.\n\n" + details_for(tzname, include_manage_link=True)
+        else:
+            body = internal_body(tzname)
         send_email(subject, body, [e])
 
-    # Admin recipients: send individually using their timezone, with admin phrasing
-    for e in admin_emails:
-        el = e.lower()
-        if not el or el in sent_set:
-            continue
+    # Fixed operational recipients replace the retired configurable setting.
+    # Send each separately so no recipient list is exposed in another email.
+    for e in _internal_booking_recipients(sent_set):
         tzname = _tz_for_user_email(e)
-        body = "A demo session has been booked.\n\n" + details_for(tzname)
+        body = internal_body(tzname)
         send_email(subject, body, [e])
 
 
@@ -794,8 +866,6 @@ def cancel_booking(booking_id: int, token: str):
     # Notify
     owner = User.query.filter_by(role="owner").first() or User.query.filter_by(role="admin").first()
     subject = f"Booking cancelled: {b.visitor_name} x {b.coach.name}"
-    raw_admins = os.getenv('ADMIN_EMAILS', '')
-    admin_emails = [e.strip() for e in raw_admins.split(',') if e.strip()]
 
     def cancel_body_for(tzname: str | None):
         s, used = _format_dt_for_tz(b.start_utc, tzname)
@@ -814,14 +884,10 @@ def cancel_booking(booking_id: int, token: str):
         owner_tz = _tz_for_user_email(owner.email)
         send_email(subject, cancel_body_for(owner_tz), [owner.email])
         sent.add(owner.email.lower())
-    # Admins
-    for e in admin_emails:
-        el = e.lower()
-        if not el or el in sent:
-            continue
+    # Fixed operational recipients receive individual cancellation updates.
+    for e in _internal_booking_recipients(sent):
         tzname = _tz_for_user_email(e)
         send_email(subject, cancel_body_for(tzname), [e])
-        sent.add(el)
     return jsonify({"ok": True})
 
 
@@ -844,8 +910,6 @@ def reschedule_booking(booking_id: int, token: str):
     db.session.commit()
     owner = User.query.filter_by(role="owner").first() or User.query.filter_by(role="admin").first()
     subject = f"Booking rescheduled: {b.visitor_name} x {b.coach.name}"
-    raw_admins = os.getenv('ADMIN_EMAILS', '')
-    admin_emails = [e.strip() for e in raw_admins.split(',') if e.strip()]
 
     def resched_body_for(tzname: str | None):
         s, used = _format_dt_for_tz(b.start_utc, tzname)
@@ -864,12 +928,8 @@ def reschedule_booking(booking_id: int, token: str):
         owner_tz = _tz_for_user_email(owner.email)
         send_email(subject, resched_body_for(owner_tz), [owner.email])
         sent.add(owner.email.lower())
-    # Admins
-    for e in admin_emails:
-        el = e.lower()
-        if not el or el in sent:
-            continue
+    # Fixed operational recipients receive individual reschedule updates.
+    for e in _internal_booking_recipients(sent):
         tzname = _tz_for_user_email(e)
         send_email(subject, resched_body_for(tzname), [e])
-        sent.add(el)
     return jsonify({'ok': True})
