@@ -23,7 +23,7 @@
     <header class="sticky top-0 z-40 border-b border-brand-100/80 bg-white/90 backdrop-blur-xl">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-[4.5rem] items-center justify-between gap-4">
-          <a href="{% if current_user.is_authenticated %}{% if current_user.role in ['owner','admin'] %}{{ url_for('dashboard.owner') }}{% elif current_user.role == 'host' %}{{ url_for('dashboard.host') }}{% else %}/coaches{% endif %}{% else %}{{ url_for('main.index') }}{% endif %}" class="flex min-w-0 items-center gap-3" aria-label="TrueCosmic Calendar home">
+          <a href="{% if current_user.is_authenticated %}{% if current_user.role in ['owner','admin'] %}{{ url_for('dashboard.owner') }}{% elif current_user.role == 'host' %}{{ url_for('dashboard.host') }}{% else %}https://coaches.truecosmic.com{% endif %}{% else %}{{ url_for('main.index') }}{% endif %}" class="flex min-w-0 items-center gap-3" aria-label="TrueCosmic Calendar home">
             <img src="{{ url_for('static', filename='img/logo.png') }}" alt="" class="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-brand-100"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';" />
             <span class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-700 font-display text-lg font-bold text-white">C</span>
@@ -39,12 +39,12 @@
                 <a class="rounded-lg px-3 py-2 transition hover:bg-brand-50 hover:text-brand-800" href="{{ url_for('dashboard.host') }}">Dashboard</a>
                 <a class="rounded-lg px-3 py-2 transition hover:bg-brand-50 hover:text-brand-800" href="{{ url_for('coach.settings') }}">Availability</a>
               {% else %}
-                <a class="rounded-lg px-3 py-2 transition hover:bg-brand-50 hover:text-brand-800" href="/coaches">Coaches</a>
+                <a class="rounded-lg px-3 py-2 transition hover:bg-brand-50 hover:text-brand-800" href="https://coaches.truecosmic.com">Coaches</a>
               {% endif %}
             {% else %}
               <a class="rounded-lg px-3 py-2 transition hover:bg-brand-50 hover:text-brand-800" href="#features">Why TrueCosmic</a>
               <a class="rounded-lg px-3 py-2 transition hover:bg-brand-50 hover:text-brand-800" href="#how">How it works</a>
-              <a class="rounded-lg px-3 py-2 transition hover:bg-brand-50 hover:text-brand-800" href="/coaches">Coaches</a>
+              <a class="rounded-lg px-3 py-2 transition hover:bg-brand-50 hover:text-brand-800" href="https://coaches.truecosmic.com">Coaches</a>
             {% endif %}
           </nav>
           <div class="hidden items-center gap-2 md:flex">
@@ -72,7 +72,7 @@
               <a class="block rounded-lg px-3 py-2 hover:bg-brand-50" href="{{ url_for('dashboard.host') }}">Dashboard</a>
               <a class="block rounded-lg px-3 py-2 hover:bg-brand-50" href="{{ url_for('coach.settings') }}">Availability</a>
             {% else %}
-              <a class="block rounded-lg px-3 py-2 hover:bg-brand-50" href="/coaches">Coaches</a>
+              <a class="block rounded-lg px-3 py-2 hover:bg-brand-50" href="https://coaches.truecosmic.com">Coaches</a>
             {% endif %}
             <div class="mt-2 flex gap-2 border-t border-brand-100 pt-3">
               <a href="{{ url_for('auth.me') }}" class="tc-btn-secondary flex-1">Account</a>
@@ -81,7 +81,7 @@
           {% else %}
             <a class="block rounded-lg px-3 py-2 hover:bg-brand-50" href="#features">Why TrueCosmic</a>
             <a class="block rounded-lg px-3 py-2 hover:bg-brand-50" href="#how">How it works</a>
-            <a class="block rounded-lg px-3 py-2 hover:bg-brand-50" href="/coaches">Coaches</a>
+            <a class="block rounded-lg px-3 py-2 hover:bg-brand-50" href="https://coaches.truecosmic.com">Coaches</a>
             <div class="mt-2 flex gap-2 border-t border-brand-100 pt-3">
               <a href="{{ url_for('auth.login') }}" class="tc-btn-secondary flex-1">Sign in</a>
               <a href="{{ url_for('auth.register') }}" class="tc-btn-primary flex-1">Sign up free</a>

@@ -225,16 +225,20 @@ def _format_dt_for_tz(dt: datetime, tzname: str | None) -> tuple[str, str]:
         except Exception:
             return str(dt), tzname or 'UTC'
 
+# Public-facing home for the coach directory. This app's own /coaches page used
+# to render every coach's real name, personal email, and a direct /c/<slug>
+# booking link with no gate at all -- anyone who found this page could book a
+# session with any coach without ever going through Claudde Bot's qualifying
+# questions, which the bot-driven flow strictly requires. The internal listing
+# page and its route are kept (not deleted) so nothing else that links to it
+# breaks, but it no longer renders coach details -- it only redirects out to
+# the gated, bot-fronted coach site.
+PUBLIC_COACH_DIRECTORY_URL = "https://coaches.truecosmic.com"
+
+
 @public_bp.route("/coaches")
 def coaches_list():
-    # List all users with role host (and owner/admin who might also be coaches)
-    users = (
-        User.query.filter(User.role.in_(["host", "owner", "admin"]))
-        .order_by(User.name.asc())
-        .all()
-    )
-    profiles = {p.user_id: p for p in CoachProfile.query.filter(CoachProfile.user_id.in_([u.id for u in users])).all()}
-    return render_template("coaches/list.html", users=users, profiles=profiles)
+    return redirect(PUBLIC_COACH_DIRECTORY_URL)
 
 
 @public_bp.route("/c/<slug>")
