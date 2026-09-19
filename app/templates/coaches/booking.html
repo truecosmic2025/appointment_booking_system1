@@ -40,16 +40,14 @@
             <input id="date" type="date" aria-label="Appointment date" class="tc-input !w-auto !px-2.5 !py-2 text-sm" />
           </div>
         </div>
-        <form id="bookForm" class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <form id="bookForm" class="mt-6 grid grid-cols-1 sm:grid-cols-4 gap-3">
           <input type="text" name="name" placeholder="Your name" aria-label="Your name" class="tc-input" value="{{ prefill_name }}" {% if prefill_name %}readonly{% endif %} required>
           <input type="email" name="email" placeholder="Your email" aria-label="Your email" class="tc-input" value="{{ prefill_email }}" {% if prefill_email %}readonly{% endif %} required>
-          {% if prefill_phone %}
-          <input type="hidden" name="phone" value="{{ prefill_phone }}">
-          {% endif %}
+          <input type="tel" name="phone" placeholder="Your phone number" aria-label="Your phone number" autocomplete="tel" inputmode="tel" class="tc-input" value="{{ prefill_phone }}" pattern="[0-9+().\-\s]{7,32}" title="Enter a valid phone number." required>
           <button type="submit" class="tc-btn-primary" disabled id="bookBtn">Book 30 min</button>
         </form>
         <div id="slots" class="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"></div>
-        <div id="result" class="mt-4 text-sm"></div>
+        <div id="result" class="mt-4 text-sm" role="status" aria-live="polite"></div>
       </div>
     </div>
   </div>
@@ -140,11 +138,7 @@ bookForm.addEventListener('submit', async (e)=>{
   e.preventDefault();
   if(!selectedStart){ alert('Select a time'); return; }
   const form = new FormData(bookForm);
-  const payload = { name: form.get('name'), email: form.get('email'), start: selectedStart, timezone: (tzInput.value || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC') };
-  const phone = form.get('phone');
-  if (phone) {
-    payload.phone = phone;
-  }
+  const payload = { name: form.get('name'), email: form.get('email'), phone: form.get('phone'), start: selectedStart, timezone: (tzInput.value || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC') };
   bookBtn.disabled = true;
   bookBtn.textContent = 'Booking...';
   if (bookingOverlay) bookingOverlay.classList.remove('hidden');

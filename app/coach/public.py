@@ -3,7 +3,7 @@ import json
 from datetime import datetime, timedelta, timezone, time
 import secrets
 
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, current_app, session
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, current_app
 from contextlib import nullcontext
 from flask_login import current_user
 
@@ -266,14 +266,6 @@ def coach_page(slug):
     if prefill_phone:
         prefill_phone = _normalize_phone_e164(prefill_phone)
     
-    try:
-        if prefill_phone:
-            session['booking_phone'] = prefill_phone
-        else:
-            prefill_phone = (session.get('booking_phone') or '').strip()
-    except Exception:
-        pass
-    
     return render_template("coaches/booking.html", coach=coach, profile=profile, hours=hours,
                          prefill_name=prefill_name, prefill_email=prefill_email, prefill_phone=prefill_phone)
 
@@ -398,23 +390,26 @@ def api_availability(slug):
 def api_book(slug):
     profile = CoachProfile.query.filter_by(slug=slug).first_or_404()
     coach = profile.user
-    data = request.get_json(force=True)
-    name = data.get("name", "").strip()
-    email = data.get("email", "").strip().lower()
+    data = request.get_json(force=True) or {}
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip().lower()
     start_iso = data.get("start")
     tzname = (data.get("timezone") or "UTC").strip() or "UTC"
     visitor_phone = (data.get("phone") or "").strip()
-    
-    # Normalize phone from request if provided
-    if visitor_phone:
-        visitor_phone = _normalize_phone_e164(visitor_phone)
-    
+
+    # Every booking path must submit a phone number explicitly; a hidden or
+    # stale session value must not allow an empty booking to be saved.
     if not visitor_phone:
-        try:
-            visitor_phone = (session.get('booking_phone') or '').strip()
-        except Exception:
-            visitor_phone = ''
-    
+        return jsonify({"error": "Phone number is required to book a session."}), 400
+
+    visitor_phone = _normalize_phone_e164(visitor_phone)
+    if not (
+        visitor_phone.startswith("+")
+        and visitor_phone[1:].isdigit()
+        and 10 <= len(visitor_phone[1:]) <= 15
+    ):
+        return jsonify({"error": "Enter a valid phone number to book a session."}), 400
+
     if not (name and email and start_iso):
         return jsonify({"error": "Missing fields"}), 400
 
@@ -456,10 +451,6 @@ def api_book(slug):
     )
     db.session.add(booking)
     db.session.commit()
-    try:
-        session.pop('booking_phone', None)
-    except Exception:
-        pass
 
     # Capture primitives to avoid DetachedInstanceError in background thread
     coach_email_val = coach.email
