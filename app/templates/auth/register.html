@@ -1,64 +1,66 @@
 {% extends "base.html" %}
-{% block title %}Sign up | TrueCosmic Calendar{% endblock %}
+{% block title %}{{ 'Create owner account' if first_registration else 'Coach invitation' }} | TrueCosmic Calendar{% endblock %}
 {% block content %}
 <section class="py-16">
   <div class="mx-auto max-w-md px-4">
-    <h1 class="text-2xl font-bold text-slate-900">Create your account</h1>
-    <form method="post" autocomplete="off" class="mt-6 space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-slate-700">Name</label>
-        <input name="name" autocomplete="off" spellcheck="false" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+    {% if registration_locked %}
+      <div class="rounded-xl border border-amber-200 bg-amber-50 p-6">
+        <p class="text-xs font-bold uppercase tracking-wide text-amber-700">Coach access</p>
+        <h1 class="mt-2 text-2xl font-bold text-slate-900">A coach invitation is required</h1>
+        <p class="mt-3 text-sm leading-6 text-slate-700">Coach accounts can only be created with a current one-time invitation link. Ask a TrueCosmic Calendar owner to send an invitation to your email address.</p>
+        <a href="{{ url_for('auth.login') }}" class="mt-5 inline-flex rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white">Sign in</a>
       </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700">Email</label>
-        <input name="email" type="email" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700">Password</label>
-        <input name="password" type="password" minlength="8" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700">Confirm password</label>
-        <input name="password2" type="password" minlength="8" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700">Time zone</label>
-        <input name="timezone" id="timezone" value="UTC" list="tzlist" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
-        <datalist id="tzlist"></datalist>
-        <p class="text-xs text-slate-500 mt-1">Detected from your browser: <span id="detectedTz">...</span></p>
-      </div>
-      <button class="w-full rounded-md bg-slate-900 px-4 py-2 text-white font-semibold">Create account</button>
-    </form>
-    <p class="mt-4 text-sm text-slate-600">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-brand-700 hover:underline">Sign in</a></p>
+    {% else %}
+      <p class="text-xs font-bold uppercase tracking-wide text-brand-600">{{ 'Initial setup' if first_registration else 'Coach invitation' }}</p>
+      <h1 class="mt-2 text-2xl font-bold text-slate-900">{{ 'Create the owner account' if first_registration else 'Create your coach account' }}</h1>
+      {% if invite %}
+        <p class="mt-3 rounded-xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm leading-6 text-brand-900">You are accepting a coach invitation for <strong>{{ invite.email }}</strong>. This one-time link expires on {{ invite.expires_at.strftime('%-d %b %Y, %-I:%M %p UTC') }}.</p>
+      {% endif %}
+      <form method="post" autocomplete="off" class="mt-6 space-y-4">
+        {% if invite %}<input type="hidden" name="invite" value="{{ invite_token }}">{% endif %}
+        <div>
+          <label class="block text-sm font-medium text-slate-700" for="name">Name</label>
+          <input id="name" name="name" value="{{ invite.name if invite else '' }}" autocomplete="name" spellcheck="false" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700" for="email">Email</label>
+          <input id="email" name="email" type="email" value="{{ invite.email if invite else '' }}" autocomplete="email" {% if invite %}readonly{% endif %} required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 {% if invite %}bg-slate-50{% endif %}" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700" for="password">Password</label>
+          <input id="password" name="password" type="password" minlength="8" autocomplete="new-password" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700" for="password2">Confirm password</label>
+          <input id="password2" name="password2" type="password" minlength="8" autocomplete="new-password" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700" for="timezone">Time zone</label>
+          <input name="timezone" id="timezone" value="UTC" list="tzlist" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+          <datalist id="tzlist"></datalist>
+          <p class="mt-1 text-xs text-slate-500">Detected from your browser: <span id="detectedTz">...</span></p>
+        </div>
+        <button class="w-full rounded-md bg-slate-900 px-4 py-2 font-semibold text-white">{{ 'Create owner account' if first_registration else 'Create coach account' }}</button>
+      </form>
+      <p class="mt-4 text-sm text-slate-600">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-brand-700 hover:underline">Sign in</a></p>
+    {% endif %}
   </div>
-  </section>
+</section>
 <script>
-  // Detect browser timezone and prefill
   (function(){
     const tz = (Intl.DateTimeFormat && Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
     const tzInput = document.getElementById('timezone');
     const tzSpan = document.getElementById('detectedTz');
     if (tzSpan) tzSpan.textContent = tz || 'Unavailable';
-    if (tzInput && (!tzInput.value || tzInput.value.toUpperCase() === 'UTC')) {
-      tzInput.value = tz;
-    }
-    // Populate datalist with supported IANA zones if available
+    if (tzInput && (!tzInput.value || tzInput.value.toUpperCase() === 'UTC')) tzInput.value = tz;
     try {
       const zones = (Intl.supportedValuesOf && Intl.supportedValuesOf('timeZone')) || [];
       const dl = document.getElementById('tzlist');
       if (dl) {
-        if (zones.length) {
-          zones.forEach(z => { const o = document.createElement('option'); o.value = z; dl.appendChild(o); });
-        } else {
-          ['UTC','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','Europe/London','Europe/Berlin','Asia/Kolkata','Asia/Tokyo','Australia/Sydney'].forEach(z=>{const o=document.createElement('option');o.value=z;dl.appendChild(o);});
-        }
-        // Ensure detected tz is included
-        if (tz) {
-          const exists = Array.from(dl.options).some(o => o.value === tz);
-          if (!exists) { const o = document.createElement('option'); o.value = tz; dl.appendChild(o); }
-        }
+        (zones.length ? zones : ['UTC','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','Europe/London','Europe/Berlin','Asia/Kolkata','Asia/Tokyo','Australia/Sydney']).forEach(zone => { const option = document.createElement('option'); option.value = zone; dl.appendChild(option); });
+        if (tz && !Array.from(dl.options).some(option => option.value === tz)) { const option = document.createElement('option'); option.value = tz; dl.appendChild(option); }
       }
-    } catch(e) { /* no-op */ }
+    } catch (e) { /* Browser time-zone suggestions are optional. */ }
   })();
 </script>
 {% endblock %}

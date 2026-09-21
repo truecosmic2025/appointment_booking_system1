@@ -1,0 +1,1095 @@
+From 9ab422c66289963ed4b18ba387fd50f10ffa46d2 Mon Sep 17 00:00:00 2001
+From: truecosmic2025 <2.26357492e+08+truecosmic2025@users.noreply.github.com>
+Date: Sat, 19 Sep 2026 17:12:26 +0000
+Subject: [PATCH 1/2] Require phone number for public bookings
+
+---
+ app/coach/public.py                    |  43 ++++-----
+ app/templates/coaches/booking.html     |  14 +--
+ docs/REQUIRED_PHONE_BOOKING_HANDOFF.md |  19 ++++
+ tests/test_required_booking_phone.py   | 125 +++++++++++++++++++++++++
+ 4 files changed, 165 insertions(+), 36 deletions(-)
+ create mode 100644 docs/REQUIRED_PHONE_BOOKING_HANDOFF.md
+ create mode 100644 tests/test_required_booking_phone.py
+
+diff --git a/app/coach/public.py b/app/coach/public.py
+index 956d4c6..10aba11 100644
+--- a/app/coach/public.py
++++ b/app/coach/public.py
+@@ -3,7 +3,7 @@ import json
+ from datetime import datetime, timedelta, timezone, time
+ import secrets
+ 
+-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, current_app, session
++from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, current_app
+ from contextlib import nullcontext
+ from flask_login import current_user
+ 
+@@ -266,14 +266,6 @@ def coach_page(slug):
+     if prefill_phone:
+         prefill_phone = _normalize_phone_e164(prefill_phone)
+     
+-    try:
+-        if prefill_phone:
+-            session['booking_phone'] = prefill_phone
+-        else:
+-            prefill_phone = (session.get('booking_phone') or '').strip()
+-    except Exception:
+-        pass
+-    
+     return render_template("coaches/booking.html", coach=coach, profile=profile, hours=hours,
+                          prefill_name=prefill_name, prefill_email=prefill_email, prefill_phone=prefill_phone)
+ 
+@@ -398,23 +390,26 @@ def api_availability(slug):
+ def api_book(slug):
+     profile = CoachProfile.query.filter_by(slug=slug).first_or_404()
+     coach = profile.user
+-    data = request.get_json(force=True)
+-    name = data.get("name", "").strip()
+-    email = data.get("email", "").strip().lower()
++    data = request.get_json(force=True) or {}
++    name = (data.get("name") or "").strip()
++    email = (data.get("email") or "").strip().lower()
+     start_iso = data.get("start")
+     tzname = (data.get("timezone") or "UTC").strip() or "UTC"
+     visitor_phone = (data.get("phone") or "").strip()
+-    
+-    # Normalize phone from request if provided
+-    if visitor_phone:
+-        visitor_phone = _normalize_phone_e164(visitor_phone)
+-    
++
++    # Every booking path must submit a phone number explicitly; a hidden or
++    # stale session value must not allow an empty booking to be saved.
+     if not visitor_phone:
+-        try:
+-            visitor_phone = (session.get('booking_phone') or '').strip()
+-        except Exception:
+-            visitor_phone = ''
+-    
++        return jsonify({"error": "Phone number is required to book a session."}), 400
++
++    visitor_phone = _normalize_phone_e164(visitor_phone)
++    if not (
++        visitor_phone.startswith("+")
++        and visitor_phone[1:].isdigit()
++        and 10 <= len(visitor_phone[1:]) <= 15
++    ):
++        return jsonify({"error": "Enter a valid phone number to book a session."}), 400
++
+     if not (name and email and start_iso):
+         return jsonify({"error": "Missing fields"}), 400
+ 
+@@ -456,10 +451,6 @@ def api_book(slug):
+     )
+     db.session.add(booking)
+     db.session.commit()
+-    try:
+-        session.pop('booking_phone', None)
+-    except Exception:
+-        pass
+ 
+     # Capture primitives to avoid DetachedInstanceError in background thread
+     coach_email_val = coach.email
+diff --git a/app/templates/coaches/booking.html b/app/templates/coaches/booking.html
+index 1b852a9..a035654 100644
+--- a/app/templates/coaches/booking.html
++++ b/app/templates/coaches/booking.html
+@@ -40,16 +40,14 @@
+             <input id="date" type="date" aria-label="Appointment date" class="tc-input !w-auto !px-2.5 !py-2 text-sm" />
+           </div>
+         </div>
+-        <form id="bookForm" class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
++        <form id="bookForm" class="mt-6 grid grid-cols-1 sm:grid-cols-4 gap-3">
+           <input type="text" name="name" placeholder="Your name" aria-label="Your name" class="tc-input" value="{{ prefill_name }}" {% if prefill_name %}readonly{% endif %} required>
+           <input type="email" name="email" placeholder="Your email" aria-label="Your email" class="tc-input" value="{{ prefill_email }}" {% if prefill_email %}readonly{% endif %} required>
+-          {% if prefill_phone %}
+-          <input type="hidden" name="phone" value="{{ prefill_phone }}">
+-          {% endif %}
++          <input type="tel" name="phone" placeholder="Your phone number" aria-label="Your phone number" autocomplete="tel" inputmode="tel" class="tc-input" value="{{ prefill_phone }}" pattern="[0-9+().\-\s]{7,32}" title="Enter a valid phone number." required>
+           <button type="submit" class="tc-btn-primary" disabled id="bookBtn">Book 30 min</button>
+         </form>
+         <div id="slots" class="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"></div>
+-        <div id="result" class="mt-4 text-sm"></div>
++        <div id="result" class="mt-4 text-sm" role="status" aria-live="polite"></div>
+       </div>
+     </div>
+   </div>
+@@ -140,11 +138,7 @@ bookForm.addEventListener('submit', async (e)=>{
+   e.preventDefault();
+   if(!selectedStart){ alert('Select a time'); return; }
+   const form = new FormData(bookForm);
+-  const payload = { name: form.get('name'), email: form.get('email'), start: selectedStart, timezone: (tzInput.value || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC') };
+-  const phone = form.get('phone');
+-  if (phone) {
+-    payload.phone = phone;
+-  }
++  const payload = { name: form.get('name'), email: form.get('email'), phone: form.get('phone'), start: selectedStart, timezone: (tzInput.value || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC') };
+   bookBtn.disabled = true;
+   bookBtn.textContent = 'Booking...';
+   if (bookingOverlay) bookingOverlay.classList.remove('hidden');
+diff --git a/docs/REQUIRED_PHONE_BOOKING_HANDOFF.md b/docs/REQUIRED_PHONE_BOOKING_HANDOFF.md
+new file mode 100644
+index 0000000..3c14d43
+--- /dev/null
++++ b/docs/REQUIRED_PHONE_BOOKING_HANDOFF.md
+@@ -0,0 +1,19 @@
++# Required Phone Number for Public Bookings
++
++## Delivered change
++
++The public booking page at `/c/<slug>` now presents a visible **Phone number** field for every visitor, including both direct calendar visitors and visitors arriving from a Claudde Bot handoff such as `?name=<visitorName>`. The browser requires a value and performs basic phone-format validation before it submits the booking request. The booking API independently rejects a missing or whitespace-only `phone` value with the inline response message **“Phone number is required to book a session.”**
++
++The API no longer uses a saved `booking_phone` session value as a fallback. Therefore, a hidden, stale, or absent session value cannot create a new booking without an explicitly submitted phone number. Phone numbers supplied in the request continue to use the existing normalization routine and are saved to the existing `booking.visitor_phone` column.
++
++## Explicitly unchanged
++
++This change does not alter the `Booking` schema, Google OAuth routes, `CoachProfile.google_credentials`, availability computation, buffer or notice-window logic, Google Calendar event creation, or the CRM confirmation pipeline. Existing bookings are neither modified nor deleted.
++
++## Existing bookings requiring manual follow-up
++
++Bookings created before this change with an empty `visitor_phone` will not be recovered automatically. The reported examples include **Rajiv Test**, two **Nica** bookings, and **Paris Jones**, dated 19 September 2026 and later. Michael or staff must manually contact these visitors and handle any required confirmation follow-up. The optional missing-phone indicator on the host and owner dashboards was intentionally not included, to keep this emergency validation fix limited to the public booking flow.
++
++## Production verification after deployment
++
++Create a non-production test booking through the raw `/c/<slug>` link and through a `?name=...` handoff link. In each case, an empty phone must be blocked and a valid phone must produce a booking row with a non-empty `visitor_phone`. After the next `sync-railway-bookings` cycle (up to 30 minutes), confirm that the test booking has an `appointment_confirmations` record. Confirm that the existing coach Google Calendar connection and event creation continue to operate normally.
+diff --git a/tests/test_required_booking_phone.py b/tests/test_required_booking_phone.py
+new file mode 100644
+index 0000000..42cc9f8
+--- /dev/null
++++ b/tests/test_required_booking_phone.py
+@@ -0,0 +1,125 @@
++"""Regression coverage for the public booking phone requirement."""
++
++import os
++import unittest
++from unittest.mock import patch
++
++os.environ["DATABASE_URL"] = "sqlite://"
++os.environ["EMAIL_ENABLED"] = "false"
++os.environ["SYNC_POST_BOOKING"] = "0"
++
++from app import create_app, db
++from app.models.booking import Booking
++from app.models.coach_profile import CoachProfile
++from app.models.user import User
++
++
++class RequiredBookingPhoneTests(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        cls.app = create_app()
++        cls.app.config.update(TESTING=True)
++
++    @classmethod
++    def tearDownClass(cls):
++        with cls.app.app_context():
++            db.drop_all()
++
++    def setUp(self):
++        self.context = self.app.app_context()
++        self.context.push()
++        db.drop_all()
++        db.create_all()
++
++        coach = User(
++            email="coach@example.test",
++            name="Test Coach",
++            role="host",
++            timezone="UTC",
++        )
++        coach.set_password("test-password")
++        db.session.add(coach)
++        db.session.commit()
++        db.session.add(CoachProfile(user_id=coach.id, slug="test-coach", timezone="UTC"))
++        db.session.commit()
++
++        self.client = self.app.test_client()
++
++    def tearDown(self):
++        db.session.remove()
++        self.context.pop()
++
++    @staticmethod
++    def booking_payload(phone):
++        return {
++            "name": "Visitor Example",
++            "email": "visitor@example.test",
++            "phone": phone,
++            "start": "2027-01-10T12:00:00+00:00",
++            "timezone": "UTC",
++        }
++
++    def test_direct_and_bot_handoff_pages_show_a_visible_required_phone_field(self):
++        for path in ("/c/test-coach", "/c/test-coach?name=Visitor%20Example"):
++            response = self.client.get(path)
++            page = response.get_data(as_text=True)
++
++            self.assertEqual(response.status_code, 200)
++            self.assertRegex(
++                page,
++                r'<input type="tel" name="phone"[^>]*required>',
++            )
++            self.assertNotIn('type="hidden" name="phone"', page)
++
++    def test_empty_phone_is_rejected_even_when_a_stale_session_value_exists(self):
++        with self.client.session_transaction() as session:
++            session["booking_phone"] = "+447734322560"
++
++        with patch("app.coach.public.create_event_with_meet") as create_event:
++            response = self.client.post(
++                "/api/book/test-coach",
++                json=self.booking_payload("   "),
++            )
++
++        self.assertEqual(response.status_code, 400)
++        self.assertEqual(
++            response.get_json(),
++            {"error": "Phone number is required to book a session."},
++        )
++        create_event.assert_not_called()
++        self.assertEqual(Booking.query.count(), 0)
++
++    def test_non_phone_value_is_rejected_before_calendar_event_creation(self):
++        with patch("app.coach.public.create_event_with_meet") as create_event:
++            response = self.client.post(
++                "/api/book/test-coach",
++                json=self.booking_payload("not-a-phone-number"),
++            )
++
++        self.assertEqual(response.status_code, 400)
++        self.assertEqual(
++            response.get_json(),
++            {"error": "Enter a valid phone number to book a session."},
++        )
++        create_event.assert_not_called()
++        self.assertEqual(Booking.query.count(), 0)
++
++    def test_valid_phone_is_normalized_and_saved_on_a_new_booking(self):
++        with patch(
++            "app.coach.public.create_event_with_meet",
++            return_value=("test-event-id", "https://meet.example.test/test"),
++        ), patch("app.coach.public.threading.Thread") as background_thread:
++            response = self.client.post(
++                "/api/book/test-coach",
++                json=self.booking_payload("+44 7734 322560"),
++            )
++
++        self.assertEqual(response.status_code, 200)
++        self.assertTrue(response.get_json()["ok"])
++        booking = Booking.query.one()
++        self.assertEqual(booking.visitor_phone, "+447734322560")
++        background_thread.assert_called_once()
++
++
++if __name__ == "__main__":
++    unittest.main()
+-- 
+2.43.0
+
+
+From faffdeec9ddfce643f02539a237e5295d7ef18d1 Mon Sep 17 00:00:00 2001
+From: truecosmic2025 <2.26357492e+08+truecosmic2025@users.noreply.github.com>
+Date: Mon, 21 Sep 2026 19:24:20 +0000
+Subject: [PATCH 2/2] Add owner-managed coach invitations
+
+---
+ app/__init__.py                    |   2 +-
+ app/auth/routes.py                 |  47 ++++++-
+ app/dashboard/routes.py            | 119 +++++++++++++++++-
+ app/models/__init__.py             |   1 +
+ app/models/coach_invite.py         |  45 +++++++
+ app/templates/auth/login.html      |   2 +-
+ app/templates/auth/register.html   |  90 ++++++-------
+ app/templates/base.html            |   2 -
+ app/templates/dashboard/owner.html |  39 +++++-
+ app/templates/index.html           |   4 +-
+ docs/COACH_INVITATION_HANDOFF.md   |  23 ++++
+ tests/test_coach_invites.py        | 196 +++++++++++++++++++++++++++++
+ 12 files changed, 513 insertions(+), 57 deletions(-)
+ create mode 100644 app/models/coach_invite.py
+ create mode 100644 docs/COACH_INVITATION_HANDOFF.md
+ create mode 100644 tests/test_coach_invites.py
+
+diff --git a/app/__init__.py b/app/__init__.py
+index 6afd23a..5d5f8b8 100644
+--- a/app/__init__.py
++++ b/app/__init__.py
+@@ -49,7 +49,7 @@ def create_app():
+     login_manager.init_app(app)
+ 
+     # Models import for SQLAlchemy configuration
+-    from .models.user import User  # noqa: F401
++    from .models import CoachInvite, User  # noqa: F401
+ 
+     # Blueprints
+     from .routes import main_bp
+diff --git a/app/auth/routes.py b/app/auth/routes.py
+index 291f0c4..11ca75b 100644
+--- a/app/auth/routes.py
++++ b/app/auth/routes.py
+@@ -5,10 +5,12 @@ from app.models.user import User
+ from app.models.coach_profile import CoachProfile
+ from app.models.coach_settings import CoachSettings
+ from app.models.booking import Booking
++from app.models.coach_invite import CoachInvite
+ from app.integrations.google_service import cancel_event
+ from functools import wraps
+ from urllib.parse import urlparse
+ from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
++from datetime import datetime
+ import os
+ 
+ # Reuse existing email sender used elsewhere in the app
+@@ -86,6 +88,15 @@ def _verify_reset_token(token: str, max_age_seconds: int = 3600) -> str | None:
+         return None
+ 
+ 
++def _usable_coach_invite(token: str) -> CoachInvite | None:
++    """Resolve one unused, unexpired invite without retaining its raw token."""
++    token = (token or "").strip()
++    if not token:
++        return None
++    invite = CoachInvite.query.filter_by(token_hash=CoachInvite.token_hash_for(token)).first()
++    return invite if invite and invite.is_usable() else None
++
++
+ @auth_bp.route("/forgot-password", methods=["GET", "POST"])
+ def forgot_password():
+     if request.method == "POST":
+@@ -158,6 +169,19 @@ def register():
+     if current_user.is_authenticated:
+         return redirect(url_for("main.index"))
+ 
++    first_registration = User.query.count() == 0
++    invite_token = (request.values.get("invite") or "").strip()
++    invite = None if first_registration else _usable_coach_invite(invite_token)
++
++    if not first_registration and not invite:
++        return render_template(
++            "auth/register.html",
++            invite=None,
++            invite_token="",
++            first_registration=False,
++            registration_locked=True,
++        )
++
+     if request.method == "POST":
+         name = request.form.get("name", "").strip()
+         email = request.form.get("email", "").strip().lower()
+@@ -169,11 +193,11 @@ def register():
+             flash("Please fill in all fields", "error")
+         elif password != password2:
+             flash("Passwords do not match", "error")
++        elif invite and email != invite.email:
++            flash("Use the email address that received this coach invitation.", "error")
+         elif User.query.filter_by(email=email).first():
+             flash("Email is already registered", "error")
+         else:
+-            # First registered user becomes owner; others are coaches (host)
+-            first = User.query.count() == 0
+             # Validate timezone (fallback to UTC if invalid)
+             try:
+                 import pytz
+@@ -181,14 +205,29 @@ def register():
+             except Exception:
+                 tz = "UTC"
+ 
+-            user = User(name=name, email=email, role=("owner" if first else "host"), timezone=tz)
++            user = User(
++                name=name,
++                email=email,
++                role=("owner" if first_registration else "host"),
++                timezone=tz,
++            )
+             user.set_password(password)
+             db.session.add(user)
++            db.session.flush()
++            if invite:
++                invite.accepted_by_user_id = user.id
++                invite.accepted_at = datetime.utcnow()
+             db.session.commit()
+             flash("Registration successful. You can now sign in.", "success")
+             return redirect(url_for("auth.login"))
+ 
+-    return render_template("auth/register.html")
++    return render_template(
++        "auth/register.html",
++        invite=invite,
++        invite_token=invite_token,
++        first_registration=first_registration,
++        registration_locked=False,
++    )
+ 
+ 
+ @auth_bp.route("/logout")
+diff --git a/app/dashboard/routes.py b/app/dashboard/routes.py
+index 98d7e1b..dc2024d 100644
+--- a/app/dashboard/routes.py
++++ b/app/dashboard/routes.py
+@@ -1,11 +1,14 @@
+ from collections import defaultdict
+ from datetime import datetime, timedelta, timezone
++import os
++import secrets
+ 
+-from flask import Blueprint, render_template, url_for
++from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+ from flask_login import login_required, current_user
++from email_validator import EmailNotValidError, validate_email
+ 
+ from app import db
+-from app.models import User, Booking, CoachProfile
++from app.models import User, Booking, CoachInvite, CoachProfile
+ from app.auth.routes import roles_required
+ 
+ 
+@@ -62,6 +65,105 @@ def _connection_state(coaches, profiles_by_user_id):
+     return disconnected
+ 
+ 
++def _coach_invite_form_token() -> str:
++    """Return the per-session CSRF token for the sensitive invite action."""
++    token = session.get("coach_invite_form_token")
++    if not token:
++        token = secrets.token_urlsafe(32)
++        session["coach_invite_form_token"] = token
++    return token
++
++
++def _public_url(endpoint: str, **values) -> str:
++    """Build a stable external URL, preferring a configured public base URL."""
++    path = url_for(endpoint, **values)
++    configured_base = (
++        os.getenv("PUBLIC_BASE_URL")
++        or os.getenv("APP_URL")
++        or os.getenv("EXTERNAL_BASE_URL")
++    )
++    if configured_base:
++        return configured_base.rstrip("/") + path
++    scheme = "https" if os.getenv("FORCE_HTTPS_URLS", "0") == "1" else None
++    if scheme:
++        return url_for(endpoint, _external=True, _scheme=scheme, **values)
++    return url_for(endpoint, _external=True, **values)
++
++
++@dash_bp.route("/owner/invite-coach", methods=["POST"])
++@login_required
++@roles_required("owner")
++def invite_coach():
++    submitted_token = request.form.get("csrf_token", "")
++    session_token = session.get("coach_invite_form_token", "")
++    if not submitted_token or not secrets.compare_digest(submitted_token, session_token):
++        flash("The invitation form expired. Please try again.", "error")
++        return redirect(url_for("dashboard.owner"))
++
++    name = (request.form.get("name") or "").strip()
++    raw_email = (request.form.get("email") or "").strip()
++    if not name or not raw_email:
++        flash("Enter the coach's name and email address.", "error")
++        return redirect(url_for("dashboard.owner"))
++
++    try:
++        email = validate_email(raw_email, check_deliverability=False).normalized.lower()
++    except EmailNotValidError:
++        flash("Enter a valid coach email address.", "error")
++        return redirect(url_for("dashboard.owner"))
++
++    if User.query.filter_by(email=email).first():
++        flash("That email already has an account. Manage it from People instead.", "error")
++        return redirect(url_for("dashboard.owner"))
++
++    now = datetime.utcnow()
++    # Reissuing an invitation revokes an earlier unused link for the same email.
++    CoachInvite.query.filter(
++        CoachInvite.email == email,
++        CoachInvite.accepted_at.is_(None),
++        CoachInvite.expires_at > now,
++    ).update({CoachInvite.expires_at: now}, synchronize_session=False)
++
++    invite, raw_token = CoachInvite.issue(
++        email=email,
++        name=name,
++        invited_by_user_id=current_user.id,
++        expires_in_days=7,
++    )
++    db.session.add(invite)
++    db.session.commit()
++
++    invite_url = _public_url("auth.register", invite=raw_token)
++    session["latest_coach_invite_url"] = invite_url
++    session["coach_invite_form_token"] = secrets.token_urlsafe(32)
++
++    try:
++        from app.coach.public import send_email
++
++        send_email(
++            "You're invited to join TrueCosmic Calendar",
++            "\n".join(
++                [
++                    f"Hi {name},",
++                    "",
++                    "You have been invited to join TrueCosmic Calendar as a coach.",
++                    "Create your account using this one-time link:",
++                    invite_url,
++                    "",
++                    "This link expires in 7 days and is tied to this email address.",
++                    "After creating your account, sign in, connect your Google Calendar, and set your availability.",
++                ]
++            ),
++            [email],
++        )
++    except Exception:
++        # The owner can still copy the generated link if outbound email is unavailable.
++        pass
++
++    flash(f"Coach invitation created for {email}. An email delivery was attempted.", "success")
++    return redirect(url_for("dashboard.owner"))
++
++
+ @dash_bp.route("/owner")
+ @login_required
+ @roles_required("owner", "admin")
+@@ -82,6 +184,16 @@ def owner():
+     profiles = CoachProfile.query.filter(CoachProfile.user_id.in_([coach.id for coach in coaches] or [-1])).all()
+     profiles_by_user_id = {profile.user_id: profile for profile in profiles}
+     disconnected_coaches = _connection_state(coaches, profiles_by_user_id)
++    invite_now = datetime.utcnow()
++    pending_invites = (
++        CoachInvite.query.filter(
++            CoachInvite.accepted_at.is_(None),
++            CoachInvite.expires_at > invite_now,
++        )
++        .order_by(CoachInvite.created_at.desc())
++        .limit(10)
++        .all()
++    )
+ 
+     upcoming = (
+         Booking.query.filter(
+@@ -165,6 +277,9 @@ def owner():
+         now=now,
+         tz_name=display_tz_name,
+         now_local_str=now_local_str,
++        pending_invites=pending_invites,
++        latest_invite_url=session.pop("latest_coach_invite_url", None),
++        coach_invite_form_token=_coach_invite_form_token(),
+     )
+ 
+ 
+diff --git a/app/models/__init__.py b/app/models/__init__.py
+index 7bf5282..1f4c027 100644
+--- a/app/models/__init__.py
++++ b/app/models/__init__.py
+@@ -2,3 +2,4 @@ from .user import User  # noqa: F401
+ from .coach_profile import CoachProfile  # noqa: F401
+ from .booking import Booking  # noqa: F401
+ from .coach_settings import CoachSettings  # noqa: F401
++from .coach_invite import CoachInvite  # noqa: F401
+diff --git a/app/models/coach_invite.py b/app/models/coach_invite.py
+new file mode 100644
+index 0000000..66f22d6
+--- /dev/null
++++ b/app/models/coach_invite.py
+@@ -0,0 +1,45 @@
++"""Persistent, one-time invitations for new coach accounts."""
++
++from datetime import datetime, timedelta
++import hashlib
++import secrets
++
++from app import db
++
++
++class CoachInvite(db.Model):
++    __tablename__ = "coach_invite"
++
++    id = db.Column(db.Integer, primary_key=True)
++    email = db.Column(db.String(255), nullable=False, index=True)
++    name = db.Column(db.String(120), nullable=False)
++    token_hash = db.Column(db.String(64), nullable=False, unique=True, index=True)
++    invited_by_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
++    accepted_by_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True, unique=True)
++    expires_at = db.Column(db.DateTime, nullable=False, index=True)
++    accepted_at = db.Column(db.DateTime, nullable=True, index=True)
++    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
++
++    inviter = db.relationship("User", foreign_keys=[invited_by_user_id])
++    accepted_by = db.relationship("User", foreign_keys=[accepted_by_user_id])
++
++    @staticmethod
++    def token_hash_for(token: str) -> str:
++        return hashlib.sha256(token.encode("utf-8")).hexdigest()
++
++    @classmethod
++    def issue(cls, *, email: str, name: str, invited_by_user_id: int, expires_in_days: int = 7):
++        """Create an invitation and return it with the only copy of its raw token."""
++        token = secrets.token_urlsafe(32)
++        invite = cls(
++            email=email.strip().lower(),
++            name=name.strip(),
++            token_hash=cls.token_hash_for(token),
++            invited_by_user_id=invited_by_user_id,
++            expires_at=datetime.utcnow() + timedelta(days=expires_in_days),
++        )
++        return invite, token
++
++    def is_usable(self, now: datetime | None = None) -> bool:
++        now = now or datetime.utcnow()
++        return self.accepted_at is None and self.expires_at > now
+diff --git a/app/templates/auth/login.html b/app/templates/auth/login.html
+index b1d2e95..a6ca33d 100644
+--- a/app/templates/auth/login.html
++++ b/app/templates/auth/login.html
+@@ -18,7 +18,7 @@
+         <a href="{{ url_for('auth.forgot_password') }}" class="text-sm text-brand-700 hover:underline">Forgot password?</a>
+       </div>
+     </form>
+-    <p class="mt-4 text-sm text-slate-600">Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-brand-700 hover:underline">Sign up free</a></p>
++    <p class="mt-4 text-sm text-slate-600">Need a coach account? Ask a TrueCosmic Calendar owner to send you an invitation link.</p>
+   </div>
+   </section>
+ {% endblock %}
+diff --git a/app/templates/auth/register.html b/app/templates/auth/register.html
+index 6cef55c..f5e31fb 100644
+--- a/app/templates/auth/register.html
++++ b/app/templates/auth/register.html
+@@ -1,64 +1,66 @@
+ {% extends "base.html" %}
+-{% block title %}Sign up | TrueCosmic Calendar{% endblock %}
++{% block title %}{{ 'Create owner account' if first_registration else 'Coach invitation' }} | TrueCosmic Calendar{% endblock %}
+ {% block content %}
+ <section class="py-16">
+   <div class="mx-auto max-w-md px-4">
+-    <h1 class="text-2xl font-bold text-slate-900">Create your account</h1>
+-    <form method="post" autocomplete="off" class="mt-6 space-y-4">
+-      <div>
+-        <label class="block text-sm font-medium text-slate-700">Name</label>
+-        <input name="name" autocomplete="off" spellcheck="false" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
++    {% if registration_locked %}
++      <div class="rounded-xl border border-amber-200 bg-amber-50 p-6">
++        <p class="text-xs font-bold uppercase tracking-wide text-amber-700">Coach access</p>
++        <h1 class="mt-2 text-2xl font-bold text-slate-900">A coach invitation is required</h1>
++        <p class="mt-3 text-sm leading-6 text-slate-700">Coach accounts can only be created with a current one-time invitation link. Ask a TrueCosmic Calendar owner to send an invitation to your email address.</p>
++        <a href="{{ url_for('auth.login') }}" class="mt-5 inline-flex rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white">Sign in</a>
+       </div>
+-      <div>
+-        <label class="block text-sm font-medium text-slate-700">Email</label>
+-        <input name="email" type="email" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+-      </div>
+-      <div>
+-        <label class="block text-sm font-medium text-slate-700">Password</label>
+-        <input name="password" type="password" minlength="8" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+-      </div>
+-      <div>
+-        <label class="block text-sm font-medium text-slate-700">Confirm password</label>
+-        <input name="password2" type="password" minlength="8" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+-      </div>
+-      <div>
+-        <label class="block text-sm font-medium text-slate-700">Time zone</label>
+-        <input name="timezone" id="timezone" value="UTC" list="tzlist" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+-        <datalist id="tzlist"></datalist>
+-        <p class="text-xs text-slate-500 mt-1">Detected from your browser: <span id="detectedTz">...</span></p>
+-      </div>
+-      <button class="w-full rounded-md bg-slate-900 px-4 py-2 text-white font-semibold">Create account</button>
+-    </form>
+-    <p class="mt-4 text-sm text-slate-600">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-brand-700 hover:underline">Sign in</a></p>
++    {% else %}
++      <p class="text-xs font-bold uppercase tracking-wide text-brand-600">{{ 'Initial setup' if first_registration else 'Coach invitation' }}</p>
++      <h1 class="mt-2 text-2xl font-bold text-slate-900">{{ 'Create the owner account' if first_registration else 'Create your coach account' }}</h1>
++      {% if invite %}
++        <p class="mt-3 rounded-xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm leading-6 text-brand-900">You are accepting a coach invitation for <strong>{{ invite.email }}</strong>. This one-time link expires on {{ invite.expires_at.strftime('%-d %b %Y, %-I:%M %p UTC') }}.</p>
++      {% endif %}
++      <form method="post" autocomplete="off" class="mt-6 space-y-4">
++        {% if invite %}<input type="hidden" name="invite" value="{{ invite_token }}">{% endif %}
++        <div>
++          <label class="block text-sm font-medium text-slate-700" for="name">Name</label>
++          <input id="name" name="name" value="{{ invite.name if invite else '' }}" autocomplete="name" spellcheck="false" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
++        </div>
++        <div>
++          <label class="block text-sm font-medium text-slate-700" for="email">Email</label>
++          <input id="email" name="email" type="email" value="{{ invite.email if invite else '' }}" autocomplete="email" {% if invite %}readonly{% endif %} required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 {% if invite %}bg-slate-50{% endif %}" />
++        </div>
++        <div>
++          <label class="block text-sm font-medium text-slate-700" for="password">Password</label>
++          <input id="password" name="password" type="password" minlength="8" autocomplete="new-password" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
++        </div>
++        <div>
++          <label class="block text-sm font-medium text-slate-700" for="password2">Confirm password</label>
++          <input id="password2" name="password2" type="password" minlength="8" autocomplete="new-password" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
++        </div>
++        <div>
++          <label class="block text-sm font-medium text-slate-700" for="timezone">Time zone</label>
++          <input name="timezone" id="timezone" value="UTC" list="tzlist" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
++          <datalist id="tzlist"></datalist>
++          <p class="mt-1 text-xs text-slate-500">Detected from your browser: <span id="detectedTz">...</span></p>
++        </div>
++        <button class="w-full rounded-md bg-slate-900 px-4 py-2 font-semibold text-white">{{ 'Create owner account' if first_registration else 'Create coach account' }}</button>
++      </form>
++      <p class="mt-4 text-sm text-slate-600">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-brand-700 hover:underline">Sign in</a></p>
++    {% endif %}
+   </div>
+-  </section>
++</section>
+ <script>
+-  // Detect browser timezone and prefill
+   (function(){
+     const tz = (Intl.DateTimeFormat && Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
+     const tzInput = document.getElementById('timezone');
+     const tzSpan = document.getElementById('detectedTz');
+     if (tzSpan) tzSpan.textContent = tz || 'Unavailable';
+-    if (tzInput && (!tzInput.value || tzInput.value.toUpperCase() === 'UTC')) {
+-      tzInput.value = tz;
+-    }
+-    // Populate datalist with supported IANA zones if available
++    if (tzInput && (!tzInput.value || tzInput.value.toUpperCase() === 'UTC')) tzInput.value = tz;
+     try {
+       const zones = (Intl.supportedValuesOf && Intl.supportedValuesOf('timeZone')) || [];
+       const dl = document.getElementById('tzlist');
+       if (dl) {
+-        if (zones.length) {
+-          zones.forEach(z => { const o = document.createElement('option'); o.value = z; dl.appendChild(o); });
+-        } else {
+-          ['UTC','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','Europe/London','Europe/Berlin','Asia/Kolkata','Asia/Tokyo','Australia/Sydney'].forEach(z=>{const o=document.createElement('option');o.value=z;dl.appendChild(o);});
+-        }
+-        // Ensure detected tz is included
+-        if (tz) {
+-          const exists = Array.from(dl.options).some(o => o.value === tz);
+-          if (!exists) { const o = document.createElement('option'); o.value = tz; dl.appendChild(o); }
+-        }
++        (zones.length ? zones : ['UTC','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','Europe/London','Europe/Berlin','Asia/Kolkata','Asia/Tokyo','Australia/Sydney']).forEach(zone => { const option = document.createElement('option'); option.value = zone; dl.appendChild(option); });
++        if (tz && !Array.from(dl.options).some(option => option.value === tz)) { const option = document.createElement('option'); option.value = tz; dl.appendChild(option); }
+       }
+-    } catch(e) { /* no-op */ }
++    } catch (e) { /* Browser time-zone suggestions are optional. */ }
+   })();
+ </script>
+ {% endblock %}
+diff --git a/app/templates/base.html b/app/templates/base.html
+index e17b034..2d21921 100644
+--- a/app/templates/base.html
++++ b/app/templates/base.html
+@@ -53,7 +53,6 @@
+               <a href="{{ url_for('auth.logout') }}" class="tc-btn-secondary !px-3 !py-2">Sign out</a>
+             {% else %}
+               <a href="{{ url_for('auth.login') }}" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-brand-50 hover:text-brand-800">Sign in</a>
+-              <a href="{{ url_for('auth.register') }}" class="tc-btn-primary !px-3.5 !py-2">Sign up free</a>
+             {% endif %}
+           </div>
+           <button id="mobileMenuBtn" class="inline-flex items-center justify-center rounded-xl p-2 text-brand-800 transition hover:bg-brand-50 md:hidden" aria-label="Open navigation" aria-controls="mobileMenu" aria-expanded="false">
+@@ -84,7 +83,6 @@
+             <a class="block rounded-lg px-3 py-2 hover:bg-brand-50" href="/coaches">Coaches</a>
+             <div class="mt-2 flex gap-2 border-t border-brand-100 pt-3">
+               <a href="{{ url_for('auth.login') }}" class="tc-btn-secondary flex-1">Sign in</a>
+-              <a href="{{ url_for('auth.register') }}" class="tc-btn-primary flex-1">Sign up free</a>
+             </div>
+           {% endif %}
+         </div>
+diff --git a/app/templates/dashboard/owner.html b/app/templates/dashboard/owner.html
+index 0df6e79..e0bbfa9 100644
+--- a/app/templates/dashboard/owner.html
++++ b/app/templates/dashboard/owner.html
+@@ -9,7 +9,10 @@
+         <h1 class="mt-2 font-display text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl">The coaching pulse</h1>
+         <p class="mt-2 text-sm text-slate-600 sm:text-base">A clear view of demand, capacity, and the week ahead. Current time in <span class="font-semibold text-brand-800">{{ tz_name }}</span>: {{ now_local_str }}</p>
+       </div>
+-      <a class="tc-btn-secondary" href="{{ url_for('admin.meetings_report') }}">Open meetings report</a>
++      <div class="flex flex-wrap gap-3">
++        {% if current_user.role == 'owner' %}<a class="tc-btn-primary" href="#invite-coach">Invite a coach</a>{% endif %}
++        <a class="tc-btn-secondary" href="{{ url_for('admin.meetings_report') }}">Open meetings report</a>
++      </div>
+     </div>
+ 
+     <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+@@ -20,6 +23,40 @@
+       <div class="tc-kpi {{ 'bg-emerald-50/70' if kpis.connection_rate == 100 else 'bg-amber-50/80' }}"><p class="text-xs font-bold uppercase tracking-wide text-slate-500">Google connected</p><p class="mt-2 text-3xl font-bold text-brand-950">{{ kpis.connected }}<span class="text-lg text-slate-400">/{{ kpis.coaches }}</span></p><p class="mt-1 text-sm {{ 'text-emerald-700' if kpis.connection_rate == 100 else 'text-amber-800' }}">{{ kpis.connection_rate }}% connected</p></div>
+     </div>
+ 
++    {% if current_user.role == 'owner' %}
++    <section id="invite-coach" class="mt-7 grid gap-6 xl:grid-cols-3">
++      <article class="tc-card p-5 sm:p-6 xl:col-span-2">
++        <p class="text-xs font-bold uppercase tracking-wide text-brand-600">Team access</p>
++        <h2 class="mt-1 text-xl font-bold text-brand-950">Invite a coach</h2>
++        <p class="mt-1 max-w-2xl text-sm leading-6 text-slate-600">A one-time account link will be emailed to the coach and expires after seven days. Their email address is locked to that invitation.</p>
++        <form method="post" action="{{ url_for('dashboard.invite_coach') }}" class="mt-5 grid gap-4 sm:grid-cols-2">
++          <input type="hidden" name="csrf_token" value="{{ coach_invite_form_token }}">
++          <div><label class="tc-label" for="invite-name">Coach name</label><input id="invite-name" name="name" autocomplete="name" required class="tc-input" placeholder="Coach's name"></div>
++          <div><label class="tc-label" for="invite-email">Coach email</label><input id="invite-email" name="email" type="email" autocomplete="email" required class="tc-input" placeholder="coach@example.com"></div>
++          <div class="sm:col-span-2"><button type="submit" class="tc-btn-primary">Create and email invite</button></div>
++        </form>
++        {% if latest_invite_url %}
++        <div class="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
++          <p class="font-semibold text-emerald-900">Coach invite link created</p>
++          <p class="mt-1 text-sm text-emerald-800">Copy this only if you need to send the invite manually. It is shown once in this dashboard.</p>
++          <div class="mt-3 flex flex-col gap-2 sm:flex-row"><input id="latestInviteUrl" readonly value="{{ latest_invite_url }}" class="tc-input !bg-white text-xs"><button type="button" class="tc-btn-secondary shrink-0" onclick="const field=document.getElementById('latestInviteUrl'); navigator.clipboard.writeText(field.value).then(() => this.textContent='Copied').catch(() => { field.select(); document.execCommand('copy'); this.textContent='Copied'; });">Copy link</button></div>
++        </div>
++        {% endif %}
++      </article>
++
++      <article class="tc-card overflow-hidden">
++        <div class="border-b border-brand-100 px-5 py-5 sm:px-6"><p class="text-xs font-bold uppercase tracking-wide text-brand-600">Outstanding</p><h2 class="mt-1 text-xl font-bold text-brand-950">Pending invitations</h2></div>
++        {% if pending_invites %}
++          <ul class="divide-y divide-brand-100 px-5 sm:px-6">
++            {% for invite in pending_invites %}<li class="py-4"><p class="font-semibold text-slate-900">{{ invite.name }}</p><p class="break-anywhere mt-1 text-sm text-slate-500">{{ invite.email }}</p><p class="mt-1 text-xs text-slate-400">Expires {{ invite.expires_at.strftime('%-d %b %Y, %-I:%M %p UTC') }}</p></li>{% endfor %}
++          </ul>
++        {% else %}
++          <div class="px-5 py-8 text-center text-sm text-slate-500 sm:px-6">No pending coach invitations.</div>
++        {% endif %}
++      </article>
++    </section>
++    {% endif %}
++
+     <div class="mt-7 grid gap-6 lg:grid-cols-3">
+       <article class="tc-card p-5 sm:p-6 lg:col-span-2">
+         <div class="flex items-start justify-between gap-4">
+diff --git a/app/templates/index.html b/app/templates/index.html
+index cc9a329..2ce7b56 100644
+--- a/app/templates/index.html
++++ b/app/templates/index.html
+@@ -14,10 +14,10 @@
+             Remove the back-and-forth of finding time. Share your link and let people pick a time that works for both of you — automatically across time zones.
+           </p>
+           <div id="cta" class="mt-8 flex flex-col sm:flex-row gap-3">
+-            <a href="{{ url_for('auth.register') }}" class="inline-flex items-center justify-center rounded-md bg-slate-900 px-6 py-3 text-base font-semibold text-white shadow hover:bg-slate-800">Sign up free</a>
++            <a href="{{ url_for('auth.login') }}" class="inline-flex items-center justify-center rounded-md bg-slate-900 px-6 py-3 text-base font-semibold text-white shadow hover:bg-slate-800">Coach sign in</a>
+             <a href="#features" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-6 py-3 text-base font-semibold text-slate-700 hover:bg-slate-50">See how it works</a>
+           </div>
+-          <p class="mt-4 text-xs text-slate-500">No credit card required</p>
++          <p class="mt-4 text-xs text-slate-500">Coach accounts are created by invitation.</p>
+         </div>
+         <div class="relative">
+           <div class="absolute -top-16 -left-16 h-64 w-64 rounded-full bg-brand-300 blur-3xl opacity-50 pointer-events-none"></div>
+diff --git a/docs/COACH_INVITATION_HANDOFF.md b/docs/COACH_INVITATION_HANDOFF.md
+new file mode 100644
+index 0000000..86025a9
+--- /dev/null
++++ b/docs/COACH_INVITATION_HANDOFF.md
+@@ -0,0 +1,23 @@
++# Owner-Managed Coach Invitations
++
++## What changed
++
++New coach accounts are now **invitation-only**. Once the app has an owner account, opening `/auth/register` without a current invitation shows an access-required message and does not present an account form. The original first-account bootstrap remains available only while the user table is empty; it creates the initial owner account exactly as before.
++
++An owner can create coach invitations from **Dashboard → Invite a coach**. The form collects the coach’s name and email address, creates a high-entropy one-time registration link, and attempts delivery through the app’s configured email provider. The link is tied to the invited email address and expires after **seven days**. The dashboard shows a newly created link once for manual copying if email delivery is unavailable, as well as a list of pending invitations.
++
++## Coach onboarding steps
++
++A coach opens the emailed invitation link, creates a password, and selects a time zone. The account is created with the `host` role. The coach then signs in, opens **Account**, selects **Connect Google Calendar**, and configures availability. After Google Calendar is connected, their public booking address is available as `https://calendar.truecosmic.com/c/<coach-slug>`; it can be copied from the coach directory.
++
++## Security behavior
++
++The app stores only a SHA-256 digest of each invitation token, not the raw token. An invitation cannot be reused after account creation. An invitation also cannot be accepted for a different email address. When an owner re-invites the same address, the earlier unused invitation is revoked immediately. The owner-only invite action has a per-session CSRF token, and only the `owner` role can create invitations. Administrators can see the main dashboard but cannot issue invitations.
++
++## Deployment requirements
++
++Deploy the application normally. The existing `db.create_all()` startup path creates the new `coach_invite` table automatically. No existing table or Google OAuth setting is changed. Confirm that the production email configuration is still enabled; if email delivery cannot be configured, the owner may copy the one-time link shown immediately after creating an invite and send it through an approved internal channel.
++
++## Production verification
++
++After deployment, sign in as an owner and create an invitation for a controlled test email. Confirm that `/auth/register` is locked without the invitation, the invitation link prefills and locks the invited email, the completed account has the `host` role, and using the same link again is rejected. Confirm that the new coach can sign in, connect Google Calendar, save availability, and receive a working `/c/<slug>` booking link.
+diff --git a/tests/test_coach_invites.py b/tests/test_coach_invites.py
+new file mode 100644
+index 0000000..de90094
+--- /dev/null
++++ b/tests/test_coach_invites.py
+@@ -0,0 +1,196 @@
++"""Security and workflow coverage for owner-created coach invitations."""
++
++import os
++import re
++import unittest
++from urllib.parse import parse_qs, urlparse
++from unittest.mock import patch
++
++os.environ["DATABASE_URL"] = "sqlite://"
++os.environ["EMAIL_ENABLED"] = "false"
++
++from app import create_app, db
++from app.models.coach_invite import CoachInvite
++from app.models.user import User
++
++
++class CoachInvitationTests(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        cls.app = create_app()
++        cls.app.config.update(TESTING=True, SECRET_KEY="test-invite-secret")
++
++    @classmethod
++    def tearDownClass(cls):
++        with cls.app.app_context():
++            db.drop_all()
++
++    def setUp(self):
++        self.context = self.app.app_context()
++        self.context.push()
++        db.drop_all()
++        db.create_all()
++        self.owner = self.make_user("Owner", "owner@example.test", "owner")
++        self.client = self.app.test_client()
++
++    def tearDown(self):
++        db.session.remove()
++        self.context.pop()
++
++    @staticmethod
++    def password():
++        return "secure-test-password"
++
++    def make_user(self, name, email, role):
++        user = User(name=name, email=email, role=role, timezone="UTC")
++        user.set_password(self.password())
++        db.session.add(user)
++        db.session.commit()
++        return user
++
++    def login_as_owner(self):
++        response = self.client.post(
++            "/auth/login",
++            data={"email": self.owner.email, "password": self.password()},
++        )
++        self.assertEqual(response.status_code, 302)
++
++    def invite_form_token(self):
++        dashboard = self.client.get("/dashboard/owner")
++        self.assertEqual(dashboard.status_code, 200)
++        match = re.search(r'name="csrf_token" value="([^"]+)"', dashboard.get_data(as_text=True))
++        self.assertIsNotNone(match)
++        return match.group(1)
++
++    def issue_via_owner_form(self, name="New Coach", email="coach@truecosmic.com"):
++        self.login_as_owner()
++        csrf_token = self.invite_form_token()
++        with patch("app.coach.public.send_email") as send_email:
++            response = self.client.post(
++                "/dashboard/owner/invite-coach",
++                data={"name": name, "email": email, "csrf_token": csrf_token},
++            )
++        self.assertEqual(response.status_code, 302)
++        send_email.assert_called_once()
++        with self.client.session_transaction() as session:
++            invite_url = session["latest_coach_invite_url"]
++        token = parse_qs(urlparse(invite_url).query)["invite"][0]
++        invite = CoachInvite.query.filter_by(token_hash=CoachInvite.token_hash_for(token)).one()
++        return invite, token
++
++    def test_open_registration_is_locked_after_owner_exists(self):
++        response = self.client.get("/auth/register")
++
++        self.assertEqual(response.status_code, 200)
++        self.assertIn(b"A coach invitation is required", response.data)
++        self.assertNotIn(b'name="password"', response.data)
++
++    def test_owner_can_email_a_one_time_invitation_and_coach_can_accept_it(self):
++        invite, token = self.issue_via_owner_form()
++        self.client.get("/auth/logout")
++
++        registration_page = self.client.get(f"/auth/register?invite={token}")
++        self.assertEqual(registration_page.status_code, 200)
++        self.assertIn(b"Create your coach account", registration_page.data)
++        self.assertIn(b"coach@truecosmic.com", registration_page.data)
++
++        registration = self.client.post(
++            "/auth/register",
++            data={
++                "invite": token,
++                "name": "New Coach",
++                "email": "coach@truecosmic.com",
++                "password": self.password(),
++                "password2": self.password(),
++                "timezone": "Europe/London",
++            },
++        )
++
++        self.assertEqual(registration.status_code, 302)
++        self.assertTrue(registration.headers["Location"].endswith("/auth/login"))
++        coach = User.query.filter_by(email="coach@truecosmic.com").one()
++        self.assertEqual(coach.role, "host")
++        self.assertEqual(coach.timezone, "Europe/London")
++        self.assertEqual(invite.accepted_by_user_id, coach.id)
++        self.assertIsNotNone(invite.accepted_at)
++
++    def test_invitation_cannot_be_reused_or_used_with_another_email(self):
++        invite, token = self.issue_via_owner_form(email="single-use@truecosmic.com")
++        self.client.get("/auth/logout")
++        accepted = self.client.post(
++            "/auth/register",
++            data={
++                "invite": token,
++                "name": "Single Use",
++                "email": "single-use@truecosmic.com",
++                "password": self.password(),
++                "password2": self.password(),
++                "timezone": "UTC",
++            },
++        )
++        self.assertEqual(accepted.status_code, 302)
++
++        reused = self.client.get(f"/auth/register?invite={token}")
++        self.assertEqual(reused.status_code, 200)
++        self.assertIn(b"A coach invitation is required", reused.data)
++        self.assertEqual(User.query.filter_by(email="single-use@truecosmic.com").count(), 1)
++
++        second_invite, second_token = CoachInvite.issue(
++            email="bound-email@truecosmic.com",
++            name="Bound Email Coach",
++            invited_by_user_id=self.owner.id,
++        )
++        db.session.add(second_invite)
++        db.session.commit()
++        wrong_email = self.client.post(
++            "/auth/register",
++            data={
++                "invite": second_token,
++                "name": "Bound Email Coach",
++                "email": "other@truecosmic.com",
++                "password": self.password(),
++                "password2": self.password(),
++                "timezone": "UTC",
++            },
++        )
++        self.assertEqual(wrong_email.status_code, 200)
++        self.assertIn(b"Use the email address that received this coach invitation.", wrong_email.data)
++        self.assertEqual(User.query.filter_by(email="other@truecosmic.com").count(), 0)
++        self.assertIsNone(second_invite.accepted_at)
++        self.assertIsNotNone(invite.accepted_at)
++
++    def test_reissuing_an_invite_invalidates_the_earlier_link(self):
++        first_invite, first_token = self.issue_via_owner_form(email="replace@truecosmic.com")
++        second_invite, second_token = self.issue_via_owner_form(email="replace@truecosmic.com")
++
++        self.assertLessEqual(first_invite.expires_at, second_invite.created_at)
++        self.assertNotEqual(first_token, second_token)
++        self.client.get("/auth/logout")
++        expired_page = self.client.get(f"/auth/register?invite={first_token}")
++        current_page = self.client.get(f"/auth/register?invite={second_token}")
++        self.assertIn(b"A coach invitation is required", expired_page.data)
++        self.assertIn(b"Create your coach account", current_page.data)
++
++    def test_first_registration_still_creates_the_initial_owner(self):
++        db.session.query(CoachInvite).delete()
++        db.session.query(User).delete()
++        db.session.commit()
++        db.session.expunge_all()
++
++        response = self.client.post(
++            "/auth/register",
++            data={
++                "name": "Initial Owner",
++                "email": "initial-owner@example.test",
++                "password": self.password(),
++                "password2": self.password(),
++                "timezone": "UTC",
++            },
++        )
++
++        self.assertEqual(response.status_code, 302)
++        self.assertEqual(User.query.filter_by(email="initial-owner@example.test").one().role, "owner")
++
++
++if __name__ == "__main__":
++    unittest.main()
+-- 
+2.43.0
+

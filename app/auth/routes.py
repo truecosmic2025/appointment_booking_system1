@@ -5,10 +5,12 @@ from app.models.user import User
 from app.models.coach_profile import CoachProfile
 from app.models.coach_settings import CoachSettings
 from app.models.booking import Booking
+from app.models.coach_invite import CoachInvite
 from app.integrations.google_service import cancel_event
 from functools import wraps
 from urllib.parse import urlparse
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+from datetime import datetime
 import os
 
 # Reuse existing email sender used elsewhere in the app
@@ -86,6 +88,15 @@ def _verify_reset_token(token: str, max_age_seconds: int = 3600) -> str | None:
         return None
 
 
+def _usable_coach_invite(token: str) -> CoachInvite | None:
+    """Resolve one unused, unexpired invite without retaining its raw token."""
+    token = (token or "").strip()
+    if not token:
+        return None
+    invite = CoachInvite.query.filter_by(token_hash=CoachInvite.token_hash_for(token)).first()
+    return invite if invite and invite.is_usable() else None
+
+
 @auth_bp.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
     if request.method == "POST":
@@ -158,6 +169,19 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
 
+    first_registration = User.query.count() == 0
+    invite_token = (request.values.get("invite") or "").strip()
+    invite = None if first_registration else _usable_coach_invite(invite_token)
+
+    if not first_registration and not invite:
+        return render_template(
+            "auth/register.html",
+            invite=None,
+            invite_token="",
+            first_registration=False,
+            registration_locked=True,
+        )
+
     if request.method == "POST":
         name = request.form.get("name", "").strip()
         email = request.form.get("email", "").strip().lower()
@@ -169,11 +193,11 @@ def register():
             flash("Please fill in all fields", "error")
         elif password != password2:
             flash("Passwords do not match", "error")
+        elif invite and email != invite.email:
+            flash("Use the email address that received this coach invitation.", "error")
         elif User.query.filter_by(email=email).first():
             flash("Email is already registered", "error")
         else:
-            # First registered user becomes owner; others are coaches (host)
-            first = User.query.count() == 0
             # Validate timezone (fallback to UTC if invalid)
             try:
                 import pytz
@@ -181,14 +205,29 @@ def register():
             except Exception:
                 tz = "UTC"
 
-            user = User(name=name, email=email, role=("owner" if first else "host"), timezone=tz)
+            user = User(
+                name=name,
+                email=email,
+                role=("owner" if first_registration else "host"),
+                timezone=tz,
+            )
             user.set_password(password)
             db.session.add(user)
+            db.session.flush()
+            if invite:
+                invite.accepted_by_user_id = user.id
+                invite.accepted_at = datetime.utcnow()
             db.session.commit()
             flash("Registration successful. You can now sign in.", "success")
             return redirect(url_for("auth.login"))
 
-    return render_template("auth/register.html")
+    return render_template(
+        "auth/register.html",
+        invite=invite,
+        invite_token=invite_token,
+        first_registration=first_registration,
+        registration_locked=False,
+    )
 
 
 @auth_bp.route("/logout")

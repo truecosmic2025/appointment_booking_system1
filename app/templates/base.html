@@ -53,7 +53,6 @@
               <a href="{{ url_for('auth.logout') }}" class="tc-btn-secondary !px-3 !py-2">Sign out</a>
             {% else %}
               <a href="{{ url_for('auth.login') }}" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-brand-50 hover:text-brand-800">Sign in</a>
-              <a href="{{ url_for('auth.register') }}" class="tc-btn-primary !px-3.5 !py-2">Sign up free</a>
             {% endif %}
           </div>
           <button id="mobileMenuBtn" class="inline-flex items-center justify-center rounded-xl p-2 text-brand-800 transition hover:bg-brand-50 md:hidden" aria-label="Open navigation" aria-controls="mobileMenu" aria-expanded="false">
@@ -84,7 +83,6 @@
             <a class="block rounded-lg px-3 py-2 hover:bg-brand-50" href="/coaches">Coaches</a>
             <div class="mt-2 flex gap-2 border-t border-brand-100 pt-3">
               <a href="{{ url_for('auth.login') }}" class="tc-btn-secondary flex-1">Sign in</a>
-              <a href="{{ url_for('auth.register') }}" class="tc-btn-primary flex-1">Sign up free</a>
             </div>
           {% endif %}
         </div>

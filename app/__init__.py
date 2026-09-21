@@ -49,7 +49,7 @@ def create_app():
     login_manager.init_app(app)
 
     # Models import for SQLAlchemy configuration
-    from .models.user import User  # noqa: F401
+    from .models import CoachInvite, User  # noqa: F401
 
     # Blueprints
     from .routes import main_bp

@@ -1,11 +1,14 @@
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
+import os
+import secrets
 
-from flask import Blueprint, render_template, url_for
+from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from flask_login import login_required, current_user
+from email_validator import EmailNotValidError, validate_email
 
 from app import db
-from app.models import User, Booking, CoachProfile
+from app.models import User, Booking, CoachInvite, CoachProfile
 from app.auth.routes import roles_required
 
 
@@ -62,6 +65,105 @@ def _connection_state(coaches, profiles_by_user_id):
     return disconnected
 
 
+def _coach_invite_form_token() -> str:
+    """Return the per-session CSRF token for the sensitive invite action."""
+    token = session.get("coach_invite_form_token")
+    if not token:
+        token = secrets.token_urlsafe(32)
+        session["coach_invite_form_token"] = token
+    return token
+
+
+def _public_url(endpoint: str, **values) -> str:
+    """Build a stable external URL, preferring a configured public base URL."""
+    path = url_for(endpoint, **values)
+    configured_base = (
+        os.getenv("PUBLIC_BASE_URL")
+        or os.getenv("APP_URL")
+        or os.getenv("EXTERNAL_BASE_URL")
+    )
+    if configured_base:
+        return configured_base.rstrip("/") + path
+    scheme = "https" if os.getenv("FORCE_HTTPS_URLS", "0") == "1" else None
+    if scheme:
+        return url_for(endpoint, _external=True, _scheme=scheme, **values)
+    return url_for(endpoint, _external=True, **values)
+
+
+@dash_bp.route("/owner/invite-coach", methods=["POST"])
+@login_required
+@roles_required("owner")
+def invite_coach():
+    submitted_token = request.form.get("csrf_token", "")
+    session_token = session.get("coach_invite_form_token", "")
+    if not submitted_token or not secrets.compare_digest(submitted_token, session_token):
+        flash("The invitation form expired. Please try again.", "error")
+        return redirect(url_for("dashboard.owner"))
+
+    name = (request.form.get("name") or "").strip()
+    raw_email = (request.form.get("email") or "").strip()
+    if not name or not raw_email:
+        flash("Enter the coach's name and email address.", "error")
+        return redirect(url_for("dashboard.owner"))
+
+    try:
+        email = validate_email(raw_email, check_deliverability=False).normalized.lower()
+    except EmailNotValidError:
+        flash("Enter a valid coach email address.", "error")
+        return redirect(url_for("dashboard.owner"))
+
+    if User.query.filter_by(email=email).first():
+        flash("That email already has an account. Manage it from People instead.", "error")
+        return redirect(url_for("dashboard.owner"))
+
+    now = datetime.utcnow()
+    # Reissuing an invitation revokes an earlier unused link for the same email.
+    CoachInvite.query.filter(
+        CoachInvite.email == email,
+        CoachInvite.accepted_at.is_(None),
+        CoachInvite.expires_at > now,
+    ).update({CoachInvite.expires_at: now}, synchronize_session=False)
+
+    invite, raw_token = CoachInvite.issue(
+        email=email,
+        name=name,
+        invited_by_user_id=current_user.id,
+        expires_in_days=7,
+    )
+    db.session.add(invite)
+    db.session.commit()
+
+    invite_url = _public_url("auth.register", invite=raw_token)
+    session["latest_coach_invite_url"] = invite_url
+    session["coach_invite_form_token"] = secrets.token_urlsafe(32)
+
+    try:
+        from app.coach.public import send_email
+
+        send_email(
+            "You're invited to join TrueCosmic Calendar",
+            "\n".join(
+                [
+                    f"Hi {name},",
+                    "",
+                    "You have been invited to join TrueCosmic Calendar as a coach.",
+                    "Create your account using this one-time link:",
+                    invite_url,
+                    "",
+                    "This link expires in 7 days and is tied to this email address.",
+                    "After creating your account, sign in, connect your Google Calendar, and set your availability.",
+                ]
+            ),
+            [email],
+        )
+    except Exception:
+        # The owner can still copy the generated link if outbound email is unavailable.
+        pass
+
+    flash(f"Coach invitation created for {email}. An email delivery was attempted.", "success")
+    return redirect(url_for("dashboard.owner"))
+
+
 @dash_bp.route("/owner")
 @login_required
 @roles_required("owner", "admin")
@@ -82,6 +184,16 @@ def owner():
     profiles = CoachProfile.query.filter(CoachProfile.user_id.in_([coach.id for coach in coaches] or [-1])).all()
     profiles_by_user_id = {profile.user_id: profile for profile in profiles}
     disconnected_coaches = _connection_state(coaches, profiles_by_user_id)
+    invite_now = datetime.utcnow()
+    pending_invites = (
+        CoachInvite.query.filter(
+            CoachInvite.accepted_at.is_(None),
+            CoachInvite.expires_at > invite_now,
+        )
+        .order_by(CoachInvite.created_at.desc())
+        .limit(10)
+        .all()
+    )
 
     upcoming = (
         Booking.query.filter(
@@ -165,6 +277,9 @@ def owner():
         now=now,
         tz_name=display_tz_name,
         now_local_str=now_local_str,
+        pending_invites=pending_invites,
+        latest_invite_url=session.pop("latest_coach_invite_url", None),
+        coach_invite_form_token=_coach_invite_form_token(),
     )
 
 
