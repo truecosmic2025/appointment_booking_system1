@@ -226,4 +226,43 @@ def create_app():
         db.session.commit()
         click.echo(f"Deleted: users={u}, coach_profiles={p}, bookings={b}")
 
+    @app.cli.command("fix-hadassah-slug")
+    def fix_hadassah_slug():
+        """Correct the misspelled coach slug 'hadasssah-headley' to 'hadassah-headley'."""
+        from .models.coach_profile import CoachProfile
+
+        old_slug = "hadasssah-headley"
+        new_slug = "hadassah-headley"
+
+        with app.app_context():
+            # Guard against unique constraint conflicts
+            existing = CoachProfile.query.filter_by(slug=new_slug).first()
+            if existing:
+                click.echo(f"FAILED: slug '{new_slug}' already exists (coach profile id={existing.id}). No changes made.")
+                return
+
+            prof = CoachProfile.query.filter_by(slug=old_slug).first()
+            if not prof:
+                click.echo(f"FAILED: no coach profile found with slug '{old_slug}'. No changes made.")
+                return
+
+            try:
+                prof.slug = new_slug
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                click.echo(f"FAILED: could not update slug: {e}")
+                return
+
+            # Verify the change
+            verified = CoachProfile.query.filter_by(slug=new_slug).first()
+            if not verified or CoachProfile.query.filter_by(slug=old_slug).first():
+                click.echo("FAILED: verification failed after update.")
+                return
+
+            user = verified.user
+            click.echo(f"Coach name: {user.name if user else 'N/A'}")
+            click.echo(f"Coach email: {user.email if user else 'N/A'}")
+            click.echo(f"SUCCESS: slug updated from '{old_slug}' to '{new_slug}'.")
+
     return app
