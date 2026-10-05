@@ -138,3 +138,48 @@ def meetings_report():
         selected_coach_id=selected_coach_id,
         now=now,
     )
+
+
+@admin_bp.route("/fix-hadassah-slug", methods=["POST"])
+@login_required
+def fix_hadassah_slug():
+    """TEMPORARY: Fix hadassah-headley slug mismatch. REMOVE AFTER USE."""
+    from app.models.coach_profile import CoachProfile
+    from flask import jsonify
+
+    if not current_user.is_authenticated or current_user.role != "owner":
+        return jsonify({"error": "admin only"}), 403
+
+    old_slug = "hadasssah-headley"
+    new_slug = "hadassah-headley"
+
+    # Check for conflicts
+    existing = CoachProfile.query.filter_by(slug=new_slug).first()
+    if existing:
+        return jsonify({"error": f"slug '{new_slug}' already exists"}), 409
+
+    # Find misspelled row
+    prof = CoachProfile.query.filter_by(slug=old_slug).first()
+    if not prof:
+        return jsonify({"error": f"no profile with slug '{old_slug}'"}), 404
+
+    # Update
+    try:
+        prof.slug = new_slug
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+    # Verify
+    verified = CoachProfile.query.filter_by(slug=new_slug).first()
+    if not verified:
+        return jsonify({"error": "verification failed"}), 500
+
+    return jsonify({
+        "success": True,
+        "coach_name": verified.user.name,
+        "coach_email": verified.user.email,
+        "slug": verified.slug,
+        "message": "Slug updated. DELETE THIS ENDPOINT NEXT."
+    }), 200
