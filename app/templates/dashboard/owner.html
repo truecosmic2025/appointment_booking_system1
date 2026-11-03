@@ -101,11 +101,22 @@
         <div class="border-b border-brand-100 px-5 py-5 sm:px-6"><p class="text-xs font-bold uppercase tracking-wide text-brand-600">Capacity view</p><h2 class="mt-1 text-xl font-bold text-brand-950">Coach momentum</h2><p class="mt-1 text-sm text-slate-500">Requests created in the last 30 days.</p></div>
         <div class="divide-y divide-brand-100">
           {% for insight in coach_insights %}
-            <div class="px-5 py-4 sm:px-6"><div class="flex items-start justify-between gap-4"><div class="min-w-0"><p class="truncate font-semibold text-slate-900">{{ insight.coach.name }}</p><p class="mt-1 text-sm text-slate-500">{{ insight.bookings_30 }} requests · {{ insight.upcoming_7 }} upcoming</p></div><span class="tc-badge {{ 'bg-emerald-50 text-emerald-700' if insight.profile and insight.profile.google_credentials else 'bg-amber-50 text-amber-800' }}">{{ 'Connected' if insight.profile and insight.profile.google_credentials else 'Not connected' }}</span></div>
+            <div class="px-5 py-4 sm:px-6"><div class="flex items-start justify-between gap-4"><div class="min-w-0"><p class="truncate font-semibold text-slate-900">{{ insight.coach.name }}</p><p class="mt-1 text-sm text-slate-500">{{ insight.bookings_30 }} requests · {{ insight.upcoming_7 }} upcoming</p>{% if insight.sources %}<p class="mt-1 text-xs text-slate-500">{% for s in insight.sources %}{{ s.label }}: {{ s.count }}{% if not loop.last %} · {% endif %}{% endfor %}</p>{% endif %}</div><span class="tc-badge {{ 'bg-emerald-50 text-emerald-700' if insight.profile and insight.profile.google_credentials else 'bg-amber-50 text-amber-800' }}">{{ 'Connected' if insight.profile and insight.profile.google_credentials else 'Not connected' }}</span></div>
               <div class="mt-3 flex h-7 items-end gap-0.5" aria-label="Eight-week booking trend">{% for value in insight.trend.series %}<span class="flex-1 rounded-t bg-brand-300" style="height: {{ (value / insight.trend.max * 100) if value else 7 }}%" title="{{ value }} request{{ '' if value == 1 else 's' }}"></span>{% endfor %}</div>
             </div>
           {% else %}
             <div class="px-5 py-10 text-center text-sm text-slate-500 sm:px-6">No active coaches to show.</div>
+          {% endfor %}
+        </div>
+      </article>
+
+      <article class="tc-card overflow-hidden">
+        <div class="border-b border-brand-100 px-5 py-5 sm:px-6"><p class="text-xs font-bold uppercase tracking-wide text-brand-600">Lead sources</p><h2 class="mt-1 text-xl font-bold text-brand-950">Where bookings come from</h2><p class="mt-1 text-sm text-slate-500">Requests created in the last 30 days, by the route that sent them.</p></div>
+        <div class="divide-y divide-brand-100">
+          {% for row in booking_sources %}
+            <div class="flex items-center justify-between gap-4 px-5 py-3 sm:px-6"><p class="font-semibold text-slate-900">{{ row.label }}</p><p class="text-sm text-slate-500">{{ row.bookings }} request{{ '' if row.bookings == 1 else 's' }}{% if row.cancelled %} · {{ row.cancelled }} cancelled{% endif %}</p></div>
+          {% else %}
+            <div class="px-5 py-10 text-center text-sm text-slate-500 sm:px-6">No bookings in the last 30 days.</div>
           {% endfor %}
         </div>
       </article>

@@ -138,7 +138,7 @@ bookForm.addEventListener('submit', async (e)=>{
   e.preventDefault();
   if(!selectedStart){ alert('Select a time'); return; }
   const form = new FormData(bookForm);
-  const payload = { name: form.get('name'), email: form.get('email'), phone: form.get('phone'), start: selectedStart, timezone: (tzInput.value || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC') };
+  const payload = { name: form.get('name'), email: form.get('email'), phone: form.get('phone'), start: selectedStart, timezone: (tzInput.value || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'), source: {{ booking_source|tojson }} || null, source_ref: {{ booking_ref|tojson }} || null };
   bookBtn.disabled = true;
   bookBtn.textContent = 'Booking...';
   if (bookingOverlay) bookingOverlay.classList.remove('hidden');

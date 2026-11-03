@@ -10,6 +10,7 @@ from email_validator import EmailNotValidError, validate_email
 from app import db
 from app.models import User, Booking, CoachInvite, CoachProfile
 from app.auth.routes import roles_required
+from app.booking_source import DIRECT, source_label
 
 
 dash_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
@@ -235,6 +236,24 @@ def owner():
             "visitor": booking.visitor_name,
         })
 
+    # Where the last 30 days' bookings came from (booking.source), overall and per coach.
+    source_rows = (
+        db.session.query(Booking.source, Booking.status, Booking.coach_id)
+        .filter(Booking.created_at >= last_30)
+        .all()
+    )
+    sources_by_key = {}
+    coach_sources = {}
+    for src, status, coach_id in source_rows:
+        key = src or DIRECT
+        row = sources_by_key.setdefault(key, {"source": key, "label": source_label(src), "bookings": 0, "cancelled": 0})
+        row["bookings"] += 1
+        if status == "cancelled":
+            row["cancelled"] += 1
+        per_coach = coach_sources.setdefault(coach_id, {})
+        per_coach[key] = per_coach.get(key, 0) + 1
+    booking_sources = sorted(sources_by_key.values(), key=lambda r: (-r["bookings"], r["label"]))
+
     trend_rows = db.session.query(Booking.created_at, Booking.coach_id).filter(Booking.created_at >= trend_since).all()
     organisation_trend = _make_weekly_trend(trend_rows, now)
     coach_insights = []
@@ -253,6 +272,10 @@ def owner():
             "bookings_30": bookings_30,
             "upcoming_7": upcoming_7,
             "trend": coach_trend,
+            "sources": [
+                {"label": source_label(None if key == DIRECT else key), "count": count}
+                for key, count in sorted(coach_sources.get(coach.id, {}).items(), key=lambda kv: -kv[1])
+            ],
         })
 
     now_local_str = now.astimezone(display_tz).strftime("%-d %b %Y, %-I:%M %p")
@@ -272,6 +295,7 @@ def owner():
         upcoming=upcoming,
         upcoming_by_day=upcoming_by_day,
         coach_insights=coach_insights,
+        booking_sources=booking_sources,
         disconnected_coaches=disconnected_coaches,
         organisation_trend=organisation_trend,
         now=now,

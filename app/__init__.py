@@ -180,6 +180,17 @@ def create_app():
                 except Exception as _e:
                     db.session.rollback()
                     pass
+            # Auto-migrate: booking source tracking (where the booking came from).
+            for _col, _ddl in (("source", "VARCHAR(64)"), ("source_ref", "VARCHAR(128)")):
+                if _col not in booking_columns:
+                    try:
+                        print(f"Running migration: Adding {_col} column to booking table...")
+                        db.session.execute(text(f"ALTER TABLE booking ADD COLUMN {_col} {_ddl}"))
+                        db.session.commit()
+                        print(f"{_col} column added successfully")
+                    except Exception as _e:
+                        db.session.rollback()
+                        pass
         except Exception as e:
             # Migration already done or error - continue silently
             pass

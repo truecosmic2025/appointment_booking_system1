@@ -15,6 +15,9 @@ class Booking(db.Model):
     google_event_id = db.Column(db.String(255), nullable=True)
     meet_link = db.Column(db.String(512), nullable=True)
     token = db.Column(db.String(64), nullable=False, index=True)  # for reschedule/cancel links
+    # Where the booking came from (see app/booking_source.py), e.g. web-chat, whatsapp-done-deal-starter-kit, jess-call.
+    source = db.Column(db.String(64), nullable=True, index=True)
+    source_ref = db.Column(db.String(128), nullable=True)  # e.g. the Claudde conversation id
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     coach = db.relationship('User')
