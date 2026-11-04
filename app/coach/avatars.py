@@ -1,10 +1,10 @@
 """Coach avatars for the public /coaches page.
 
-Photos are read from the coaches site (coaches.truecosmic.com) so a coach's
-photo only ever needs changing in one place. Nothing is stored in this app's
-database: the list is fetched from the coaches site's public API, cached in
-memory, and any failure simply falls back to the coach's initials. A slow or
-unavailable coaches site must never break or noticeably slow the page.
+Photos come from the coaches site (coaches.truecosmic.com) so a coach's photo
+only ever needs changing in one place. The URLs are copied into this app's own
+database (coach_avatar table) by a background sync, and pages read only that
+copy, so a slow or unavailable coaches site never slows a page down, and the
+photos survive deploys. No photo simply falls back to the coach's initials.
 """
 
 import logging
@@ -19,12 +19,12 @@ log = logging.getLogger(__name__)
 
 COACHES_SITE_URL = os.getenv("COACHES_SITE_URL", "https://coaches.truecosmic.com").rstrip("/")
 
-CACHE_TTL_SECONDS = 3600
+CACHE_TTL_SECONDS = 3600  # how often the saved copy is refreshed
 # After a failed fetch, don't try again for this long so every page view
 # isn't held up waiting on a coaches site that is down. Kept short: a deploy
 # starts with an empty cache, so a slow first answer must not hide photos for long.
 FAILURE_RETRY_SECONDS = 30
-REQUEST_TIMEOUT_SECONDS = 6
+REQUEST_TIMEOUT_SECONDS = 15  # background only, so a slow site costs nothing
 
 # Calendar slug -> coaches-site slug, for coaches whose slug differs between
 # the two apps. Anything not listed here is matched by identical slug, then by
@@ -36,13 +36,13 @@ SLUG_ALIASES = {
 }
 
 _lock = threading.Lock()
-_cache = {"by_slug": {}, "by_name": {}, "fetched_at": 0.0, "next_attempt_at": 0.0}
+_state = {"next_sync_at": 0.0, "running": False}
 
 
 def reset_cache() -> None:
-    """Forget everything cached (used by tests)."""
+    """Forget sync timing (used by tests)."""
     with _lock:
-        _cache.update(by_slug={}, by_name={}, fetched_at=0.0, next_attempt_at=0.0)
+        _state.update(next_sync_at=0.0, running=False)
 
 
 def _normalise_name(name: str) -> str:
@@ -79,49 +79,93 @@ def _fetch_coaches() -> list | None:
     return data if isinstance(data, list) else None
 
 
-def _refresh_if_needed() -> None:
-    now = time.time()
-    with _lock:
-        fresh = _cache["fetched_at"] and now - _cache["fetched_at"] < CACHE_TTL_SECONDS
-        if fresh or now < _cache["next_attempt_at"]:
-            return
-        # Claim this attempt so concurrent requests don't all fetch at once.
-        _cache["next_attempt_at"] = now + FAILURE_RETRY_SECONDS
+def sync_now() -> bool:
+    """Copy the coaches site's photo URLs into the database. Needs an app context.
+
+    Returns True if the list was fetched and saved. On any failure the existing
+    copy is left untouched.
+    """
+    from app import db
+    from app.models.coach_avatar import CoachAvatar
 
     coaches = _fetch_coaches()
     if coaches is None:
-        return  # keep whatever we had; next_attempt_at already delays a retry
-
-    by_slug, by_name = {}, {}
+        return False
+    rows = {}
     for c in coaches:
         if not isinstance(c, dict):
             continue
         url = resolve_image_url(c.get("profileImage"))
-        if not url:
-            continue
         slug = (c.get("slug") or "").strip().lower()
-        if slug:
-            by_slug[slug] = url
-        name = _normalise_name(c.get("name") or "")
-        if name:
-            by_name[name] = url
+        if url and slug:
+            rows[slug] = (_normalise_name(c.get("name") or ""), url)
+    try:
+        existing = {r.site_slug: r for r in CoachAvatar.query.all()}
+        for slug, (name_key, url) in rows.items():
+            row = existing.pop(slug, None)
+            if row is None:
+                db.session.add(CoachAvatar(site_slug=slug, name_key=name_key, image_url=url))
+            else:
+                row.name_key, row.image_url = name_key, url
+        for stale in existing.values():  # coach removed their photo or left
+            db.session.delete(stale)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        log.exception("Coach avatars: could not save the coaches list")
+        return False
+    return True
 
+
+def _sync_in_thread(app) -> None:
+    ok = False
+    try:
+        with app.app_context():
+            ok = sync_now()
+    except Exception:
+        log.exception("Coach avatars: background sync failed")
     with _lock:
-        _cache.update(by_slug=by_slug, by_name=by_name, fetched_at=time.time(), next_attempt_at=0.0)
+        _state["running"] = False
+        _state["next_sync_at"] = time.time() + (CACHE_TTL_SECONDS if ok else FAILURE_RETRY_SECONDS)
 
 
-def avatar_for(slug: str | None, name: str | None = None) -> str | None:
-    """Best avatar URL for a calendar coach, or None if there isn't one."""
-    _refresh_if_needed()
+def sync_in_background(app, force: bool = False) -> bool:
+    """Start a background sync if one is due. Never blocks the caller."""
     with _lock:
-        by_slug, by_name = _cache["by_slug"], _cache["by_name"]
+        if _state["running"] or (not force and time.time() < _state["next_sync_at"]):
+            return False
+        _state["running"] = True
+    threading.Thread(target=_sync_in_thread, args=(app,), name="coach-avatar-sync", daemon=True).start()
+    return True
+
+
+class AvatarIndex:
+    def __init__(self, by_slug: dict, by_name: dict):
+        self.by_slug, self.by_name = by_slug, by_name
+
+    def get(self, slug: str | None, name: str | None = None) -> str | None:
         slug = (slug or "").strip().lower()
         if slug:
-            site_slug = SLUG_ALIASES.get(slug, slug)
-            if site_slug in by_slug:
-                return by_slug[site_slug]
+            url = self.by_slug.get(SLUG_ALIASES.get(slug, slug))
+            if url:
+                return url
         normalised = _normalise_name(name or "")
-        return by_name.get(normalised) if normalised else None
+        return self.by_name.get(normalised) if normalised else None
+
+
+def avatar_index() -> AvatarIndex:
+    """Photo lookup read from the database; kicks off a refresh in the background when due."""
+    from flask import current_app
+    from app.models.coach_avatar import CoachAvatar
+
+    if not current_app.config.get("TESTING"):
+        sync_in_background(current_app._get_current_object())
+    try:
+        rows = CoachAvatar.query.all()
+    except Exception:
+        log.exception("Coach avatars: could not read saved photos")
+        return AvatarIndex({}, {})
+    return AvatarIndex({r.site_slug: r.image_url for r in rows}, {r.name_key: r.image_url for r in rows if r.name_key})
 
 
 def initials_for(name: str | None) -> str:
@@ -132,8 +176,3 @@ def initials_for(name: str | None) -> str:
     if len(words) == 1:
         return words[0][0].upper()
     return (words[0][0] + words[-1][0]).upper()
-
-
-def warm_up_in_background() -> None:
-    """Fetch the coaches list at start-up so the first visitors already get photos."""
-    threading.Thread(target=_refresh_if_needed, name="coach-avatar-warmup", daemon=True).start()

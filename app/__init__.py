@@ -237,11 +237,11 @@ def create_app():
         db.session.commit()
         click.echo(f"Deleted: users={u}, coach_profiles={p}, bookings={b}")
 
-    # Pre-load coach photos so the first page views after a deploy already have them.
+    # Copy coach photo URLs from the coaches site in the background (never blocks start-up or pages).
     if os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("COACH_AVATAR_WARMUP") == "1":
         try:
-            from app.coach.avatars import warm_up_in_background
-            warm_up_in_background()
+            from app.coach.avatars import sync_in_background
+            sync_in_background(app, force=True)
         except Exception:
             pass
 

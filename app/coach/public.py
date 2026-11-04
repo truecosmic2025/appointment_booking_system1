@@ -8,7 +8,7 @@ from contextlib import nullcontext
 from flask_login import current_user
 
 from app.booking_source import clean_ref, clean_source, source_label
-from app.coach.avatars import avatar_for, initials_for
+from app.coach.avatars import avatar_index, initials_for
 from urllib.parse import urlencode
 from app.coach.i18n import STRINGS, pick_language
 from app import db
@@ -238,8 +238,9 @@ def coaches_list():
         .all()
     )
     profiles = {p.user_id: p for p in CoachProfile.query.filter(CoachProfile.user_id.in_([u.id for u in users])).all()}
+    photos = avatar_index()
     avatars = {
-        u.id: avatar_for(profiles[u.id].slug if u.id in profiles else None, u.name)
+        u.id: photos.get(profiles[u.id].slug if u.id in profiles else None, u.name)
         for u in users
     }
     initials = {u.id: initials_for(u.name) for u in users}
@@ -282,7 +283,7 @@ def coach_page(slug):
     return render_template("coaches/booking.html", coach=coach, profile=profile, hours=hours,
                          lang_query=urlencode({**request.args.to_dict(), "lang": "en" if lang == "es" else "es"}),
                          lang=lang, t=STRINGS[lang], other_lang=("en" if lang == "es" else "es"),
-                         avatar_url=avatar_for(profile.slug, coach.name), initials=initials_for(coach.name),
+                         avatar_url=avatar_index().get(profile.slug, coach.name), initials=initials_for(coach.name),
                          prefill_name=prefill_name, prefill_email=prefill_email, prefill_phone=prefill_phone,
                          booking_source=booking_source, booking_ref=booking_ref)
 
