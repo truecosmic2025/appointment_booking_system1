@@ -8,6 +8,7 @@ from contextlib import nullcontext
 from flask_login import current_user
 
 from app.booking_source import clean_ref, clean_source, source_label
+from app.coach.avatars import avatar_for, initials_for
 from app import db
 from app.models.user import User
 from app.models.coach_profile import CoachProfile
@@ -235,7 +236,12 @@ def coaches_list():
         .all()
     )
     profiles = {p.user_id: p for p in CoachProfile.query.filter(CoachProfile.user_id.in_([u.id for u in users])).all()}
-    return render_template("coaches/list.html", users=users, profiles=profiles)
+    avatars = {
+        u.id: avatar_for(profiles[u.id].slug if u.id in profiles else None, u.name)
+        for u in users
+    }
+    initials = {u.id: initials_for(u.name) for u in users}
+    return render_template("coaches/list.html", users=users, profiles=profiles, avatars=avatars, initials=initials)
 
 
 @public_bp.route("/c/<slug>")
