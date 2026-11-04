@@ -8,10 +8,10 @@
       {% for u in users %}
         <a href="/c/{{ profiles.get(u.id).slug if profiles.get(u.id) else '#' }}" class="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-5 hover:shadow">
           {# Initials sit underneath the photo, so if the photo fails to load it is removed and they show instead. #}
-          <div class="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-brand-100 ring-2 ring-brand-200">
-            <span class="absolute inset-0 flex items-center justify-center text-lg font-semibold text-brand-700" aria-hidden="true">{{ initials.get(u.id) }}</span>
+          <div class="relative shrink-0 overflow-hidden rounded-full bg-brand-100 ring-2 ring-brand-200" style="position:relative;width:64px;height:64px;min-width:64px;border-radius:9999px;overflow:hidden;background:#f0eafe;box-shadow:0 0 0 2px #e0d4fb;">
+            <span class="absolute inset-0 flex items-center justify-center text-lg font-semibold text-brand-700" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:#552f80;" aria-hidden="true">{{ initials.get(u.id) }}</span>
             {% if avatars.get(u.id) %}
-              <img src="{{ avatars.get(u.id) }}" alt="{{ u.name }}" loading="lazy" referrerpolicy="no-referrer" class="absolute inset-0 h-full w-full object-cover object-top" onerror="this.remove()">
+              <img src="{{ avatars.get(u.id) }}" alt="{{ u.name }}" loading="lazy" referrerpolicy="no-referrer" class="absolute inset-0 h-full w-full object-cover object-top" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;" onerror="this.remove()">
             {% endif %}
           </div>
           <div class="min-w-0">
