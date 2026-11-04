@@ -58,6 +58,22 @@
       </div>
     </div>
   </div>
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8" style="margin-top:32px;">
+    <div class="tc-card p-5 sm:p-6">
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+        {% if avatar_url %}<img src="{{ avatar_url }}" alt="{{ coach.name }}" referrerpolicy="no-referrer" style="width:56px;height:56px;border-radius:9999px;object-fit:cover;object-position:top;" onerror="this.remove()">{% endif %}
+        <div style="flex:1;min-width:220px;">
+          <h2 class="text-lg font-bold text-brand-950">What happens when you book</h2>
+          <p class="mt-1 text-sm text-slate-600">A relaxed, no-pressure 30-minute conversation with {{ coach.name }}, one of TrueCosmic's coaches.</p>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:20px;">
+        <div><p class="text-xs font-bold uppercase tracking-wide text-brand-600">1. Pick a time</p><p class="mt-1 text-sm text-slate-600">Choose a slot above. Times show in your own time zone.</p></div>
+        <div><p class="text-xs font-bold uppercase tracking-wide text-brand-600">2. Get your confirmation</p><p class="mt-1 text-sm text-slate-600">You'll get an email with the details and a calendar invite straight away.</p></div>
+        <div><p class="text-xs font-bold uppercase tracking-wide text-brand-600">3. Meet your coach</p><p class="mt-1 text-sm text-slate-600">Talk through where you are, what you want and whether coaching is right for you.</p></div>
+      </div>
+    </div>
+  </div>
 </section>
 <!-- Booking overlay shown during in-progress booking -->
 <div id="bookingOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
