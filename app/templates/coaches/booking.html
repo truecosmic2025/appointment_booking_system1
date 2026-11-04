@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Book {{ coach.name }} | TrueCosmic Calendar{% endblock %}
+{% block title %}{{ t.title.format(name=coach.name) }}{% endblock %}
 {% block content %}
 <section class="py-8 sm:py-14">
   <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
@@ -12,15 +12,16 @@
             <img src="{{ avatar_url }}" alt="{{ coach.name }}" referrerpolicy="no-referrer" class="coach-avatar-photo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;" onerror="this.remove()">
           {% endif %}
         </div>
-        <p class="text-xs font-bold uppercase tracking-wide text-brand-600">TrueCosmic session</p>
-        <h1 class="mt-2 text-2xl font-bold text-brand-950">Meet with {{ coach.name }}</h1>
-        <div class="mt-2 text-sm text-slate-600">A focused 30-minute coaching session.</div>
-        <div class="mt-4 inline-flex items-center gap-2 rounded-full {{ 'bg-emerald-50 text-emerald-800' if profile.google_credentials else 'bg-amber-50 text-amber-800' }} px-3 py-1.5 text-xs font-bold">{{ 'Google Calendar connected' if profile.google_credentials else 'Calendar connection unavailable' }}</div>
+        <p class="text-xs font-bold uppercase tracking-wide text-brand-600">{{ t.eyebrow }}</p>
+        <h1 class="mt-2 text-2xl font-bold text-brand-950">{{ t.meet.format(name=coach.name) }}</h1>
+        <div class="mt-2 text-sm text-slate-600">{{ t.tagline }}</div>
+        <div class="mt-3"><a href="?{{ lang_query }}" class="text-xs font-semibold text-brand-700 underline" hreflang="{{ other_lang }}">{{ t.switch_label }}</a></div>
+        <div class="mt-4 inline-flex items-center gap-2 rounded-full {{ 'bg-emerald-50 text-emerald-800' if profile.google_credentials else 'bg-amber-50 text-amber-800' }} px-3 py-1.5 text-xs font-bold">{{ t.cal_ok if profile.google_credentials else t.cal_bad }}</div>
         {% if hours %}
         <div class="mt-6 border-t border-brand-100 pt-5">
-          <div class="text-sm font-bold text-brand-950">Working hours <span class="font-medium text-slate-500">({{ profile.timezone or 'UTC' }})</span></div>
+          <div class="text-sm font-bold text-brand-950">{{ t.hours }} <span class="font-medium text-slate-500">({{ profile.timezone or 'UTC' }})</span></div>
           <ul class="mt-3 text-sm text-slate-600 space-y-2">
-            {% set labels = {'mon':'Mon','tue':'Tue','wed':'Wed','thu':'Thu','fri':'Fri','sat':'Sat','sun':'Sun'} %}
+            {% set labels = t.days %}
             {% for d in ['mon','tue','wed','thu','fri','sat','sun'] %}
               {% if hours.get(d) %}
                 <li>
@@ -39,19 +40,19 @@
     <div class="md:col-span-2">
       <div class="tc-card p-5 sm:p-6">
         <div class="flex items-center justify-between flex-wrap gap-3">
-          <div><p class="text-xs font-bold uppercase tracking-wide text-brand-600">Choose a time</p><h2 class="mt-1 text-xl font-bold text-brand-950">Find your moment</h2></div>
+          <div><p class="text-xs font-bold uppercase tracking-wide text-brand-600">{{ t.choose }}</p><h2 class="mt-1 text-xl font-bold text-brand-950">{{ t.find }}</h2></div>
           <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-xs font-semibold text-slate-500">Times in</span>
-            <input id="tzInput" list="tzlist" aria-label="Time zone" class="tc-input !w-44 !px-2.5 !py-2 text-xs" />
+            <span class="text-xs font-semibold text-slate-500">{{ t.times_in }}</span>
+            <input id="tzInput" list="tzlist" aria-label="{{ t.tz_label }}" class="tc-input !w-44 !px-2.5 !py-2 text-xs" />
             <datalist id="tzlist"></datalist>
-            <input id="date" type="date" aria-label="Appointment date" class="tc-input !w-auto !px-2.5 !py-2 text-sm" />
+            <input id="date" type="date" aria-label="{{ t.date_label }}" class="tc-input !w-auto !px-2.5 !py-2 text-sm" />
           </div>
         </div>
         <form id="bookForm" class="mt-6 grid grid-cols-1 sm:grid-cols-4 gap-3">
-          <input type="text" name="name" placeholder="Your name" aria-label="Your name" class="tc-input" value="{{ prefill_name }}" {% if prefill_name %}readonly{% endif %} required>
-          <input type="email" name="email" placeholder="Your email" aria-label="Your email" class="tc-input" value="{{ prefill_email }}" {% if prefill_email %}readonly{% endif %} required>
-          <input type="tel" name="phone" placeholder="Your phone number" aria-label="Your phone number" autocomplete="tel" inputmode="tel" class="tc-input" value="{{ prefill_phone }}" pattern="[0-9+().\-\s]{7,32}" title="Enter a valid phone number." required>
-          <button type="submit" class="tc-btn-primary" disabled id="bookBtn">Book 30 min</button>
+          <input type="text" name="name" placeholder="{{ t.name }}" aria-label="{{ t.name }}" class="tc-input" value="{{ prefill_name }}" {% if prefill_name %}readonly{% endif %} required>
+          <input type="email" name="email" placeholder="{{ t.email }}" aria-label="{{ t.email }}" class="tc-input" value="{{ prefill_email }}" {% if prefill_email %}readonly{% endif %} required>
+          <input type="tel" name="phone" placeholder="{{ t.phone }}" aria-label="{{ t.phone }}" autocomplete="tel" inputmode="tel" class="tc-input" value="{{ prefill_phone }}" pattern="[0-9+().\-\s]{7,32}" title="{{ t.phone_title }}" required>
+          <button type="submit" class="tc-btn-primary" disabled id="bookBtn">{{ t.book }}</button>
         </form>
         <div id="slots" class="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"></div>
         <div id="result" class="mt-4 text-sm" role="status" aria-live="polite"></div>
@@ -63,14 +64,14 @@
       <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
         {% if avatar_url %}<img src="{{ avatar_url }}" alt="{{ coach.name }}" referrerpolicy="no-referrer" style="width:56px;height:56px;border-radius:9999px;object-fit:cover;object-position:top;" onerror="this.remove()">{% endif %}
         <div style="flex:1;min-width:220px;">
-          <h2 class="text-lg font-bold text-brand-950">What happens when you book</h2>
-          <p class="mt-1 text-sm text-slate-600">A relaxed, no-pressure 30-minute conversation with {{ coach.name }}, one of TrueCosmic's coaches.</p>
+          <h2 class="text-lg font-bold text-brand-950">{{ t.what_h }}</h2>
+          <p class="mt-1 text-sm text-slate-600">{{ t.what_p.format(name=coach.name) }}</p>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:20px;">
-        <div><p class="text-xs font-bold uppercase tracking-wide text-brand-600">1. Pick a time</p><p class="mt-1 text-sm text-slate-600">Choose a slot above. Times show in your own time zone.</p></div>
-        <div><p class="text-xs font-bold uppercase tracking-wide text-brand-600">2. Get your confirmation</p><p class="mt-1 text-sm text-slate-600">You'll get an email with the details and a calendar invite straight away.</p></div>
-        <div><p class="text-xs font-bold uppercase tracking-wide text-brand-600">3. Meet your coach</p><p class="mt-1 text-sm text-slate-600">Talk through where you are, what you want and whether coaching is right for you.</p></div>
+        <div><p class="text-xs font-bold uppercase tracking-wide text-brand-600">{{ t.s1_h }}</p><p class="mt-1 text-sm text-slate-600">{{ t.s1_p }}</p></div>
+        <div><p class="text-xs font-bold uppercase tracking-wide text-brand-600">{{ t.s2_h }}</p><p class="mt-1 text-sm text-slate-600">{{ t.s2_p }}</p></div>
+        <div><p class="text-xs font-bold uppercase tracking-wide text-brand-600">{{ t.s3_h }}</p><p class="mt-1 text-sm text-slate-600">{{ t.s3_p }}</p></div>
       </div>
     </div>
   </div>
@@ -79,9 +80,9 @@
 <div id="bookingOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
   <div class="tc-card p-6 flex items-center gap-3 shadow-cosmic">
     <div class="h-6 w-6 border-2 border-brand-600 border-t-transparent rounded-full animate-spin"></div>
-    <div class="text-slate-800 font-medium">Booking your session…</div>
+    <div class="text-slate-800 font-medium">{{ t.overlay }}</div>
   </div>
-  <span class="sr-only" role="status" aria-live="polite">Booking in progress</span>
+  <span class="sr-only" role="status" aria-live="polite">{{ t.overlay_sr }}</span>
   <style>
     @keyframes tc-spin { to { transform: rotate(360deg); } }
     .animate-spin { animation: tc-spin 1s linear infinite; }
@@ -89,6 +90,7 @@
 </div>
 <script>
 const slug = {{ profile.slug|tojson }}
+const T = {{ t|tojson }};
 const dateInput = document.getElementById('date');
 const slotsEl = document.getElementById('slots');
 const bookForm = document.getElementById('bookForm');
@@ -119,13 +121,13 @@ dateInput.valueAsDate = new Date();
 initTz();
 
 async function loadSlots(){
-  slotsEl.innerHTML = '<div class="text-slate-500">Loading...</div>';
+  slotsEl.innerHTML = '<div class="text-slate-500">' + T.loading + '</div>';
   const d = dateInput.value || new Date().toISOString().substring(0,10);
   const res = await fetch(`/api/availability/${slug}?date=${d}`);
   const data = await res.json();
   const slots = data.slots || [];
   if(!slots.length){
-    slotsEl.innerHTML = '<div class="text-slate-500">No available slots for this day.</div>';
+    slotsEl.innerHTML = '<div class="text-slate-500">' + T.no_slots + '</div>';
     bookBtn.disabled = true;
     return;
   }
@@ -138,7 +140,7 @@ async function loadSlots(){
     const tz = tzInput.value || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
     let label;
     try {
-      label = dt.toLocaleTimeString([], {hour: 'numeric', minute:'2-digit', timeZone: tz});
+      label = dt.toLocaleTimeString(T.locale, {hour: 'numeric', minute:'2-digit', timeZone: tz});
     } catch(e) {
       label = dt.toUTCString().slice(17,22) + ' UTC';
     }
@@ -159,44 +161,43 @@ loadSlots();
 
 bookForm.addEventListener('submit', async (e)=>{
   e.preventDefault();
-  if(!selectedStart){ alert('Select a time'); return; }
+  if(!selectedStart){ alert(T.select_time); return; }
   const form = new FormData(bookForm);
   const payload = { name: form.get('name'), email: form.get('email'), phone: form.get('phone'), start: selectedStart, timezone: (tzInput.value || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'), source: {{ booking_source|tojson }} || null, source_ref: {{ booking_ref|tojson }} || null };
   bookBtn.disabled = true;
-  bookBtn.textContent = 'Booking...';
+  bookBtn.textContent = T.booking;
   if (bookingOverlay) bookingOverlay.classList.remove('hidden');
   try {
     const res = await fetch(`/api/book/${slug}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
     let data = {};
     try { data = await res.json(); } catch(_) {}
     if(res.ok && data.ok){
-      resultEl.innerHTML = `Booked! Meet link: <a class="text-brand-700 underline" href="${data.meet_link}" target="_blank">Join</a>. <br>Manage: <a class="text-brand-700 underline" href="${data.manage_url}">Reschedule/Cancel</a>`;
       resultEl.innerHTML = `
         <div class="rounded-lg border border-green-300 bg-green-50 p-4">
           <div class="flex items-start gap-3">
             <div class="h-6 w-6 rounded-full bg-green-600 text-white flex items-center justify-center text-sm">✓</div>
             <div class="text-xl sm:text-2xl font-semibold text-green-800">
-              Booked! Meet link: <a class="text-brand-700 underline font-bold" href="${data.meet_link}" target="_blank">Join</a>. Manage: <a class="text-brand-700 underline font-bold" href="${data.manage_url}">Reschedule/Cancel</a>
+              ${T.booked} ${T.meet_link}: <a class="text-brand-700 underline font-bold" href="${data.meet_link}" target="_blank">${T.join}</a>. ${T.manage}: <a class="text-brand-700 underline font-bold" href="${data.manage_url}">${T.resched}</a>
             </div>
           </div>
         </div>`;
       resultEl.insertAdjacentHTML('beforeend',
-        '<div class="mt-3 text-sm text-slate-600">Can’t find the confirmation email? Check your Spam or Junk folder. To use the booking, reschedule, or cancel links from that email, move it out of Spam/Junk into your inbox first.</div>'
+        '<div class="mt-3 text-sm text-slate-600">' + T.spam + '</div>'
       );
       resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
       bookForm.reset();
       selectedStart = null;
       bookBtn.disabled = true;
     } else {
-      resultEl.textContent = (data && (data.error || data.message)) || `Booking failed (${res.status})`;
+      resultEl.textContent = (data && (data.error || data.message)) || `${T.fail} (${res.status})`;
       bookBtn.disabled = false;
     }
   } catch (err) {
     console.error(err);
-    resultEl.textContent = 'Network error while booking. Please try again.';
+    resultEl.textContent = T.network;
     bookBtn.disabled = false;
   } finally {
-    bookBtn.textContent = 'Book 30 min';
+    bookBtn.textContent = T.book;
     if (bookingOverlay) bookingOverlay.classList.add('hidden');
   }
 });

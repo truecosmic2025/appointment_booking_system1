@@ -9,6 +9,8 @@ from flask_login import current_user
 
 from app.booking_source import clean_ref, clean_source, source_label
 from app.coach.avatars import avatar_for, initials_for
+from urllib.parse import urlencode
+from app.coach.i18n import STRINGS, pick_language
 from app import db
 from app.models.user import User
 from app.models.coach_profile import CoachProfile
@@ -273,10 +275,13 @@ def coach_page(slug):
     if prefill_phone:
         prefill_phone = _normalize_phone_e164(prefill_phone)
     
+    lang = pick_language(profile.slug, request.args.get('lang'))
     booking_source = clean_source(request.args.get('src')) or ''
     booking_ref = clean_ref(request.args.get('ref')) or ''
 
     return render_template("coaches/booking.html", coach=coach, profile=profile, hours=hours,
+                         lang_query=urlencode({**request.args.to_dict(), "lang": "en" if lang == "es" else "es"}),
+                         lang=lang, t=STRINGS[lang], other_lang=("en" if lang == "es" else "es"),
                          avatar_url=avatar_for(profile.slug, coach.name), initials=initials_for(coach.name),
                          prefill_name=prefill_name, prefill_email=prefill_email, prefill_phone=prefill_phone,
                          booking_source=booking_source, booking_ref=booking_ref)

@@ -173,6 +173,27 @@ class CoachesPageTests(unittest.TestCase):
         self.assertNotIn('class="coach-avatar-photo"', html)
         self.assertIn(">TT<", html)
 
+    def test_blanca_page_defaults_to_spanish_with_english_toggle(self):
+        user = User(email="blanca@example.test", name="Blanca Celis", role="host", timezone="UTC")
+        user.set_password("test-password")
+        db.session.add(user)
+        db.session.commit()
+        db.session.add(CoachProfile(user_id=user.id, slug="blanca-celis", timezone="UTC"))
+        db.session.commit()
+        with patch.object(avatars.requests, "get", return_value=_response(COACHES_PAYLOAD)):
+            es = self.client.get("/c/blanca-celis?name=Ana").get_data(as_text=True)
+            en = self.client.get("/c/blanca-celis?lang=en").get_data(as_text=True)
+            robert = self.client.get("/c/robert").get_data(as_text=True)
+            robert_es = self.client.get("/c/robert?lang=es").get_data(as_text=True)
+        self.assertIn("Reserva con Blanca Celis", es)
+        self.assertIn("Qué ocurre al reservar", es)
+        self.assertIn("name=Ana", es)  # prefill survives the language link
+        self.assertIn("lang=en", es)
+        self.assertIn("Meet with Blanca Celis", en)
+        self.assertIn("lang=es", en)
+        self.assertIn("Meet with Robert Meade", robert)
+        self.assertIn("Reserva con Robert Meade", robert_es)
+
 
 if __name__ == "__main__":
     unittest.main()
