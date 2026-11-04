@@ -277,6 +277,7 @@ def coach_page(slug):
     booking_ref = clean_ref(request.args.get('ref')) or ''
 
     return render_template("coaches/booking.html", coach=coach, profile=profile, hours=hours,
+                         avatar_url=avatar_for(profile.slug, coach.name), initials=initials_for(coach.name),
                          prefill_name=prefill_name, prefill_email=prefill_email, prefill_phone=prefill_phone,
                          booking_source=booking_source, booking_ref=booking_ref)
 

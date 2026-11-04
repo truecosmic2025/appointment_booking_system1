@@ -161,6 +161,15 @@ class CoachesPageTests(unittest.TestCase):
         self.assertIn(">RM<", html)
         self.assertNotIn('alt="Robert Meade"', html)
 
+    def test_coach_own_page_shows_their_photo_or_initials(self):
+        with patch.object(avatars.requests, "get", return_value=_response(COACHES_PAYLOAD)):
+            html = self.client.get("/c/robert").get_data(as_text=True)
+            self.assertIn('class="coach-avatar-photo"', html)
+            self.assertIn("https://truecosmic.com/academy/robert.jpg.webp", html)
+            html = self.client.get("/c/truecosmic-team").get_data(as_text=True)
+        self.assertNotIn('class="coach-avatar-photo"', html)
+        self.assertIn(">TT<", html)
+
 
 if __name__ == "__main__":
     unittest.main()
