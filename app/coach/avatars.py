@@ -21,9 +21,10 @@ COACHES_SITE_URL = os.getenv("COACHES_SITE_URL", "https://coaches.truecosmic.com
 
 CACHE_TTL_SECONDS = 3600
 # After a failed fetch, don't try again for this long so every page view
-# isn't held up waiting on a coaches site that is down.
-FAILURE_RETRY_SECONDS = 300
-REQUEST_TIMEOUT_SECONDS = 3
+# isn't held up waiting on a coaches site that is down. Kept short: a deploy
+# starts with an empty cache, so a slow first answer must not hide photos for long.
+FAILURE_RETRY_SECONDS = 30
+REQUEST_TIMEOUT_SECONDS = 6
 
 # Calendar slug -> coaches-site slug, for coaches whose slug differs between
 # the two apps. Anything not listed here is matched by identical slug, then by
@@ -131,3 +132,8 @@ def initials_for(name: str | None) -> str:
     if len(words) == 1:
         return words[0][0].upper()
     return (words[0][0] + words[-1][0]).upper()
+
+
+def warm_up_in_background() -> None:
+    """Fetch the coaches list at start-up so the first visitors already get photos."""
+    threading.Thread(target=_refresh_if_needed, name="coach-avatar-warmup", daemon=True).start()
